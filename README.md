@@ -7,11 +7,11 @@ An open-source TV interface for your HTPC that can run on Chrome & Firefox.
 # Features
 
 - Use your phone as a remote
-- Add shows to your library
+- Add movies & shows to your library
 - Send friend requests to users
 
 # To-do
 
-- [ ] Movies support
+- [x] Movies support
 - [ ] Friend chats
 - [ ] Watch parties

@@ -58,8 +58,8 @@ const pkg = {
       callback;
     }
 
-    async function searchShow(showName) {
-      const url = `https://api.themoviedb.org/3/search/tv?query=${showName}&include_adult=true&language=en-US&page=1`;
+    async function searchMovie(movieName) {
+      const url = `https://api.themoviedb.org/3/search/movie?query=${movieName}&include_adult=true&language=en-US&page=1`;
       const options = {
         method: "GET",
         headers: {
@@ -79,12 +79,11 @@ const pkg = {
 
     let responseData = {
       cancelled: true,
-      season: null,
-      showName: null,
-      showDesc: null,
-      showCover: null,
-      showPoster: null,
-      showFolder: null,
+      movieName: null,
+      movieDesc: null,
+      movieCover: null,
+      moviePoster: null,
+      movieFile: null,
       nsfw: false,
     };
 
@@ -134,9 +133,9 @@ const pkg = {
     let UiElems = [];
     let launchArgs = Root.Arguments !== undefined ? Root.Arguments[0] : {};
 
-    new Html("h1").text("Add a show").appendTo(wrapper);
-    new Html("p").text("Add a show to your library.").appendTo(wrapper);
-    new Html("h2").text("Search by show").appendTo(wrapper);
+    new Html("h1").text("Add a movie").appendTo(wrapper);
+    new Html("p").text("Add a movie to your library.").appendTo(wrapper);
+    new Html("h2").text("Search by movie").appendTo(wrapper);
     let cover = new Html("img")
       .styleJs({
         zIndex: -1,
@@ -156,19 +155,19 @@ const pkg = {
     const row = new Html("div").class("flex-list").appendTo(wrapper);
 
     async function searchCallback() {
-      let apiData = await searchShow(textData["showName"]);
+      let apiData = await searchMovie(textData["movieName"]);
       console.log(apiData);
       foundList.clear();
-      apiData.results.forEach((show) => {
-        console.log(show);
+      apiData.results.forEach((movie) => {
+        console.log(movie);
         let button = new Html("button");
         let img = new Html("img");
         let title = new Html("p");
 
-        let posterPath = `https://image.tmdb.org/t/p/w400${show.poster_path}`;
-        let coverPath = `https://image.tmdb.org/t/p/original${show.backdrop_path}`;
+        let posterPath = `https://image.tmdb.org/t/p/w400${movie.poster_path}`;
+        let coverPath = `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
 
-        title.text(show.name);
+        title.text(movie.original_title);
         img.attr({ src: posterPath });
 
         button
@@ -182,13 +181,13 @@ const pkg = {
             padding: "10px",
           })
           .on("click", () => {
-            showName.text(show.name);
-            responseData.showName = show.name;
-            responseData.showDesc = show.overview;
-            responseData.showCover = coverPath;
-            responseData.showPoster = posterPath;
-            responseData.nsfw = show.adult;
-            if (!show.adult) {
+            movieName.text(movie.original_title);
+            responseData.movieName = movie.original_title;
+            responseData.movieDesc = movie.overview;
+            responseData.movieCover = coverPath;
+            responseData.moviePoster = posterPath;
+            responseData.nsfw = movie.adult;
+            if (!movie.adult) {
               cover.attr({ src: coverPath });
               cover.styleJs({ opacity: "1", transform: "scale(1)" });
               document.dispatchEvent(
@@ -201,7 +200,7 @@ const pkg = {
             } else {
               Root.Libs.Notify.show(
                 "Cover hidden",
-                `This show contains NSFW content`
+                `This movie contains NSFW content`
               );
               cover.styleJs({ opacity: "0", transform: "scale(1.5)" });
             }
@@ -211,7 +210,7 @@ const pkg = {
 
         img.styleJs({ width: "70%" });
 
-        if (show.adult) {
+        if (movie.adult) {
           img.styleJs({ filter: "blur(20px)" });
         }
 
@@ -220,17 +219,12 @@ const pkg = {
         button.appendTo(foundList);
       });
       Root.Libs.Notify.show(
-        "Shows found",
-        `Found ${apiData.results.length} results that match "${textData["showName"]}"`
+        "Movies found",
+        `Found ${apiData.results.length} results that match "${textData["movieName"]}"`
       );
       foundInd.styleJs({ display: "block" });
       foundList.styleJs({ display: "flex" });
-      UiElems = [
-        row.elm.children,
-        row2.elm.children,
-        foundList.elm.children,
-        row3.elm.children,
-      ];
+      UiElems = [row.elm.children, foundList.elm.children, row2.elm.children];
       Ui.init(Pid, "horizontal", UiElems, function (e) {
         if (e === "menu" || e === "back") {
           closeSequence();
@@ -238,44 +232,30 @@ const pkg = {
       });
     }
 
-    let showName = new Html("button")
+    let movieName = new Html("button")
       .class("input-box")
       .on("click", (e) => {
         promptForInput(
-          "Show Name",
-          "Enter your show's name",
+          "Movie Name",
+          "Enter your movie's name",
           e.target,
           false,
-          "showName"
+          "movieName"
         );
       })
       .appendTo(row);
 
     new Html("button")
-      .text("Search show")
+      .text("Search movie")
       .on("click", (e) => {
         searchCallback();
       })
       .appendTo(row);
 
-    let selectedFolder = null;
-    const row2 = new Html("div").class("flex-list").appendTo(wrapper);
-    new Html("button")
-      .class("input-box")
-      .text("Season...")
-      .on("click", (e) => {
-        promptForInput(
-          "Season",
-          "Enter your show's season",
-          e.target,
-          false,
-          "showSeason"
-        );
-      })
-      .appendTo(row2);
+    let selectedFile = null;
 
     let foundInd = new Html("h2")
-      .text("Found shows")
+      .text("Found movies")
       .appendTo(wrapper)
       .styleJs({ display: "none" });
     let foundList = new Html("div")
@@ -287,22 +267,23 @@ const pkg = {
         display: "none",
       });
 
-    new Html("h2").text("Episodes").appendTo(wrapper);
-    let epInd = new Html("p").text("No folder selected").appendTo(wrapper);
-    const row3 = new Html("div")
+    new Html("h2").text("Movie file").appendTo(wrapper);
+    let epInd = new Html("p").text("No file selected").appendTo(wrapper);
+    const row2 = new Html("div")
       .class("flex-list")
       .appendMany(
-        new Html("button").text("Import from folder").on("click", async (e) => {
+        new Html("button").text("Import file").on("click", async (e) => {
           Ui.transition("popOut", wrapper, 500, true);
           await Root.Libs.startPkg(
             "apps:FileManager",
             [
               {
-                title: "Choose a folder where the show is stored",
-                folderSelect: true,
+                title: "Choose the movie's file",
+                fileSelect: true,
+                filterExtensions: ["mp4", "webm", "avi", "mkv"],
                 callback: function (arg) {
                   if (!arg.cancelled) {
-                    selectedFolder = arg.selected;
+                    selectedFile = arg.selected;
                     epInd.text(`Selected: ${arg.selected}`);
                   }
                 },
@@ -311,14 +292,13 @@ const pkg = {
             true
           );
         }),
-        new Html("button").text("Add show").on("click", async (e) => {
-          if (selectedFolder == null) {
+        new Html("button").text("Add movie").on("click", async (e) => {
+          if (selectedFile == null) {
             await Root.Libs.Modal.Show({
               parent: wrapper,
               pid: Root.Pid,
-              title: "Please select a folder",
-              description:
-                "Please select where Movies & TV will grab the show.",
+              title: "Please select a file",
+              description: "Please select the file Movies & TV will play.",
               buttons: [
                 {
                   type: "primary",
@@ -328,15 +308,15 @@ const pkg = {
             });
             return;
           }
-          if (responseData.showName == null) {
-            responseData.showName = textData["showName"];
-            if (responseData.showName == null) {
+          if (responseData.movieName == null) {
+            responseData.movieName = textData["movieName"];
+            if (responseData.movieName == null) {
               await Root.Libs.Modal.Show({
                 parent: wrapper,
                 pid: Root.Pid,
                 title: "Please choose a name",
                 description:
-                  "Please choose the name Movies & TV will display for the show.\n Alternatively, you can search for shows using the Search by Show feature.",
+                  "Please choose the name Movies & TV will display for the movie.\n Alternatively, you can search for shows using the Search by Movie feature.",
                 buttons: [
                   {
                     type: "primary",
@@ -347,13 +327,7 @@ const pkg = {
             }
             return;
           }
-          if (responseData.season == null) {
-            responseData.season = textData["showSeason"];
-            if (responseData.season == null) {
-              responseData.season = 1;
-            }
-          }
-          responseData.showFolder = selectedFolder;
+          responseData.movieFile = selectedFile;
           responseData.cancelled = false;
           if (launchArgs.callback) {
             launchArgs.callback(responseData);
@@ -367,7 +341,7 @@ const pkg = {
       )
       .appendTo(wrapper);
 
-    UiElems = [row.elm.children, row2.elm.children, row3.elm.children];
+    UiElems = [row.elm.children, row2.elm.children];
 
     Ui.init(Pid, "horizontal", UiElems, function (e) {
       if (e === "menu" || e === "back") {

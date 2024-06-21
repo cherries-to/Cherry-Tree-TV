@@ -247,9 +247,19 @@ const pkg = {
       let launchArgs = Root.Arguments !== undefined ? Root.Arguments[0] : {};
 
       let folderSelector = false;
+      let fileSelector = false;
+      let filterExtensions = null;
 
       if (launchArgs.folderSelect) {
         folderSelector = launchArgs.folderSelect;
+      }
+
+      if (launchArgs.fileSelect) {
+        fileSelector = launchArgs.fileSelect;
+      }
+
+      if (launchArgs.filterExtensions) {
+        filterExtensions = launchArgs.filterExtensions;
       }
 
       let title = "File Manager";
@@ -299,6 +309,34 @@ const pkg = {
                 resolve(respItem);
                 pkg.end();
               });
+          }
+          if (fileSelector && item.type == "file") {
+            let put = false;
+            if (!filterExtensions) {
+              put = true;
+            } else {
+              let re = /(?:\.([^.]+))?$/;
+              let ext = re.exec(item.name)[1];
+              if (filterExtensions.includes(ext)) {
+                put = true;
+              }
+            }
+            if (put) {
+              new Html("button")
+                .text("Select file")
+                .appendTo(row)
+                .on("click", () => {
+                  let respItem = {
+                    cancelled: false,
+                    selected: path + item.name,
+                  };
+                  if (launchArgs.callback) {
+                    launchArgs.callback(respItem);
+                  }
+                  resolve(respItem);
+                  pkg.end();
+                });
+            }
           }
           UiElems.push(row.elm.children);
         });

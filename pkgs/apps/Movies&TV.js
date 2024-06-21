@@ -66,22 +66,50 @@ const pkg = {
 
     const row1 = new Html("div").class("flex-list").appendTo(wrapper);
 
-    movies.forEach((movie) => {
+    let noMovies = new Html("button")
+      .text("No movies have been added")
+      .appendTo(row1);
+
+    watchList.movies.forEach((movie, index) => {
+      if (noMovies) {
+        noMovies.cleanup();
+        noMovies = null;
+      }
       console.log(movie);
       let button = new Html("button");
       let img = new Html("img");
       let title = new Html("p");
 
-      title.text(movie.title);
-      img.attr({ src: movie.cover });
+      title.text(movie.movieName);
+      img.attr({ src: movie.moviePoster });
 
-      button.styleJs({
-        display: "Flex",
-        flexDirection: "column",
-        width: "40px",
-        height: "100%",
-        gap: "10px",
-      });
+      button
+        .styleJs({
+          display: "flex",
+          flexDirection: "column",
+          width: "40px",
+          height: "100%",
+          gap: "10px",
+        })
+        .on("click", async (e) => {
+          Ui.transition("popOut", wrapper, 500, true);
+          await Root.Libs.startPkg(
+            "apps:MovieViewer",
+            [
+              movie,
+              {
+                callback: async function (remove) {
+                  if (remove) {
+                    watchList.movies.splice(index, 1);
+                    button.cleanup();
+                    await vfs.writeFile(dataPath, JSON.stringify(watchList));
+                  }
+                },
+              },
+            ],
+            true
+          );
+        });
 
       title.styleJs({ textAlign: "center", width: "100%" });
 
@@ -90,25 +118,9 @@ const pkg = {
       img.appendTo(button);
       title.appendTo(button);
       button.appendTo(row1);
-      button.on("click", () => {
-        let audio = Sfx.getAudio();
-        audio.pause();
-      });
     });
 
     new Html("h2").text("Shows").appendTo(wrapper);
-    // new Html("p")
-    //   .text("Play around with some in-development features")
-    //   .appendTo(wrapper);
-
-    let shows = [
-      {
-        title: "KONOSUBA - God's blessing on this wonderful world!",
-        cover:
-          "https://image.tmdb.org/t/p/w400/oRaOeQlwktbGSd2T31FYAcgHZlh.jpg",
-      },
-    ];
-
     const row2 = new Html("div").class("flex-list").appendTo(wrapper);
 
     let noShows = new Html("button")
@@ -168,6 +180,93 @@ const pkg = {
     new Html("h2").text("Add...").appendTo(wrapper);
 
     const row3 = new Html("div").class("flex-list").appendTo(wrapper);
+
+    async function movieCreated(data) {
+      if (data.cancelled) {
+        return;
+      }
+      console.log(data);
+      watchList.movies.push(data);
+      await vfs.writeFile(dataPath, JSON.stringify(watchList));
+
+      row1.clear();
+
+      watchList.movies.forEach((movie, index) => {
+        if (noMovies) {
+          noMovies.cleanup();
+          noMovies = null;
+        }
+        console.log(movie);
+        let button = new Html("button");
+        let img = new Html("img");
+        let title = new Html("p");
+
+        title.text(movie.movieName);
+        img.attr({ src: movie.moviePoster });
+
+        button
+          .styleJs({
+            display: "flex",
+            flexDirection: "column",
+            width: "40px",
+            height: "100%",
+            gap: "10px",
+          })
+          .on("click", async (e) => {
+            Ui.transition("popOut", wrapper, 500, true);
+            await Root.Libs.startPkg(
+              "apps:MovieViewer",
+              [
+                movie,
+                {
+                  callback: async function (remove) {
+                    if (remove) {
+                      watchList.movies.splice(index, 1);
+                      await vfs.writeFile(dataPath, JSON.stringify(watchList));
+                      button.cleanup();
+                    }
+                  },
+                },
+              ],
+              true
+            );
+          });
+
+        title.styleJs({ textAlign: "center", width: "100%" });
+
+        img.styleJs({ width: "100%" });
+
+        img.appendTo(button);
+        title.appendTo(button);
+        button.appendTo(row1);
+      });
+
+      Ui.init(
+        Root.Pid,
+        "horizontal",
+        [row1.elm.children, row2.elm.children, row3.elm.children],
+        function (e) {
+          if (e === "menu" || e === "back") {
+            Root.end();
+          }
+        }
+      );
+
+      setTimeout(async () => {
+        await Root.Libs.Modal.Show({
+          parent: wrapper,
+          pid: Root.Pid,
+          title: "Movie added",
+          description: `${data.movieName} has been added to your library.`,
+          buttons: [
+            {
+              type: "primary",
+              text: "OK",
+            },
+          ],
+        });
+      }, 500);
+    }
 
     async function showCreated(data) {
       if (data.cancelled) {
@@ -258,7 +357,12 @@ const pkg = {
 
     row3.appendMany(
       new Html("button").text("Add movies").on("click", async (e) => {
-        await Root.end();
+        Ui.transition("popOut", wrapper, 500, true);
+        await Root.Libs.startPkg(
+          "apps:MoviesManager",
+          [{ callback: movieCreated }],
+          true
+        );
       }),
       new Html("button").text("Add shows").on("click", async (e) => {
         Ui.transition("popOut", wrapper, 500, true);
