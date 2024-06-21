@@ -138,11 +138,11 @@ async function start() {
       });
       c.on("close", () => {
         alert("Connection closed.");
-        location.replace('?');
+        location.href = `${location.protocol}//${location.host}/link`;
       });
       c.on("error", (err) => {
         alert("Connection error.\n\n" + err);
-        location.replace('?');
+        location.href = `${location.protocol}//${location.host}/link`;
       });
     });
   }
