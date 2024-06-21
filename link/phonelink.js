@@ -30,18 +30,25 @@ async function start() {
   const panelCode = document.querySelector('[data-ui="code"]');
   const panelRemote = document.querySelector('[data-ui="remote"]');
   const panelKeyboard = document.querySelector('[data-ui="keyboard"]');
-
-  let peer = null,
-    conn = null;
-
-  await animateIn(panelCode);
-
   const pcInput = panelCode.querySelector("input");
   const pcPress = panelCode.querySelector("button");
   const bgButton = panelRemote.querySelector("button#bg");
   const pkHeader = panelKeyboard.querySelector("h2");
   const pkParagraph = panelKeyboard.querySelector("p");
   const pkInput = panelKeyboard.querySelector("input");
+
+  let peer = null,
+    conn = null;
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  if (urlParams.has("code")) {
+    let code = urlParams.get("code");
+    pcInput.value = code;
+    connect();
+  }
+
+  await animateIn(panelCode);
 
   panelRemote.querySelectorAll("button").forEach((btn) => {
     if (btn.dataset.action === "mic") {
@@ -131,11 +138,11 @@ async function start() {
       });
       c.on("close", () => {
         alert("Connection closed.");
-        location.reload();
+        location.replace('?');
       });
       c.on("error", (err) => {
         alert("Connection error.\n\n" + err);
-        location.reload();
+        location.replace('?');
       });
     });
   }
@@ -149,13 +156,6 @@ async function start() {
   pcPress.addEventListener("click", async () => {
     connect();
   });
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  if (urlParams.has("code")) {
-    let code = urlParams.get("code");
-    pcInput.value = code;
-    connect();
-  }
 }
 
 start();

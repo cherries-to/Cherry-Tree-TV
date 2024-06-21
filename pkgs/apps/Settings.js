@@ -122,31 +122,31 @@ const pkg = {
     new Html("h2").text("Input").appendTo(wrapper);
     new Html("p").text("Configure input methods.").appendTo(wrapper);
 
+    let phoneLinkStatus = new Html("p")
+      .html(`Phone Link code:&nbsp;`)
+      .append(new Html("strong").text(window.phoneLinkCode))
+      .appendTo(wrapper);
+
     let qr = new Html("img")
       .styleJs({
         borderRadius: "5px",
         width: "20%",
       })
-      .appendTo(wrapper);
-
-    fetch("http://localhost:9864/local_ip")
-      .then((res) => res.text())
-      .then((ip) => {
-        qr.attr({
-          src: `${location.protocol}//${location.hostname}:9864/qr?url=${location.protocol}//${ip}:${location.port}/link/index.html?code=${window.phoneLinkCode}`,
-        });
-      });
-
-    let phoneLinkStatus = new Html("p")
-      .html(`Phone Link code:&nbsp;`)
-      .append(new Html("strong").text(window.phoneLinkCode))
-      .appendTo(wrapper);
+      .appendTo(phoneLinkStatus);
 
     function showTvLinkCode() {
       phoneLinkStatus.style({ display: "block" });
 
       phoneLinkStatus.elm.querySelector("strong").textContent =
         window.phoneLinkCode;
+
+      fetch("http://localhost:9864/local_ip")
+        .then((res) => res.text())
+        .then((ip) => {
+          qr.attr({
+            src: `${location.protocol}//${location.hostname}:9864/qr?url=${location.protocol}//${ip}:${location.port}/link/index.html?code=${window.phoneLinkCode}`,
+          });
+        });
     }
     function hideTvLinkCode() {
       phoneLinkStatus.style({ display: "none" });
@@ -210,7 +210,7 @@ const pkg = {
 
           // Ui.transition("popOut", wrapper, 500, true);
           // await Root.Libs.startPkg("apps:ControllerRemapping", [], true);
-        })
+        }),
     );
 
     new Html("h2").text("Display").appendTo(wrapper);

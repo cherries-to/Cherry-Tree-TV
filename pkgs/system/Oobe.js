@@ -487,7 +487,9 @@ const pkg = {
           new Html("div").class("flex-col").appendMany(
             new Html("img")
               .attr({
-                src: `${location.protocol}//${location.hostname}:9864/qr?url=${location.protocol}//${ip}:${location.port}/link/index.html?code=${window.phoneLinkCode}`,
+                src: `http://127.0.0.1:9864/qr?url=${location.protocol}//${ip}:${location.port}/link/index.html?code=${window.phoneLinkCode}`,
+
+                // src: `${location.protocol}//${location.hostname}:9864/qr?url=${location.protocol}//${ip}:${location.port}/link/index.html?code=${window.phoneLinkCode}`,
               })
               .styleJs({
                 borderRadius: "5px",

@@ -39,7 +39,9 @@ input[type="text"]:focus {
 
 #bg {
   background-color: black;
-  /* background-image: url("./channels4_profile.jpg"); */
+  /* real background leak 2024 */
+  /* background-image: url("./channels4_profile.jpg");
+  background-size: cover; */
   background-image: url("cherryTV.svg");
   background-size: contain;
   background-repeat: no-repeat;
