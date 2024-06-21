@@ -91,8 +91,8 @@ const pkg = {
     let userSvc = Root.Processes.getService("UserSvc").data;
 
     await Root.Core.pkg.run("ui:Background", [], true);
+    await Root.Core.pkg.run("ui:VolumeIndicator", [], true);
     await Root.Core.pkg.run("ui:StatusIndicator", [], true);
-
     // doEverythingElse();
 
     async function doEverythingElse() {

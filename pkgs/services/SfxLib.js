@@ -134,6 +134,9 @@ const pkg = {
       SoundManager.setVolume(v);
       window.setVolume(v);
     },
+    getVolume: (v) => {
+      return SoundManager.vol ?? 1;
+    },
     // get() {
     //   return Data;
     // },

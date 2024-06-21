@@ -132,7 +132,7 @@ async function start() {
             }
           }, 500);
           setTimeout(() => {
-            bgButton.style.opacity = 0.4;
+            bgButton.style.opacity = 0.3;
           }, 1000);
         }
       });
