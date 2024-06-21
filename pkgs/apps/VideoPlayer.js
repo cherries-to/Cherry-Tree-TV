@@ -1,6 +1,6 @@
 import Html from "/libs/html.js";
 
-let wrapper, Ui, Pid, Sfx;
+let wrapper, Ui, Pid, Sfx, volumeUpdate;
 
 const pkg = {
   name: "Video Player",
@@ -83,7 +83,7 @@ const pkg = {
     let bottom;
     let playPause;
     let progress;
-    let timeElapsed;
+    let timeElapsed, timeElapsedFront, timeElapsedMiddle, timeElapsedBack;
     let captionToggle;
     let vidInfo;
 
@@ -137,13 +137,15 @@ const pkg = {
         .appendTo(wrapper)
         .styleJs({
           position: "absolute",
-          bottom: "0",
+          bottom: "1rem",
           zIndex: "100",
-          width: "100%",
-          opacity: 0,
-          height: "50px",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          transition: "all 0.1s linear",
+          width: "calc(100% - 2rem)",
+          opacity: "1",
+          left: "1rem",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          transition: "0.1s linear",
+          padding: "1rem",
+          borderRadius: "8px",
         })
         .appendTo(wrapper);
       vidInfo = new Html("div").class("flex-column").appendTo(wrapper).styleJs({
@@ -194,12 +196,24 @@ const pkg = {
           justifyContent: "center",
           padding: "0",
         });
-      timeElapsed = new Html("p")
-        .text("00:00 / 00:00")
-        .appendTo(bottom)
-        .styleJs({ width: "10%" });
+      timeElapsed = new Html("p").appendTo(bottom).styleJs({
+        flexShrink: "0",
+        display: "flex",
+        "align-items": "center",
+        gap: "8px",
+      });
+      timeElapsedFront = new Html("span").styleJs({ fontSize: "1.3rem" });
+      timeElapsedMiddle = new Html("span")
+        .styleJs({ opacity: 0.7, fontSize: "1.8rem" })
+        .text("/");
+      timeElapsedBack = new Html("span").styleJs({ fontSize: "1.3rem" });
+      timeElapsed.appendMany(
+        timeElapsedFront,
+        timeElapsedMiddle,
+        timeElapsedBack
+      );
       progress = new Html("input").appendTo(bottom).styleJs({
-        width: "50%",
+        "flex-grow": "1",
         color: "var(--current-player)",
         border: "none",
       });
@@ -262,7 +276,6 @@ const pkg = {
           videoElm.elm.currentTime = newTime;
         })
         .styleJs({
-          width: "20%",
           height: "50px",
           display: "flex",
           flexDirection: "column",
@@ -289,7 +302,8 @@ const pkg = {
       videoElm.on("loadedmetadata", () => {
         const videoDuration = Math.round(videoElm.elm.duration);
         const time = formatTime(videoDuration);
-        timeElapsed.text(`00:00 / ${time.minutes}:${time.seconds}`);
+        timeElapsedFront.text("00:00");
+        timeElapsedBack.text(`${time.minutes}:${time.seconds}`);
         progress.attr({
           type: "range",
           min: 0,
@@ -302,9 +316,8 @@ const pkg = {
         const duration = formatTime(videoDuration);
         const videoElapsed = Math.round(videoElm.elm.currentTime);
         const elapsed = formatTime(videoElapsed);
-        timeElapsed.text(
-          `${elapsed.minutes}:${elapsed.seconds} / ${duration.minutes}:${duration.seconds}`
-        );
+        timeElapsedFront.text(`${elapsed.minutes}:${elapsed.seconds}`);
+        timeElapsedBack.text(`${duration.minutes}:${duration.seconds}`);
         progress.attr({
           type: "range",
           min: 0,
@@ -312,6 +325,11 @@ const pkg = {
           value: videoElm.elm.currentTime,
         });
       });
+      videoElm.elm.volume = Sfx.getVolume();
+      volumeUpdate = (e) => {
+        videoElm.elm.volume = e.detail / 100;
+      };
+      document.addEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
       videoElm.on("play", () => {
         playPause.html(icons["pause"]);
         Sfx.playSfx("deck_ui_switch_toggle_on.wav");
@@ -378,6 +396,7 @@ const pkg = {
     // await Ui.transition("popOut", wrapper);
     Ui.giveUpUi(Pid);
     wrapper.cleanup();
+    document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
   },
 };
 

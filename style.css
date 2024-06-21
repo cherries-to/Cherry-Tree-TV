@@ -255,6 +255,26 @@ ul {
     opacity: 0;
   }
 }
+@keyframes slideUpIn {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes slideUpOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
 @keyframes pop {
   from {
     transform: scale(1);
@@ -316,6 +336,14 @@ ul {
 .slideOut {
   pointer-events: none;
   animation: slideOut 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+.slideUpIn {
+  pointer-events: none;
+  animation: slideUpIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+.slideUpOut {
+  pointer-events: none;
+  animation: slideUpOut 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 .fadeIn {
   pointer-events: none;

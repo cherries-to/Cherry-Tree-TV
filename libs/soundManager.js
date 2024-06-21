@@ -37,6 +37,7 @@ export class soundManager {
   }
 
   setVolume(volume) {
+    this.vol = volume;
     this.gainNode.gain.value = volume;
   }
 }

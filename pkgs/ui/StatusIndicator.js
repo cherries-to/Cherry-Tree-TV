@@ -2,7 +2,7 @@ import Html from "/libs/html.js";
 import { Peer } from "https://esm.sh/peerjs@1.5.4?bundle-deps";
 
 const pkg = {
-  name: "Simple",
+  name: "Status Indicator",
   type: "app",
   privs: 0,
   start: async function (Root) {
@@ -136,7 +136,18 @@ const pkg = {
           try {
             if (data.input) {
               if (typeof data.input !== "string") return;
-              if (!inputs.includes(data.input)) return;
+              if (!inputs.includes(data.input)) {
+                if (data.input === "volDown") {
+                  document.dispatchEvent(
+                    new CustomEvent("CherryTree.Input.VolumeDown")
+                  );
+                } else if (data.input === "volUp") {
+                  document.dispatchEvent(
+                    new CustomEvent("CherryTree.Input.VolumeUp")
+                  );
+                }
+                return;
+              }
               window.Libs.Input.pop(data.input, 5);
             }
             if (data.textInput !== undefined) {
