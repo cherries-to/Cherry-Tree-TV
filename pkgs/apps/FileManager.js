@@ -20,7 +20,7 @@ const pkg = {
 
       Sfx = Root.Processes.getService("SfxLib").data;
 
-      Sfx.playSfx("deck_ui_into_game_detail.wav");
+      // Sfx.playSfx("deck_ui_into_game_detail.wav");
 
       const Background = Root.Processes.getService("Background").data;
 
@@ -343,7 +343,8 @@ const pkg = {
 
       renderDrives();
 
-      if (Root.Arguments.length === 0) resolve();
+      if (Root.Arguments !== undefined)
+        if (Root.Arguments.length === 0) resolve();
     });
   },
   end: async function () {

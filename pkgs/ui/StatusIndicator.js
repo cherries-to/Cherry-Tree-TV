@@ -133,7 +133,6 @@ const pkg = {
         });
 
         conn.on("data", (data) => {
-          console.log("got it", data);
           try {
             if (data.input) {
               if (typeof data.input !== "string") return;

@@ -45,7 +45,10 @@ def qr_code():
 @app.route("/drives")
 def getDrives():
     available_drives = [
-        '%s:' % d for d in string.ascii_uppercase if os.path.exists('%s:' % d)]
+        '%s:' % d for d in string.ascii_uppercase if os.path.exists('%s:' % d)
+    ]
+    # remove external drive (optional)
+    # del available_drives[-1]
     return jsonify(available_drives)
 
 
