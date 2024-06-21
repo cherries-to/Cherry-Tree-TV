@@ -1,4 +1,10 @@
 import Html from "/libs/html.js";
+import {
+  CaptionsRenderer,
+  parseResponse,
+} from "../../node_modules/media-captions/dist/prod.js";
+
+console.log(CaptionsRenderer);
 
 let wrapper, Ui, Pid, Sfx, volumeUpdate;
 
@@ -73,8 +79,12 @@ const pkg = {
           }
         }
       });
-      console.log(foundCaptions);
-      return foundCaptions;
+      console.log(foundCaptions.length);
+      if (foundCaptions.length > 0) {
+        return foundCaptions;
+      } else {
+        return null;
+      }
     }
 
     let videoElm;
@@ -86,6 +96,10 @@ const pkg = {
     let timeElapsed, timeElapsedFront, timeElapsedMiddle, timeElapsedBack;
     let captionToggle;
     let vidInfo;
+    let captionOverlay;
+    let renderer;
+    let trackFetchAbort;
+    let captionIndex = 0;
 
     let icons = {
       play: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
@@ -98,7 +112,7 @@ const pkg = {
       captionsOn:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>',
       captionsOff:
-        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions-off"><path d="M10.5 5H19a2 2 0 0 1 2 2v8.5"/><path d="M17 11h-.5"/><path d="M19 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/><path d="m2 2 20 20"/><path d="M7 11h4"/><path d="M7 15h2.5"/></svg>',
     };
 
     function formatTime(timeInSeconds) {
@@ -146,8 +160,16 @@ const pkg = {
           transition: "0.1s linear",
           padding: "1rem",
           borderRadius: "8px",
+          opacity: "0",
         })
         .appendTo(wrapper);
+      captionOverlay = new Html("div")
+        .styleJs({
+          bottom: "48px",
+          transition: "all 0.1s cubic-bezier(0.87, 0, 0.13, 1)",
+        })
+        .appendTo(wrapper);
+      renderer = new CaptionsRenderer(captionOverlay.elm);
       vidInfo = new Html("div").class("flex-column").appendTo(wrapper).styleJs({
         position: "absolute",
         top: "0",
@@ -264,17 +286,6 @@ const pkg = {
       captionToggle = new Html("button")
         .html(icons["captionsOff"])
         .appendTo(bottom)
-        .on("click", () => {
-          console.log("click");
-          let currentVideoTime = videoElm.elm.currentTime
-            ? videoElm.elm.currentTime
-            : 0;
-          let newTime = currentVideoTime + 10;
-          if (newTime > videoElm.elm.duration) {
-            newTime = videoElm.elm.duration;
-          }
-          videoElm.elm.currentTime = newTime;
-        })
         .styleJs({
           height: "50px",
           display: "flex",
@@ -283,20 +294,29 @@ const pkg = {
           justifyContent: "center",
           padding: "0",
         });
-      if (captions) {
-        captions.forEach((caption, index) => {
+      if (captions != null) {
+        let urlObj = new URL("http://127.0.0.1:9864/getFile");
+        urlObj.searchParams.append("path", captions[0]);
+        captionToggle.html(icons["captionsOn"]);
+        loadNewTrack(urlObj.href);
+        captionToggle.on("click", () => {
           let urlObj = new URL("http://127.0.0.1:9864/getFile");
+          let caption = captions[captionIndex++ % captions.length];
           let fileName = caption.split(/.*[\/|\\]/)[1];
           let noExt = fileName.replace(/\.[^/.]+$/, "");
           urlObj.searchParams.append("path", caption);
-          let captionDefault = false;
-          if (index == 0) {
-            captionDefault = true;
-            captionToggle.html(icons["captionsOn"]);
-          }
-          new Html("track")
-            .attr({ src: urlObj.href, label: noExt, default: captionDefault })
-            .appendTo(videoElm);
+          loadNewTrack(urlObj.href);
+          Root.Libs.Notify.show(
+            `Captions toggled`,
+            `Now using caption ${noExt}`
+          );
+        });
+      } else {
+        captionToggle.on("click", () => {
+          Root.Libs.Notify.show(
+            `This video doesn't have captions`,
+            `To show captions, please put subtitle files (.vtt) in the video's directory.`
+          );
         });
       }
       videoElm.on("loadedmetadata", () => {
@@ -324,6 +344,7 @@ const pkg = {
           max: videoElm.elm.duration,
           value: videoElm.elm.currentTime,
         });
+        renderer.currentTime = videoElm.elm.currentTime;
       });
       videoElm.elm.volume = Sfx.getVolume();
       volumeUpdate = (e) => {
@@ -342,6 +363,22 @@ const pkg = {
       });
       Ui.transition("popIn", wrapper);
       videoElm.elm.play();
+    }
+
+    async function loadNewTrack(captionPath) {
+      try {
+        trackFetchAbort?.abort();
+
+        const signal = (trackFetchAbort = new AbortController()).signal;
+
+        const { regions, cues } = await parseResponse(
+          fetch(captionPath, { signal })
+        );
+
+        renderer.changeTrack({ regions, cues });
+      } catch (e) {
+        console.log(`Aborted loading subtitle track!`, e);
+      }
     }
 
     // let raw = sessionStorage.getItem("launch_args")
@@ -372,9 +409,11 @@ const pkg = {
           if (atTop) {
             bottom.styleJs({ opacity: "0" });
             vidInfo.styleJs({ opacity: "0" });
+            captionOverlay.styleJs({ bottom: "48px" });
           } else {
             bottom.styleJs({ opacity: "1" });
             vidInfo.styleJs({ opacity: "1" });
+            captionOverlay.styleJs({ bottom: "calc(48px + 3rem)" });
           }
         }, 50);
         // if (e.x === -1 && videoElm) {

@@ -1,0 +1,31 @@
+{
+  "name": "cherry-tree",
+  "version": "1.0.0",
+  "description": "A web-based UI for your home theatre PC.",
+  "main": "core.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skywarspro15/Cherry-Tree.git"
+  },
+  "keywords": [
+    "htpc",
+    "web-os",
+    "movies",
+    "tv"
+  ],
+  "author": "Cherries.to & Tranch Software",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/skywarspro15/Cherry-Tree/issues"
+  },
+  "homepage": "https://github.com/skywarspro15/Cherry-Tree#readme",
+  "dependencies": {
+    "media-captions": "^0.0.18"
+  }
+}
