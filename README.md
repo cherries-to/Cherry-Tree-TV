@@ -1,3 +1,17 @@
-# Cherry Tree TV
+# Cherry Tree TV (indev)
 
-An open-source TV interface that can run on any display with a GUI, and it also includes phone link functionality.
+An open-source TV interface for your HTPC that can run on Chrome & Firefox.
+
+![Running instance of Cherry Tree](assets/img/readme-1.png)
+
+# Features
+
+- Use your phone as a remote
+- Add shows to your library
+- Send friend requests to users
+
+# To-do
+
+- [ ] Movies support
+- [ ] Friend chats
+- [ ] Watch parties
