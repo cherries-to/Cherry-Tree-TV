@@ -132,10 +132,11 @@ const pkg = {
         borderRadius: "5px",
         width: "20%",
       })
-      .appendTo(phoneLinkStatus);
+      .appendTo(wrapper);
 
     function showTvLinkCode() {
       phoneLinkStatus.style({ display: "block" });
+      qr.style({ display: "block" });
 
       phoneLinkStatus.elm.querySelector("strong").textContent =
         window.phoneLinkCode;
@@ -150,6 +151,7 @@ const pkg = {
     }
     function hideTvLinkCode() {
       phoneLinkStatus.style({ display: "none" });
+      qr.style({ display: "none" });
     }
 
     // events
@@ -210,7 +212,7 @@ const pkg = {
 
           // Ui.transition("popOut", wrapper, 500, true);
           // await Root.Libs.startPkg("apps:ControllerRemapping", [], true);
-        }),
+        })
     );
 
     new Html("h2").text("Display").appendTo(wrapper);
