@@ -174,9 +174,11 @@ const pkg = {
     }
 
     async function enablePhoneLink() {
+      localforage.setItem("settings__phoneLink", true);
       await connectPeerJs();
     }
     function disablePhoneLink() {
+      localforage.setItem("settings__phoneLink", false);
       disconnectPeerJs();
     }
 
