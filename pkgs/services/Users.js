@@ -73,6 +73,7 @@ const pkg = {
           try {
             const s = JSON.parse(e.data);
             if (s.type !== undefined) {
+              console.log(s);
               if (s.id) {
                 const responseId = s.id;
                 if (messageResponses[responseId]) {
@@ -97,18 +98,8 @@ const pkg = {
                 }
               } else if (s.type === "message") {
                 root.Libs.Notify.show(s.data.title, s.data.description);
-              } else if (s.type === "incomingMsg") {
+              } else if (s.type === "watchParty") {
                 console.log(s);
-                if (isJson(s.text)) {
-                  let parsed = JSON.parse(s.text);
-                  console.log(parsed);
-                  if (parsed.type === "watchParty") {
-                    root.Libs.Notify.show(
-                      `${s.from.name} is hosting a watch party!`,
-                      `${s.from.name} wants you to watch ${parsed.file} with them!`
-                    );
-                  }
-                }
               } else if (s.type === "error" && s.reason) {
                 if (s.reason === "SocketClosedBadJwt") {
                   // Somehow callback with false ?
