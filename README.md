@@ -15,3 +15,4 @@ An open-source TV interface for your HTPC that can run on Chrome & Firefox.
 - [x] Movies support
 - [ ] Friend chats
 - [ ] Watch parties (IN DEVELOPMENT)
+- [ ] Picture adjustments (IN DEVELOPMENT)

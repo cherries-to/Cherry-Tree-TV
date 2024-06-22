@@ -116,6 +116,8 @@ const pkg = {
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions-off"><path d="M10.5 5H19a2 2 0 0 1 2 2v8.5"/><path d="M17 11h-.5"/><path d="M19 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/><path d="m2 2 20 20"/><path d="M7 11h4"/><path d="M7 15h2.5"/></svg>',
       broadcast:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-radio"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>',
+      slider:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sliders-horizontal"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>',
     };
 
     function formatTime(timeInSeconds) {
@@ -191,49 +193,6 @@ const pkg = {
         .styleJs({
           padding: "50px",
         });
-      playPause = new Html("button")
-        .html(icons["pause"])
-        .appendTo(bottom)
-        .on("click", () => {
-          console.log("click");
-          let paused = videoElm.elm.paused || videoElm.elm.ended;
-          console.log(paused);
-          if (paused) {
-            videoElm.elm.play();
-          } else {
-            videoElm.elm.pause();
-          }
-        })
-        .styleJs({
-          minWidth: "50px",
-          height: "50px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0",
-        });
-      timeElapsed = new Html("p").appendTo(bottom).styleJs({
-        flexShrink: "0",
-        display: "flex",
-        "align-items": "center",
-        gap: "8px",
-      });
-      timeElapsedFront = new Html("span").styleJs({ fontSize: "1.3rem" });
-      timeElapsedMiddle = new Html("span")
-        .styleJs({ opacity: 0.7, fontSize: "1.8rem" })
-        .text("/");
-      timeElapsedBack = new Html("span").styleJs({ fontSize: "1.3rem" });
-      timeElapsed.appendMany(
-        timeElapsedFront,
-        timeElapsedMiddle,
-        timeElapsedBack
-      );
-      progress = new Html("input").appendTo(bottom).styleJs({
-        "flex-grow": "1",
-        color: "var(--current-player)",
-        border: "none",
-      });
       new Html("button")
         .html(icons["stepBack"])
         .appendTo(bottom)
@@ -247,6 +206,29 @@ const pkg = {
             newTime = 0;
           }
           videoElm.elm.currentTime = newTime;
+        })
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0",
+        });
+      1;
+      playPause = new Html("button")
+        .html(icons["pause"])
+        .appendTo(bottom)
+        .on("click", () => {
+          console.log("click");
+          let paused = videoElm.elm.paused || videoElm.elm.ended;
+          console.log(paused);
+          if (paused) {
+            videoElm.elm.play();
+          } else {
+            videoElm.elm.pause();
+          }
         })
         .styleJs({
           minWidth: "50px",
@@ -280,6 +262,27 @@ const pkg = {
           justifyContent: "center",
           padding: "0",
         });
+      timeElapsed = new Html("p").appendTo(bottom).styleJs({
+        flexShrink: "0",
+        display: "flex",
+        "align-items": "center",
+        gap: "8px",
+      });
+      timeElapsedFront = new Html("span").styleJs({ fontSize: "1.3rem" });
+      timeElapsedMiddle = new Html("span")
+        .styleJs({ opacity: 0.7, fontSize: "1.8rem" })
+        .text("/");
+      timeElapsedBack = new Html("span").styleJs({ fontSize: "1.3rem" });
+      timeElapsed.appendMany(
+        timeElapsedFront,
+        timeElapsedMiddle,
+        timeElapsedBack
+      );
+      progress = new Html("input").appendTo(bottom).styleJs({
+        "flex-grow": "1",
+        color: "var(--current-player)",
+        border: "none",
+      });
       captionToggle = new Html("button")
         .html(icons["captionsOff"])
         .appendTo(bottom)
@@ -423,6 +426,107 @@ const pkg = {
               }
             });
           }
+        });
+
+      new Html("button")
+        .html(icons["slider"])
+        .appendTo(bottom)
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0",
+        })
+        .on("click", (e) => {
+          let overlay = new Html("div")
+            .styleJs({
+              width: "350px",
+              height: "600px",
+              background: "rgba(0,0,0,0.5)",
+              position: "absolute",
+              top: "50px",
+              left: "50px",
+              zIndex: 1000000,
+              backdropFilter: "blur(50px)",
+              borderRadius: "10px",
+              display: "flex",
+              flexDirection: "column",
+              padding: "25px",
+              overflow: "scroll",
+              gap: "10px",
+            })
+            .appendTo(wrapper);
+          new Html("h1").text("Picture Adjustment").appendTo(overlay);
+          new Html("p")
+            .html(`Adjust picture settings to your liking.`)
+            .appendTo(overlay);
+          new Html("br").appendTo(overlay);
+          let tempUiElems = [];
+          let row = new Html("div")
+            .class("flex-list")
+            .appendTo(overlay)
+            .styleJs({ width: "100%" });
+          new Html("button")
+            .text("Adjust brightness")
+            .appendTo(row)
+            .styleJs({ width: "100%" });
+          let row2 = new Html("div")
+            .class("flex-list")
+            .appendTo(overlay)
+            .styleJs({ width: "100%" });
+          new Html("button")
+            .text("Adjust contrast")
+            .appendTo(row2)
+            .styleJs({ width: "100%" });
+          tempUiElems.push(row.elm.children);
+          tempUiElems.push(row2.elm.children);
+          Sfx.playSfx("deck_ui_into_game_detail.wav");
+          Ui.transition("popIn", overlay);
+          bottom.styleJs({ opacity: "0" });
+          vidInfo.styleJs({ opacity: "0" });
+          captionOverlay.styleJs({ bottom: "48px" });
+          e.target.classList.remove("over");
+          Ui.init(Pid, "horizontal", tempUiElems, function (e) {
+            if (e === "menu" || e === "back") {
+              Sfx.playSfx("deck_ui_out_of_game_detail.wav");
+              Ui.transition("popOut", overlay);
+              setTimeout(() => {
+                overlay.cleanup();
+                bottom.styleJs({ opacity: "1" });
+                vidInfo.styleJs({ opacity: "1" });
+                captionOverlay.styleJs({
+                  bottom: "calc(48px + 3rem)",
+                });
+                Ui.init(
+                  Pid,
+                  "horizontal",
+                  [top.elm.children, bottom.elm.children],
+                  function (e) {
+                    if (e === "menu" || e === "back") {
+                      pkg.end();
+                    }
+                    setTimeout(() => {
+                      let atTop = invButton.elm.classList.contains("over");
+                      if (atTop) {
+                        bottom.styleJs({ opacity: "0" });
+                        vidInfo.styleJs({ opacity: "0" });
+                        captionOverlay.styleJs({ bottom: "48px" });
+                      } else {
+                        bottom.styleJs({ opacity: "1" });
+                        vidInfo.styleJs({ opacity: "1" });
+                        captionOverlay.styleJs({
+                          bottom: "calc(48px + 3rem)",
+                        });
+                      }
+                    }, 50);
+                  }
+                );
+              }, 200);
+            }
+          });
         });
       if (captions != null) {
         let urlObj = new URL("http://127.0.0.1:9864/getFile");
