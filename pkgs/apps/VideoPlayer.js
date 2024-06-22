@@ -113,6 +113,8 @@ const pkg = {
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>',
       captionsOff:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions-off"><path d="M10.5 5H19a2 2 0 0 1 2 2v8.5"/><path d="M17 11h-.5"/><path d="M19 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/><path d="m2 2 20 20"/><path d="M7 11h4"/><path d="M7 15h2.5"/></svg>',
+      broadcast:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-radio"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>',
     };
 
     function formatTime(timeInSeconds) {
@@ -211,6 +213,7 @@ const pkg = {
           }
         })
         .styleJs({
+          minWidth: "50px",
           height: "50px",
           display: "flex",
           flexDirection: "column",
@@ -254,6 +257,7 @@ const pkg = {
           videoElm.elm.currentTime = newTime;
         })
         .styleJs({
+          minWidth: "50px",
           height: "50px",
           display: "flex",
           flexDirection: "column",
@@ -276,6 +280,7 @@ const pkg = {
           videoElm.elm.currentTime = newTime;
         })
         .styleJs({
+          minWidth: "50px",
           height: "50px",
           display: "flex",
           flexDirection: "column",
@@ -287,6 +292,7 @@ const pkg = {
         .html(icons["captionsOff"])
         .appendTo(bottom)
         .styleJs({
+          minWidth: "50px",
           height: "50px",
           display: "flex",
           flexDirection: "column",
@@ -294,6 +300,15 @@ const pkg = {
           justifyContent: "center",
           padding: "0",
         });
+      new Html("button").html(icons["broadcast"]).appendTo(bottom).styleJs({
+        minWidth: "50px",
+        height: "50px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0",
+      });
       if (captions != null) {
         let urlObj = new URL("http://127.0.0.1:9864/getFile");
         urlObj.searchParams.append("path", captions[0]);
