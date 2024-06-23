@@ -1,6 +1,6 @@
 # Cherry Tree TV (indev)
 
-An open-source TV interface for your HTPC that can run on Chrome & Firefox.
+An open-source TV-style front-end for your HTPC that can run on Chrome & Firefox.
 
 ![Running instance of Cherry Tree](assets/img/readme-1.png)
 
