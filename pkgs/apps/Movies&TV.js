@@ -46,36 +46,75 @@ const pkg = {
     // const row = new Html("div").class("flex-list").appendTo(wrapper);
 
     new Html("h2").text("Movies").appendTo(wrapper);
-    // new Html("p")
-    //   .text("Play around with some in-development features")
-    //   .appendTo(wrapper);
-
-    let movies = [
-      {
-        title:
-          "KONOSUBA – God's blessing on this wonderful world! Legend of Crimson",
-        cover:
-          "https://image.tmdb.org/t/p/w400/fv5BgcfkpWh3V6Pb1qVlXESBOdl.jpg",
-      },
-      {
-        title: "Inside Out 2",
-        cover:
-          "https://image.tmdb.org/t/p/w400/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg",
-      },
-    ];
 
     const row1 = new Html("div").class("flex-list").appendTo(wrapper);
-
     let noMovies = new Html("button")
       .text("No movies have been added")
       .appendTo(row1);
 
-    watchList.movies.forEach((movie, index) => {
-      if (noMovies) {
-        noMovies.cleanup();
-        noMovies = null;
+    new Html("h2").text("Shows").appendTo(wrapper);
+    const row2 = new Html("div").class("flex-list").appendTo(wrapper);
+    let noShows = new Html("button")
+      .text("No shows have been added")
+      .appendTo(row2);
+
+    new Html("h2").text("Add...").appendTo(wrapper);
+    const row3 = new Html("div").class("flex-list").appendTo(wrapper);
+
+    // Function to update the movies list
+    async function updateMovieList() {
+      row1.clear();
+
+      if (watchList.movies.length === 0) {
+        noMovies = new Html("button")
+          .text("No movies have been added")
+          .appendTo(row1);
+      } else {
+        watchList.movies.forEach((movie, index) => {
+          createMovieButton(movie, index).appendTo(row1);
+        });
       }
-      console.log(movie);
+
+      Ui.init(
+        Root.Pid,
+        "horizontal",
+        [row1.elm.children, row2.elm.children, row3.elm.children],
+        function (e) {
+          if (e === "back") {
+            Root.end();
+          }
+        }
+      );
+    }
+
+    // Function to update the shows list
+    async function updateShowList() {
+      row2.clear();
+
+      if (watchList.shows.length === 0) {
+        noShows = new Html("button")
+          .text("No shows have been added")
+          .appendTo(row2);
+      } else {
+        watchList.shows.forEach((show, index) => {
+          createShowButton(show, index).appendTo(row2);
+        });
+      }
+
+      Ui.init(
+        Root.Pid,
+        "horizontal",
+        [row1.elm.children, row2.elm.children, row3.elm.children],
+        function (e) {
+          if (e === "back") {
+            Root.end();
+          }
+        }
+      );
+    }
+
+    // Function to create a movie button
+    function createMovieButton(movie, index) {
       let button = new Html("button");
       let img = new Html("img");
       let title = new Html("p");
@@ -101,8 +140,10 @@ const pkg = {
                 callback: async function (remove) {
                   if (remove) {
                     watchList.movies.splice(index, 1);
-                    button.cleanup();
                     await vfs.writeFile(dataPath, JSON.stringify(watchList));
+                    button.cleanup();
+                    // Update the movie list after removing
+                    updateMovieList();
                   }
                 },
               },
@@ -112,27 +153,15 @@ const pkg = {
         });
 
       title.styleJs({ textAlign: "center", width: "100%" });
-
       img.styleJs({ width: "100%" });
 
       img.appendTo(button);
       title.appendTo(button);
-      button.appendTo(row1);
-    });
+      return button;
+    }
 
-    new Html("h2").text("Shows").appendTo(wrapper);
-    const row2 = new Html("div").class("flex-list").appendTo(wrapper);
-
-    let noShows = new Html("button")
-      .text("No shows have been added")
-      .appendTo(row2);
-
-    watchList.shows.forEach((show, index) => {
-      if (noShows) {
-        noShows.cleanup();
-        noShows = null;
-      }
-      console.log(show);
+    // Function to create a show button
+    function createShowButton(show, index) {
       let button = new Html("button");
       let img = new Html("img");
       let title = new Html("p");
@@ -158,8 +187,10 @@ const pkg = {
                 callback: async function (remove) {
                   if (remove) {
                     watchList.shows.splice(index, 1);
-                    button.cleanup();
                     await vfs.writeFile(dataPath, JSON.stringify(watchList));
+                    button.cleanup();
+                    // Update the show list after removing
+                    updateShowList();
                   }
                 },
               },
@@ -169,17 +200,14 @@ const pkg = {
         });
 
       title.styleJs({ textAlign: "center", width: "100%" });
-
       img.styleJs({ width: "100%" });
 
       img.appendTo(button);
       title.appendTo(button);
-      button.appendTo(row2);
-    });
+      return button;
+    }
 
-    new Html("h2").text("Add...").appendTo(wrapper);
-
-    const row3 = new Html("div").class("flex-list").appendTo(wrapper);
+    // ... (rest of the code)
 
     async function movieCreated(data) {
       if (data.cancelled) {
@@ -188,69 +216,8 @@ const pkg = {
       console.log(data);
       watchList.movies.push(data);
       await vfs.writeFile(dataPath, JSON.stringify(watchList));
-
-      row1.clear();
-
-      watchList.movies.forEach((movie, index) => {
-        if (noMovies) {
-          noMovies.cleanup();
-          noMovies = null;
-        }
-        console.log(movie);
-        let button = new Html("button");
-        let img = new Html("img");
-        let title = new Html("p");
-
-        title.text(movie.movieName);
-        img.attr({ src: movie.moviePoster });
-
-        button
-          .styleJs({
-            display: "flex",
-            flexDirection: "column",
-            width: "40px",
-            height: "100%",
-            gap: "10px",
-          })
-          .on("click", async (e) => {
-            Ui.transition("popOut", wrapper, 500, true);
-            await Root.Libs.startPkg(
-              "apps:MovieViewer",
-              [
-                movie,
-                {
-                  callback: async function (remove) {
-                    if (remove) {
-                      watchList.movies.splice(index, 1);
-                      await vfs.writeFile(dataPath, JSON.stringify(watchList));
-                      button.cleanup();
-                    }
-                  },
-                },
-              ],
-              true
-            );
-          });
-
-        title.styleJs({ textAlign: "center", width: "100%" });
-
-        img.styleJs({ width: "100%" });
-
-        img.appendTo(button);
-        title.appendTo(button);
-        button.appendTo(row1);
-      });
-
-      Ui.init(
-        Root.Pid,
-        "horizontal",
-        [row1.elm.children, row2.elm.children, row3.elm.children],
-        function (e) {
-          if (e === "back") {
-            Root.end();
-          }
-        }
-      );
+      // Update the movie list after adding
+      updateMovieList();
 
       setTimeout(async () => {
         await Root.Libs.Modal.Show({
@@ -275,69 +242,8 @@ const pkg = {
       console.log(data);
       watchList.shows.push(data);
       await vfs.writeFile(dataPath, JSON.stringify(watchList));
-
-      row2.clear();
-
-      watchList.shows.forEach((show, index) => {
-        if (noShows) {
-          noShows.cleanup();
-          noShows = null;
-        }
-        console.log(show);
-        let button = new Html("button");
-        let img = new Html("img");
-        let title = new Html("p");
-
-        title.text(show.showName);
-        img.attr({ src: show.showPoster });
-
-        button
-          .styleJs({
-            display: "flex",
-            flexDirection: "column",
-            width: "40px",
-            height: "100%",
-            gap: "10px",
-          })
-          .on("click", async (e) => {
-            Ui.transition("popOut", wrapper, 500, true);
-            await Root.Libs.startPkg(
-              "apps:ShowViewer",
-              [
-                show,
-                {
-                  callback: async function (remove) {
-                    if (remove) {
-                      watchList.shows.splice(index, 1);
-                      await vfs.writeFile(dataPath, JSON.stringify(watchList));
-                      button.cleanup();
-                    }
-                  },
-                },
-              ],
-              true
-            );
-          });
-
-        title.styleJs({ textAlign: "center", width: "100%" });
-
-        img.styleJs({ width: "100%" });
-
-        img.appendTo(button);
-        title.appendTo(button);
-        button.appendTo(row2);
-      });
-
-      Ui.init(
-        Root.Pid,
-        "horizontal",
-        [row1.elm.children, row2.elm.children, row3.elm.children],
-        function (e) {
-          if (e === "back") {
-            Root.end();
-          }
-        }
-      );
+      // Update the show list after adding
+      updateShowList();
 
       setTimeout(async () => {
         await Root.Libs.Modal.Show({
@@ -354,6 +260,10 @@ const pkg = {
         });
       }, 500);
     }
+
+    // Initial rendering of movie and show lists
+    updateMovieList();
+    updateShowList();
 
     row3.appendMany(
       new Html("button").text("Add movies").on("click", async (e) => {
