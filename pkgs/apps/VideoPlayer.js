@@ -2,6 +2,7 @@ import Html from "/libs/html.js";
 import {
   CaptionsRenderer,
   parseResponse,
+  parseText,
 } from "../../node_modules/media-captions/dist/prod.js";
 import { Peer } from "https://esm.sh/peerjs@1.5.4?bundle-deps";
 
@@ -143,7 +144,7 @@ const pkg = {
           videoElm.addEventListener("play", () => {
             conn.send({ type: "play" });
           });
-          conn.on("data", (data) => {
+          conn.on("data", async (data) => {
             console.log(data);
             if (data.type == "connect") {
               if (!data.username) {
@@ -164,29 +165,21 @@ const pkg = {
               conn.send({ type: "captions", captions: captions });
             }
             if (data.type == "loadCaption") {
-              if (!data.index) {
-                conn.send({
-                  type: "error",
-                  message: "Please provide which caption to fetch",
-                });
-                conn.close();
-              } else {
-                let caption = captions[data.index];
-                let urlObj = new URL("http://127.0.0.1:9864/getFile");
-                urlObj.searchParams.append("path", caption);
-                let fileName = caption.split(/.*[\/|\\]/)[1];
-                let noExt = fileName.replace(/\.[^/.]+$/, "");
-                let re = /(?:\.([^.]+))?$/;
-                let lang = re.exec(noExt)[1]
-                  ? re.exec(noExt)[1]
-                  : "No language specified";
-                let captionData = getTrack(urlObj.href);
-                conn.send({
-                  type: "captionData",
-                  captionName: lang,
-                  captionData: captionData,
-                });
-              }
+              let caption = captions[data.index];
+              let urlObj = new URL("http://127.0.0.1:9864/getFile");
+              urlObj.searchParams.append("path", caption);
+              let fileName = caption.split(/.*[\/|\\]/)[1];
+              let noExt = fileName.replace(/\.[^/.]+$/, "");
+              let re = /(?:\.([^.]+))?$/;
+              let lang = re.exec(noExt)[1]
+                ? re.exec(noExt)[1]
+                : "No language specified";
+              let captionData = await getTrack(urlObj.href);
+              conn.send({
+                type: "captionData",
+                captionName: lang,
+                captionData: captionData,
+              });
             }
           });
           conn.on("close", () => {
@@ -585,7 +578,10 @@ const pkg = {
           playBgm();
         }
         if (data.type == "captionData") {
-          const { regions, cues } = await parseResponse(data.captionData);
+          console.log(data.captionData);
+          console.log(renderer);
+          const { regions, cues } = await parseText(data.captionData);
+          console.log(regions, cues);
           renderer.changeTrack({ regions, cues });
           Root.Libs.Notify.show(
             "Captions toggled",
@@ -656,9 +652,9 @@ const pkg = {
         let conn = peer.connect(watchCode);
         conn.on("open", () => {
           conn.send({ type: "connect", username: info.name });
-          conn.on("data", (data) => {
-            console.log(data);
-          });
+          // conn.on("data", (data) => {
+          //   console.log(data);
+          // });
           createPartyCaptionToggleButton(bottom, function () {
             conn.send({ type: "getCaptions" });
           });
@@ -984,6 +980,7 @@ const pkg = {
           .appendTo(row)
           .styleJs({ width: "100%" })
           .on("click", () => {
+            console.log(index);
             conn.send({ type: "loadCaption", index: index });
           });
         tempUiElems.push(row.elm.children);
