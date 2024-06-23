@@ -322,7 +322,7 @@ const pkg = {
           UiElems.push(row.elm.children);
           buttons.push(row);
           Ui.init(Pid, "horizontal", UiElems, function (e) {
-            if (e === "menu" || e === "back") {
+            if (e === "back") {
               closeSequence();
             }
           });
@@ -370,7 +370,7 @@ const pkg = {
     renderEpisodes(sortCreated);
 
     Ui.init(Pid, "horizontal", UiElems, function (e) {
-      if (e === "menu" || e === "back") {
+      if (e === "back") {
         closeSequence();
       }
     });

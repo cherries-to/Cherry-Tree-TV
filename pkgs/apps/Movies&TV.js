@@ -246,7 +246,7 @@ const pkg = {
         "horizontal",
         [row1.elm.children, row2.elm.children, row3.elm.children],
         function (e) {
-          if (e === "menu" || e === "back") {
+          if (e === "back") {
             Root.end();
           }
         }
@@ -333,7 +333,7 @@ const pkg = {
         "horizontal",
         [row1.elm.children, row2.elm.children, row3.elm.children],
         function (e) {
-          if (e === "menu" || e === "back") {
+          if (e === "back") {
             Root.end();
           }
         }
@@ -379,7 +379,7 @@ const pkg = {
       "horizontal",
       [row1.elm.children, row2.elm.children, row3.elm.children],
       function (e) {
-        if (e === "menu" || e === "back") {
+        if (e === "back") {
           Root.end();
         }
       }

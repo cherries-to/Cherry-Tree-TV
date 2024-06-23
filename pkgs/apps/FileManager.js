@@ -343,7 +343,7 @@ const pkg = {
         Sfx.playSfx("deck_ui_into_game_detail.wav");
         Ui.transition("popIn", wrapper);
         Ui.init(Pid, "horizontal", UiElems, function (e) {
-          if (e === "menu" || e === "back") {
+          if (e === "back") {
             closeSequence();
           }
         });
@@ -373,7 +373,7 @@ const pkg = {
         });
         Ui.transition("popIn", wrapper);
         Ui.init(Pid, "horizontal", UiElems, function (e) {
-          if (e === "menu" || e === "back") {
+          if (e === "back") {
             closeSequence();
           }
         });

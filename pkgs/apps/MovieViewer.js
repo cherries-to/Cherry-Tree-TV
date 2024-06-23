@@ -302,7 +302,7 @@ const pkg = {
     UiElems.push(row.elm.children);
 
     Ui.init(Pid, "horizontal", UiElems, function (e) {
-      if (e === "menu" || e === "back") {
+      if (e === "back") {
         closeSequence();
       }
     });

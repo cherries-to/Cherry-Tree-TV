@@ -226,7 +226,7 @@ const pkg = {
       foundList.styleJs({ display: "flex" });
       UiElems = [row.elm.children, foundList.elm.children, row2.elm.children];
       Ui.init(Pid, "horizontal", UiElems, function (e) {
-        if (e === "menu" || e === "back") {
+        if (e === "back") {
           closeSequence();
         }
       });
@@ -344,7 +344,7 @@ const pkg = {
     UiElems = [row.elm.children, row2.elm.children];
 
     Ui.init(Pid, "horizontal", UiElems, function (e) {
-      if (e === "menu" || e === "back") {
+      if (e === "back") {
         closeSequence();
       }
     });

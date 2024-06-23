@@ -292,7 +292,7 @@ const pkg = {
       "horizontal",
       [row.elm.children, row2.elm.children, row3.elm.children],
       function (e) {
-        if (e === "menu" || e === "back") {
+        if (e === "back") {
           Root.end();
         }
       }

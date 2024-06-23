@@ -719,7 +719,7 @@ const pkg = {
         row5.elm.children,
       ],
       function (e) {
-        if (e === "menu" || e === "back") {
+        if (e === "back") {
           Root.end();
         }
       }

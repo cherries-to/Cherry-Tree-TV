@@ -45,7 +45,7 @@ const pkg = {
       "horizontal",
       [row.elm.children]
       // function (e) {
-      //   if (e === "menu" || e === "back") {
+      //   if (e === "back") {
       //     pkg.end();
       //   }
       // }

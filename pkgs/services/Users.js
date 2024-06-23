@@ -100,9 +100,23 @@ const pkg = {
                 root.Libs.Notify.show(s.data.title, s.data.description);
               } else if (s.type === "watchParty") {
                 console.log(s);
+                let parsedData = JSON.parse(s.text);
                 root.Libs.Notify.show(
                   `${s.from.name} is hosting a watch party!`,
-                  `Press the %menu% button to handle the invite.`
+                  `Press the %menu% button to handle the invite.`,
+                  "menu",
+                  async () => {
+                    root.Libs.Modal.Show({
+                      title: "Watch Party Invite",
+                      description: `${s.from.name} has invited you to watch\n ${parsedData.name}`,
+                      parent: document.body,
+                      pid: await ui.data.getTopUi(),
+                      buttons: [
+                        { type: "default", text: "Accept" },
+                        { type: "default", text: "Ignore" },
+                      ],
+                    });
+                  }
                 );
               } else if (s.type === "error" && s.reason) {
                 if (s.reason === "SocketClosedBadJwt") {

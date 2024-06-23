@@ -3,6 +3,7 @@ import {
   CaptionsRenderer,
   parseResponse,
 } from "../../node_modules/media-captions/dist/prod.js";
+import { Peer } from "https://esm.sh/peerjs@1.5.4?bundle-deps";
 
 console.log(CaptionsRenderer);
 
@@ -100,7 +101,46 @@ const pkg = {
     let captionOverlay;
     let renderer;
     let trackFetchAbort;
-    let captionIndex = 0;
+
+    let peer = null;
+
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+
+    let hostCode = "watchParty-";
+    for (let i = 0; i < 10; i++) {
+      hostCode += chars[Math.floor(Math.random() * chars.length)];
+    }
+
+    async function hostWatchParty(videoElm, captions) {
+      let stream = videoElm.mozCaptureStream
+        ? videoElm.mozCaptureStream()
+        : videoElm.captureStream();
+      peer = new Peer(hostCode);
+      peer.on("connection", (conn) => {
+        let peerId = conn.peer;
+        videoElm.addEventListener("timeupdate", () => {
+          conn.send({
+            type: "timeupdate",
+            currentTime: videoElm.currentTime,
+            duration: videoElm.duration,
+          });
+        });
+        videoElm.addEventListener("pause", () => {
+          conn.send({ type: "pause" });
+        });
+        videoElm.addEventListener("play", () => {
+          conn.send({ type: "play" });
+        });
+        conn.on("data", (data) => {
+          if (data.type == "connect") {
+            peer.call(peerId, stream);
+          }
+        });
+      });
+    }
+
+    console.log(hostCode);
 
     let icons = {
       play: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
@@ -365,16 +405,17 @@ const pkg = {
                   .text(friend.name)
                   .appendTo(row)
                   .styleJs({ width: "100%" })
-                  .on("click", () => {
+                  .on("click", async () => {
                     let friendId = friend.id;
                     console.log(friend.id);
-                    ws.sendMessage({
+                    let result = await ws.sendMessage({
                       type: "watchParty",
                       userId: friendId,
                       message: JSON.stringify({
                         name: displayName ? displayName : noExt,
                       }),
                     });
+                    console.log(result);
                   });
                 tempUiElems.push(row.elm.children);
               }
@@ -397,7 +438,7 @@ const pkg = {
             captionOverlay.styleJs({ bottom: "48px" });
             e.target.classList.remove("over");
             Ui.init(Pid, "horizontal", tempUiElems, function (e) {
-              if (e === "menu" || e === "back") {
+              if (e === "back") {
                 Sfx.playSfx("deck_ui_out_of_game_detail.wav");
                 Ui.transition("popOut", overlay);
                 setTimeout(() => {
@@ -412,7 +453,7 @@ const pkg = {
                     "horizontal",
                     [top.elm.children, bottom.elm.children],
                     function (e) {
-                      if (e === "menu" || e === "back") {
+                      if (e === "back") {
                         pkg.end();
                       }
                       setTimeout(() => {
@@ -499,7 +540,7 @@ const pkg = {
           captionOverlay.styleJs({ bottom: "48px" });
           e.target.classList.remove("over");
           Ui.init(Pid, "horizontal", tempUiElems, function (e) {
-            if (e === "menu" || e === "back") {
+            if (e === "back") {
               Sfx.playSfx("deck_ui_out_of_game_detail.wav");
               Ui.transition("popOut", overlay);
               setTimeout(() => {
@@ -514,7 +555,7 @@ const pkg = {
                   "horizontal",
                   [top.elm.children, bottom.elm.children],
                   function (e) {
-                    if (e === "menu" || e === "back") {
+                    if (e === "back") {
                       pkg.end();
                     }
                     setTimeout(() => {
@@ -603,7 +644,7 @@ const pkg = {
           captionOverlay.styleJs({ bottom: "48px" });
           e.target.classList.remove("over");
           Ui.init(Pid, "horizontal", tempUiElems, function (e) {
-            if (e === "menu" || e === "back") {
+            if (e === "back") {
               Sfx.playSfx("deck_ui_out_of_game_detail.wav");
               Ui.transition("popOut", overlay);
               setTimeout(() => {
@@ -618,7 +659,7 @@ const pkg = {
                   "horizontal",
                   [top.elm.children, bottom.elm.children],
                   function (e) {
-                    if (e === "menu" || e === "back") {
+                    if (e === "back") {
                       pkg.end();
                     }
                     setTimeout(() => {
@@ -738,7 +779,7 @@ const pkg = {
       "horizontal",
       [top.elm.children, bottom.elm.children],
       function (e) {
-        if (e === "menu" || e === "back") {
+        if (e === "back") {
           pkg.end();
         }
         setTimeout(() => {

@@ -56,7 +56,7 @@ const pkg = {
     Ui.transition("popIn", wrapper);
 
     Ui.init(Pid, "horizontal", [wrapper], function (e) {
-      if (e === "menu" || e === "back") {
+      if (e === "back") {
         closeSequence();
       }
     });
