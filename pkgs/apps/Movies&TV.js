@@ -113,7 +113,6 @@ const pkg = {
       );
     }
 
-    // Function to create a movie button
     function createMovieButton(movie, index) {
       let button = new Html("button");
       let img = new Html("img");
@@ -142,7 +141,6 @@ const pkg = {
                     watchList.movies.splice(index, 1);
                     await vfs.writeFile(dataPath, JSON.stringify(watchList));
                     button.cleanup();
-                    // Update the movie list after removing
                     updateMovieList();
                   }
                 },
@@ -160,7 +158,6 @@ const pkg = {
       return button;
     }
 
-    // Function to create a show button
     function createShowButton(show, index) {
       let button = new Html("button");
       let img = new Html("img");
@@ -189,7 +186,6 @@ const pkg = {
                     watchList.shows.splice(index, 1);
                     await vfs.writeFile(dataPath, JSON.stringify(watchList));
                     button.cleanup();
-                    // Update the show list after removing
                     updateShowList();
                   }
                 },
@@ -207,8 +203,6 @@ const pkg = {
       return button;
     }
 
-    // ... (rest of the code)
-
     async function movieCreated(data) {
       if (data.cancelled) {
         return;
@@ -216,7 +210,6 @@ const pkg = {
       console.log(data);
       watchList.movies.push(data);
       await vfs.writeFile(dataPath, JSON.stringify(watchList));
-      // Update the movie list after adding
       updateMovieList();
 
       setTimeout(async () => {
@@ -242,7 +235,6 @@ const pkg = {
       console.log(data);
       watchList.shows.push(data);
       await vfs.writeFile(dataPath, JSON.stringify(watchList));
-      // Update the show list after adding
       updateShowList();
 
       setTimeout(async () => {
@@ -261,7 +253,6 @@ const pkg = {
       }, 500);
     }
 
-    // Initial rendering of movie and show lists
     updateMovieList();
     updateShowList();
 
@@ -296,10 +287,8 @@ const pkg = {
     );
   },
   end: async function () {
-    // Exit this UI when the process is exited
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
-    // await Ui.transition("popOut", wrapper);
     Ui.giveUpUi(Pid);
     wrapper.cleanup();
   },

@@ -277,7 +277,7 @@ const pkg = {
         });
 
       playPause = new Html("button")
-        .html(icons["pause"]) // Assuming autoplay is true by default
+        .html(icons["play"])
         .appendTo(bottom)
         .on("click", () => {
           console.log("click");
@@ -322,7 +322,7 @@ const pkg = {
           justifyContent: "center",
           padding: "0",
         });
-      return playPause; // Return playPause button to update its icon later
+      return playPause;
     }
 
     function createTimeElapsed(bottom) {
@@ -460,12 +460,12 @@ const pkg = {
       };
       document.addEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
       videoElm.on("play", () => {
-        playPause.html(icons["pause"]); // Update play/pause button icon
+        playPause.html(icons["pause"]);
         Sfx.playSfx("deck_ui_switch_toggle_on.wav");
         stopBgm();
       });
       videoElm.on("pause", () => {
-        playPause.html(icons["play"]); // Update play/pause button icon
+        playPause.html(icons["play"]);
         Sfx.playSfx("deck_ui_switch_toggle_off.wav");
         playBgm();
       });
@@ -487,7 +487,7 @@ const pkg = {
       createCaptionOverlay();
       createVideoInfo(displayName, path);
 
-      let playPause = createControlButtons(bottom); // Store playPause button
+      createControlButtons(bottom);
       createTimeElapsed(bottom);
       createProgressSlider(bottom);
       createCaptionToggleButton(bottom, captions, displayName, path);
@@ -497,10 +497,10 @@ const pkg = {
 
       Ui.transition("popIn", wrapper);
       if (autoplay) {
+        playPause.html(icons["pause"]);
         videoElm.elm.play();
       }
 
-      // Initialize UI navigation for the main player
       Ui.init(
         Pid,
         "horizontal",
@@ -549,7 +549,6 @@ const pkg = {
         captionOverlay.styleJs({
           bottom: "calc(48px + 3rem)",
         });
-        // Reinitialize UI navigation for the main player
         Ui.init(
           Pid,
           "horizontal",
@@ -763,10 +762,6 @@ const pkg = {
       }, 50);
     }
 
-    // let raw = sessionStorage.getItem("launch_args")
-    //   ? sessionStorage.getItem("launch_args")
-    //   : "{}";
-    // let launchArgs = JSON.parse(raw);
     let launchArgs = Root.Arguments[0];
     let captions = null;
     let autoplay =
@@ -785,10 +780,8 @@ const pkg = {
   },
 
   end: async function () {
-    // Exit this UI when the process is exited
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
-    // await Ui.transition("popOut", wrapper);
     Ui.giveUpUi(Pid);
     wrapper.cleanup();
     document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
