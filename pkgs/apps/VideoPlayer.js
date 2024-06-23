@@ -169,13 +169,7 @@ const pkg = {
       };
     }
 
-    function playVideo(
-      path,
-      captions = null,
-      displayName = null,
-      isLocal = true,
-      autoplay = true
-    ) {
+    function createVideoElement(path, isLocal) {
       let url = path;
       if (isLocal) {
         let urlObj = new URL("http://127.0.0.1:9864/getFile");
@@ -187,6 +181,10 @@ const pkg = {
         .styleJs({ width: "100%", height: "100%", position: "absolute" })
         .attr({ src: url, crossorigin: "anonymous" });
       videoElm.elm.controls = false;
+      return videoElm;
+    }
+
+    function createTopBar() {
       top = new Html("div").class("flex-list").appendTo(wrapper).styleJs({
         position: "absolute",
         width: "100%",
@@ -200,23 +198,27 @@ const pkg = {
         .styleJs({
           opacity: 0,
         });
-      bottom = new Html("div")
-        .class("flex-list")
-        .appendTo(wrapper)
-        .styleJs({
-          position: "absolute",
-          bottom: "1rem",
-          zIndex: "100",
-          width: "calc(100% - 2rem)",
-          opacity: "1",
-          left: "1rem",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          transition: "0.1s linear",
-          padding: "1rem",
-          borderRadius: "8px",
-          opacity: "0",
-        })
-        .appendTo(wrapper);
+      return top;
+    }
+
+    function createBottomBar() {
+      bottom = new Html("div").class("flex-list").appendTo(wrapper).styleJs({
+        position: "absolute",
+        bottom: "1rem",
+        zIndex: "100",
+        width: "calc(100% - 2rem)",
+        opacity: "1",
+        left: "1rem",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        transition: "0.1s linear",
+        padding: "1rem",
+        borderRadius: "8px",
+        opacity: "0",
+      });
+      return bottom;
+    }
+
+    function createCaptionOverlay() {
       captionOverlay = new Html("div")
         .styleJs({
           bottom: "48px",
@@ -224,6 +226,10 @@ const pkg = {
         })
         .appendTo(wrapper);
       renderer = new CaptionsRenderer(captionOverlay.elm);
+      return captionOverlay;
+    }
+
+    function createVideoInfo(displayName, path) {
       vidInfo = new Html("div").class("flex-column").appendTo(wrapper).styleJs({
         position: "absolute",
         top: "0",
@@ -242,6 +248,10 @@ const pkg = {
         .styleJs({
           padding: "50px",
         });
+      return vidInfo;
+    }
+
+    function createControlButtons(bottom) {
       new Html("button")
         .html(icons["stepBack"])
         .appendTo(bottom)
@@ -265,9 +275,9 @@ const pkg = {
           justifyContent: "center",
           padding: "0",
         });
-      1;
+
       playPause = new Html("button")
-        .html(autoplay ? icons["pause"] : icons["play"])
+        .html(icons["pause"]) // Assuming autoplay is true by default
         .appendTo(bottom)
         .on("click", () => {
           console.log("click");
@@ -288,6 +298,7 @@ const pkg = {
           justifyContent: "center",
           padding: "0",
         });
+
       new Html("button")
         .html(icons["stepForward"])
         .appendTo(bottom)
@@ -311,6 +322,10 @@ const pkg = {
           justifyContent: "center",
           padding: "0",
         });
+      return playPause; // Return playPause button to update its icon later
+    }
+
+    function createTimeElapsed(bottom) {
       timeElapsed = new Html("p").appendTo(bottom).styleJs({
         flexShrink: "0",
         display: "flex",
@@ -327,13 +342,21 @@ const pkg = {
         timeElapsedMiddle,
         timeElapsedBack
       );
+      return timeElapsed;
+    }
+
+    function createProgressSlider(bottom) {
       progress = new Html("input").appendTo(bottom).styleJs({
         "flex-grow": "1",
         color: "var(--current-player)",
         border: "none",
       });
+      return progress;
+    }
+
+    function createCaptionToggleButton(bottom, captions, displayName, path) {
       captionToggle = new Html("button")
-        .html(icons["captionsOff"])
+        .html(captions ? icons["captionsOn"] : icons["captionsOff"])
         .appendTo(bottom)
         .styleJs({
           minWidth: "50px",
@@ -344,6 +367,26 @@ const pkg = {
           justifyContent: "center",
           padding: "0",
         });
+
+      if (captions != null) {
+        let urlObj = new URL("http://127.0.0.1:9864/getFile");
+        urlObj.searchParams.append("path", captions[0]);
+        loadNewTrack(urlObj.href);
+        captionToggle.on("click", (e) => {
+          openCaptionsMenu(e, captions, displayName, path);
+        });
+      } else {
+        captionToggle.on("click", () => {
+          Root.Libs.Notify.show(
+            `This video doesn't have captions`,
+            `To show captions, please put subtitle files (.vtt) in the video's directory.`
+          );
+        });
+      }
+      return captionToggle;
+    }
+
+    function createBroadcastButton(bottom, displayName, noExt) {
       new Html("button")
         .html(icons["broadcast"])
         .appendTo(bottom)
@@ -360,124 +403,12 @@ const pkg = {
           if (ws) {
             friends = (await ws.sendMessage({ type: "get-friends" })).result;
             console.log(friends);
-            let overlay = new Html("div")
-              .styleJs({
-                width: "350px",
-                height: "600px",
-                background: "rgba(0,0,0,0.5)",
-                position: "absolute",
-                top: "50px",
-                left: "50px",
-                zIndex: 1000000,
-                backdropFilter: "blur(50px)",
-                borderRadius: "10px",
-                display: "flex",
-                flexDirection: "column",
-                padding: "25px",
-                overflow: "scroll",
-                gap: "10px",
-              })
-              .appendTo(wrapper);
-            new Html("h1").text("Invite a friend").appendTo(overlay);
-            new Html("p")
-              .html(
-                `Get a friend to watch <strong>${
-                  displayName ? displayName : noExt
-                }</strong> with you`
-              )
-              .appendTo(overlay);
-            new Html("br").appendTo(overlay);
-            new Html("h2")
-              .text("Who's online")
-              .appendTo(overlay)
-              .styleJs({ paddingBottom: "10px" });
-            let tempUiElems = [];
-            let hasFriend = false;
-            friends.forEach((friend) => {
-              if (friend.status == 1) {
-                console.log(friend);
-                hasFriend = true;
-                let row = new Html("div")
-                  .class("flex-list")
-                  .appendTo(overlay)
-                  .styleJs({ width: "100%" });
-                new Html("button")
-                  .text(friend.name)
-                  .appendTo(row)
-                  .styleJs({ width: "100%" })
-                  .on("click", async () => {
-                    let friendId = friend.id;
-                    console.log(friend.id);
-                    let result = await ws.sendMessage({
-                      type: "watchParty",
-                      userId: friendId,
-                      message: JSON.stringify({
-                        name: displayName ? displayName : noExt,
-                      }),
-                    });
-                    console.log(result);
-                  });
-                tempUiElems.push(row.elm.children);
-              }
-            });
-            if (!hasFriend) {
-              let row = new Html("div")
-                .class("flex-list")
-                .appendTo(overlay)
-                .styleJs({ width: "100%" });
-              new Html("button")
-                .text("None of your friends are online")
-                .appendTo(row)
-                .styleJs({ width: "100%" });
-              tempUiElems.push(row.elm.children);
-            }
-            Sfx.playSfx("deck_ui_into_game_detail.wav");
-            Ui.transition("popIn", overlay);
-            bottom.styleJs({ opacity: "0" });
-            vidInfo.styleJs({ opacity: "0" });
-            captionOverlay.styleJs({ bottom: "48px" });
-            e.target.classList.remove("over");
-            Ui.init(Pid, "horizontal", tempUiElems, function (e) {
-              if (e === "back") {
-                Sfx.playSfx("deck_ui_out_of_game_detail.wav");
-                Ui.transition("popOut", overlay);
-                setTimeout(() => {
-                  overlay.cleanup();
-                  bottom.styleJs({ opacity: "1" });
-                  vidInfo.styleJs({ opacity: "1" });
-                  captionOverlay.styleJs({
-                    bottom: "calc(48px + 3rem)",
-                  });
-                  Ui.init(
-                    Pid,
-                    "horizontal",
-                    [top.elm.children, bottom.elm.children],
-                    function (e) {
-                      if (e === "back") {
-                        pkg.end();
-                      }
-                      setTimeout(() => {
-                        let atTop = invButton.elm.classList.contains("over");
-                        if (atTop) {
-                          bottom.styleJs({ opacity: "0" });
-                          vidInfo.styleJs({ opacity: "0" });
-                          captionOverlay.styleJs({ bottom: "48px" });
-                        } else {
-                          bottom.styleJs({ opacity: "1" });
-                          vidInfo.styleJs({ opacity: "1" });
-                          captionOverlay.styleJs({
-                            bottom: "calc(48px + 3rem)",
-                          });
-                        }
-                      }, 50);
-                    }
-                  );
-                }, 200);
-              }
-            });
+            openWatchPartyMenu(e, displayName, noExt);
           }
         });
+    }
 
+    function createPictureAdjustButton(bottom) {
       new Html("button")
         .html(icons["slider"])
         .appendTo(bottom)
@@ -491,205 +422,11 @@ const pkg = {
           padding: "0",
         })
         .on("click", (e) => {
-          let overlay = new Html("div")
-            .styleJs({
-              width: "350px",
-              height: "600px",
-              background: "rgba(0,0,0,0.5)",
-              position: "absolute",
-              top: "50px",
-              left: "50px",
-              zIndex: 1000000,
-              backdropFilter: "blur(50px)",
-              borderRadius: "10px",
-              display: "flex",
-              flexDirection: "column",
-              padding: "25px",
-              overflow: "scroll",
-              gap: "10px",
-            })
-            .appendTo(wrapper);
-          new Html("h1").text("Picture Adjustment").appendTo(overlay);
-          new Html("p")
-            .html(`Adjust picture settings to your liking.`)
-            .appendTo(overlay);
-          new Html("br").appendTo(overlay);
-          let tempUiElems = [];
-          let row = new Html("div")
-            .class("flex-list")
-            .appendTo(overlay)
-            .styleJs({ width: "100%" });
-          new Html("button")
-            .text("Adjust brightness")
-            .appendTo(row)
-            .styleJs({ width: "100%" });
-          let row2 = new Html("div")
-            .class("flex-list")
-            .appendTo(overlay)
-            .styleJs({ width: "100%" });
-          new Html("button")
-            .text("Adjust contrast")
-            .appendTo(row2)
-            .styleJs({ width: "100%" });
-          tempUiElems.push(row.elm.children);
-          tempUiElems.push(row2.elm.children);
-          Sfx.playSfx("deck_ui_into_game_detail.wav");
-          Ui.transition("popIn", overlay);
-          bottom.styleJs({ opacity: "0" });
-          vidInfo.styleJs({ opacity: "0" });
-          captionOverlay.styleJs({ bottom: "48px" });
-          e.target.classList.remove("over");
-          Ui.init(Pid, "horizontal", tempUiElems, function (e) {
-            if (e === "back") {
-              Sfx.playSfx("deck_ui_out_of_game_detail.wav");
-              Ui.transition("popOut", overlay);
-              setTimeout(() => {
-                overlay.cleanup();
-                bottom.styleJs({ opacity: "1" });
-                vidInfo.styleJs({ opacity: "1" });
-                captionOverlay.styleJs({
-                  bottom: "calc(48px + 3rem)",
-                });
-                Ui.init(
-                  Pid,
-                  "horizontal",
-                  [top.elm.children, bottom.elm.children],
-                  function (e) {
-                    if (e === "back") {
-                      pkg.end();
-                    }
-                    setTimeout(() => {
-                      let atTop = invButton.elm.classList.contains("over");
-                      if (atTop) {
-                        bottom.styleJs({ opacity: "0" });
-                        vidInfo.styleJs({ opacity: "0" });
-                        captionOverlay.styleJs({ bottom: "48px" });
-                      } else {
-                        bottom.styleJs({ opacity: "1" });
-                        vidInfo.styleJs({ opacity: "1" });
-                        captionOverlay.styleJs({
-                          bottom: "calc(48px + 3rem)",
-                        });
-                      }
-                    }, 50);
-                  }
-                );
-              }, 200);
-            }
-          });
+          openPictureAdjustMenu(e);
         });
-      if (captions != null) {
-        let urlObj = new URL("http://127.0.0.1:9864/getFile");
-        urlObj.searchParams.append("path", captions[0]);
-        captionToggle.html(icons["captionsOn"]);
-        loadNewTrack(urlObj.href);
-        captionToggle.on("click", (e) => {
-          let overlay = new Html("div")
-            .styleJs({
-              width: "350px",
-              height: "600px",
-              background: "rgba(0,0,0,0.5)",
-              position: "absolute",
-              top: "50px",
-              left: "50px",
-              zIndex: 1000000,
-              backdropFilter: "blur(50px)",
-              borderRadius: "10px",
-              display: "flex",
-              flexDirection: "column",
-              padding: "25px",
-              overflow: "scroll",
-              gap: "10px",
-            })
-            .appendTo(wrapper);
-          new Html("h1").text("Captions").appendTo(overlay);
-          new Html("p")
-            .html(
-              `Enable captions for <strong>${
-                displayName ? displayName : noExt
-              }</strong>`
-            )
-            .appendTo(overlay);
-          new Html("br").appendTo(overlay);
-          let tempUiElems = [];
-          captions.forEach((caption) => {
-            let fileName = caption.split(/.*[\/|\\]/)[1];
-            let noExt = fileName.replace(/\.[^/.]+$/, "");
-            let re = /(?:\.([^.]+))?$/;
-            let lang = re.exec(noExt)[1];
-            console.log(caption);
-            let row = new Html("div")
-              .class("flex-list")
-              .appendTo(overlay)
-              .styleJs({ width: "100%" });
-            new Html("button")
-              .text(lang)
-              .appendTo(row)
-              .styleJs({ width: "100%" })
-              .on("click", () => {
-                let urlObj = new URL("http://127.0.0.1:9864/getFile");
-                urlObj.searchParams.append("path", caption);
-                loadNewTrack(urlObj.href);
-                Root.Libs.Notify.show(
-                  `Captions toggled`,
-                  `Now using caption ${lang}`
-                );
-              });
-            tempUiElems.push(row.elm.children);
-          });
-          Sfx.playSfx("deck_ui_into_game_detail.wav");
-          Ui.transition("popIn", overlay);
-          bottom.styleJs({ opacity: "0" });
-          vidInfo.styleJs({ opacity: "0" });
-          captionOverlay.styleJs({ bottom: "48px" });
-          e.target.classList.remove("over");
-          Ui.init(Pid, "horizontal", tempUiElems, function (e) {
-            if (e === "back") {
-              Sfx.playSfx("deck_ui_out_of_game_detail.wav");
-              Ui.transition("popOut", overlay);
-              setTimeout(() => {
-                overlay.cleanup();
-                bottom.styleJs({ opacity: "1" });
-                vidInfo.styleJs({ opacity: "1" });
-                captionOverlay.styleJs({
-                  bottom: "calc(48px + 3rem)",
-                });
-                Ui.init(
-                  Pid,
-                  "horizontal",
-                  [top.elm.children, bottom.elm.children],
-                  function (e) {
-                    if (e === "back") {
-                      pkg.end();
-                    }
-                    setTimeout(() => {
-                      let atTop = invButton.elm.classList.contains("over");
-                      if (atTop) {
-                        bottom.styleJs({ opacity: "0" });
-                        vidInfo.styleJs({ opacity: "0" });
-                        captionOverlay.styleJs({ bottom: "48px" });
-                      } else {
-                        bottom.styleJs({ opacity: "1" });
-                        vidInfo.styleJs({ opacity: "1" });
-                        captionOverlay.styleJs({
-                          bottom: "calc(48px + 3rem)",
-                        });
-                      }
-                    }, 50);
-                  }
-                );
-              }, 200);
-            }
-          });
-        });
-      } else {
-        captionToggle.on("click", () => {
-          Root.Libs.Notify.show(
-            `This video doesn't have captions`,
-            `To show captions, please put subtitle files (.vtt) in the video's directory.`
-          );
-        });
-      }
+    }
+
+    function addVideoEventListeners() {
       videoElm.on("loadedmetadata", () => {
         const videoDuration = Math.round(videoElm.elm.duration);
         const time = formatTime(videoDuration);
@@ -723,19 +460,53 @@ const pkg = {
       };
       document.addEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
       videoElm.on("play", () => {
-        playPause.html(icons["pause"]);
+        playPause.html(icons["pause"]); // Update play/pause button icon
         Sfx.playSfx("deck_ui_switch_toggle_on.wav");
         stopBgm();
       });
       videoElm.on("pause", () => {
-        playPause.html(icons["play"]);
+        playPause.html(icons["play"]); // Update play/pause button icon
         Sfx.playSfx("deck_ui_switch_toggle_off.wav");
         playBgm();
       });
+    }
+
+    function playVideo(
+      path,
+      captions = null,
+      displayName = null,
+      isLocal = true,
+      autoplay = true
+    ) {
+      let fileName = path.split(/.*[\/|\\]/)[1];
+      let noExt = fileName.replace(/\.[^/.]+$/, "");
+
+      createVideoElement(path, isLocal);
+      createTopBar();
+      let bottom = createBottomBar();
+      createCaptionOverlay();
+      createVideoInfo(displayName, path);
+
+      let playPause = createControlButtons(bottom); // Store playPause button
+      createTimeElapsed(bottom);
+      createProgressSlider(bottom);
+      createCaptionToggleButton(bottom, captions, displayName, path);
+      createBroadcastButton(bottom, displayName, noExt);
+      createPictureAdjustButton(bottom);
+      addVideoEventListeners();
+
       Ui.transition("popIn", wrapper);
       if (autoplay) {
         videoElm.elm.play();
       }
+
+      // Initialize UI navigation for the main player
+      Ui.init(
+        Pid,
+        "horizontal",
+        [top.elm.children, bottom.elm.children],
+        handleUiNavigation
+      );
     }
 
     async function loadNewTrack(captionPath) {
@@ -752,6 +523,244 @@ const pkg = {
       } catch (e) {
         console.log(`Aborted loading subtitle track!`, e);
       }
+    }
+
+    function openMenu(overlay, tempUiElems) {
+      Sfx.playSfx("deck_ui_into_game_detail.wav");
+      Ui.transition("popIn", overlay);
+      bottom.styleJs({ opacity: "0" });
+      vidInfo.styleJs({ opacity: "0" });
+      captionOverlay.styleJs({ bottom: "48px" });
+
+      Ui.init(Pid, "horizontal", tempUiElems, function (e) {
+        if (e === "back") {
+          closeMenu(overlay);
+        }
+      });
+    }
+
+    function closeMenu(overlay) {
+      Sfx.playSfx("deck_ui_out_of_game_detail.wav");
+      Ui.transition("popOut", overlay);
+      setTimeout(() => {
+        overlay.cleanup();
+        bottom.styleJs({ opacity: "1" });
+        vidInfo.styleJs({ opacity: "1" });
+        captionOverlay.styleJs({
+          bottom: "calc(48px + 3rem)",
+        });
+        // Reinitialize UI navigation for the main player
+        Ui.init(
+          Pid,
+          "horizontal",
+          [top.elm.children, bottom.elm.children],
+          handleUiNavigation
+        );
+      }, 200);
+    }
+
+    function openWatchPartyMenu(e, displayName, noExt) {
+      let overlay = new Html("div")
+        .styleJs({
+          width: "350px",
+          height: "600px",
+          background: "rgba(0,0,0,0.5)",
+          position: "absolute",
+          top: "50px",
+          left: "50px",
+          zIndex: 1000000,
+          backdropFilter: "blur(50px)",
+          borderRadius: "10px",
+          display: "flex",
+          flexDirection: "column",
+          padding: "25px",
+          overflow: "scroll",
+          gap: "10px",
+        })
+        .appendTo(wrapper);
+      new Html("h1").text("Invite a friend").appendTo(overlay);
+      new Html("p")
+        .html(
+          `Get a friend to watch <strong>${
+            displayName ? displayName : noExt
+          }</strong> with you`
+        )
+        .appendTo(overlay);
+      new Html("br").appendTo(overlay);
+      new Html("h2")
+        .text("Who's online")
+        .appendTo(overlay)
+        .styleJs({ paddingBottom: "10px" });
+      let tempUiElems = [];
+      let hasFriend = false;
+      friends.forEach((friend) => {
+        if (friend.status == 1) {
+          console.log(friend);
+          hasFriend = true;
+          let row = new Html("div")
+            .class("flex-list")
+            .appendTo(overlay)
+            .styleJs({ width: "100%" });
+          new Html("button")
+            .text(friend.name)
+            .appendTo(row)
+            .styleJs({ width: "100%" })
+            .on("click", async () => {
+              let friendId = friend.id;
+              console.log(friend.id);
+              let result = await ws.sendMessage({
+                type: "watchParty",
+                userId: friendId,
+                message: JSON.stringify({
+                  name: displayName ? displayName : noExt,
+                }),
+              });
+              console.log(result);
+            });
+          tempUiElems.push(row.elm.children);
+        }
+      });
+      if (!hasFriend) {
+        let row = new Html("div")
+          .class("flex-list")
+          .appendTo(overlay)
+          .styleJs({ width: "100%" });
+        new Html("button")
+          .text("None of your friends are online")
+          .appendTo(row)
+          .styleJs({ width: "100%" });
+        tempUiElems.push(row.elm.children);
+      }
+
+      openMenu(overlay, tempUiElems);
+      e.target.classList.remove("over");
+    }
+
+    function openPictureAdjustMenu(e) {
+      let overlay = new Html("div")
+        .styleJs({
+          width: "350px",
+          height: "600px",
+          background: "rgba(0,0,0,0.5)",
+          position: "absolute",
+          top: "50px",
+          left: "50px",
+          zIndex: 1000000,
+          backdropFilter: "blur(50px)",
+          borderRadius: "10px",
+          display: "flex",
+          flexDirection: "column",
+          padding: "25px",
+          overflow: "scroll",
+          gap: "10px",
+        })
+        .appendTo(wrapper);
+      new Html("h1").text("Picture Adjustment").appendTo(overlay);
+      new Html("p")
+        .html(`Adjust picture settings to your liking.`)
+        .appendTo(overlay);
+      new Html("br").appendTo(overlay);
+      let tempUiElems = [];
+      let row = new Html("div")
+        .class("flex-list")
+        .appendTo(overlay)
+        .styleJs({ width: "100%" });
+      new Html("button")
+        .text("Adjust brightness")
+        .appendTo(row)
+        .styleJs({ width: "100%" });
+      let row2 = new Html("div")
+        .class("flex-list")
+        .appendTo(overlay)
+        .styleJs({ width: "100%" });
+      new Html("button")
+        .text("Adjust contrast")
+        .appendTo(row2)
+        .styleJs({ width: "100%" });
+      tempUiElems.push(row.elm.children);
+      tempUiElems.push(row2.elm.children);
+
+      openMenu(overlay, tempUiElems);
+      e.target.classList.remove("over");
+    }
+
+    function openCaptionsMenu(e, captions, displayName, path) {
+      let overlay = new Html("div")
+        .styleJs({
+          width: "350px",
+          height: "600px",
+          background: "rgba(0,0,0,0.5)",
+          position: "absolute",
+          top: "50px",
+          left: "50px",
+          zIndex: 1000000,
+          backdropFilter: "blur(50px)",
+          borderRadius: "10px",
+          display: "flex",
+          flexDirection: "column",
+          padding: "25px",
+          overflow: "scroll",
+          gap: "10px",
+        })
+        .appendTo(wrapper);
+      new Html("h1").text("Captions").appendTo(overlay);
+      new Html("p")
+        .html(
+          `Enable captions for <strong>${
+            displayName
+              ? displayName
+              : path.split(/.*[\/|\\]/)[1].replace(/\.[^/.]+$/, "")
+          }</strong>`
+        )
+        .appendTo(overlay);
+      new Html("br").appendTo(overlay);
+      let tempUiElems = [];
+      captions.forEach((caption) => {
+        let fileName = caption.split(/.*[\/|\\]/)[1];
+        let noExt = fileName.replace(/\.[^/.]+$/, "");
+        let re = /(?:\.([^.]+))?$/;
+        let lang = re.exec(noExt)[1];
+        console.log(caption);
+        let row = new Html("div")
+          .class("flex-list")
+          .appendTo(overlay)
+          .styleJs({ width: "100%" });
+        new Html("button")
+          .text(lang)
+          .appendTo(row)
+          .styleJs({ width: "100%" })
+          .on("click", () => {
+            let urlObj = new URL("http://127.0.0.1:9864/getFile");
+            urlObj.searchParams.append("path", caption);
+            loadNewTrack(urlObj.href);
+            Root.Libs.Notify.show(
+              `Captions toggled`,
+              `Now using caption ${lang}`
+            );
+          });
+        tempUiElems.push(row.elm.children);
+      });
+
+      openMenu(overlay, tempUiElems);
+      e.target.classList.remove("over");
+    }
+
+    function handleUiNavigation(e) {
+      if (e === "back") {
+        pkg.end();
+      }
+      setTimeout(() => {
+        let atTop = invButton.elm.classList.contains("over");
+        if (atTop) {
+          bottom.styleJs({ opacity: "0" });
+          vidInfo.styleJs({ opacity: "0" });
+          captionOverlay.styleJs({ bottom: "48px" });
+        } else {
+          bottom.styleJs({ opacity: "1" });
+          vidInfo.styleJs({ opacity: "1" });
+          captionOverlay.styleJs({ bottom: "calc(48px + 3rem)" });
+        }
+      }, 50);
     }
 
     // let raw = sessionStorage.getItem("launch_args")
@@ -773,30 +782,8 @@ const pkg = {
       }
       playVideo(path, captions, displayName, !launchArgs.isOnline, autoplay);
     }
-
-    Ui.init(
-      Pid,
-      "horizontal",
-      [top.elm.children, bottom.elm.children],
-      function (e) {
-        if (e === "back") {
-          pkg.end();
-        }
-        setTimeout(() => {
-          let atTop = invButton.elm.classList.contains("over");
-          if (atTop) {
-            bottom.styleJs({ opacity: "0" });
-            vidInfo.styleJs({ opacity: "0" });
-            captionOverlay.styleJs({ bottom: "48px" });
-          } else {
-            bottom.styleJs({ opacity: "1" });
-            vidInfo.styleJs({ opacity: "1" });
-            captionOverlay.styleJs({ bottom: "calc(48px + 3rem)" });
-          }
-        }, 50);
-      }
-    );
   },
+
   end: async function () {
     // Exit this UI when the process is exited
     Ui.cleanup(Pid);
