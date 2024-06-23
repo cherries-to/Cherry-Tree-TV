@@ -129,10 +129,19 @@ const pkg = {
       };
     }
 
-    function playVideo(path, captions = null, displayName = null) {
-      let urlObj = new URL("http://127.0.0.1:9864/getFile");
-      urlObj.searchParams.append("path", path);
-      let url = urlObj.href;
+    function playVideo(
+      path,
+      captions = null,
+      displayName = null,
+      isLocal = true,
+      autoplay = true
+    ) {
+      let url = path;
+      if (isLocal) {
+        let urlObj = new URL("http://127.0.0.1:9864/getFile");
+        urlObj.searchParams.append("path", path);
+        url = urlObj.href;
+      }
       videoElm = new Html("video")
         .appendTo(wrapper)
         .styleJs({ width: "100%", height: "100%", position: "absolute" })
@@ -218,7 +227,7 @@ const pkg = {
         });
       1;
       playPause = new Html("button")
-        .html(icons["pause"])
+        .html(autoplay ? icons["pause"] : icons["play"])
         .appendTo(bottom)
         .on("click", () => {
           console.log("click");
@@ -683,7 +692,9 @@ const pkg = {
         playBgm();
       });
       Ui.transition("popIn", wrapper);
-      videoElm.elm.play();
+      if (autoplay) {
+        videoElm.elm.play();
+      }
     }
 
     async function loadNewTrack(captionPath) {
@@ -707,14 +718,19 @@ const pkg = {
     //   : "{}";
     // let launchArgs = JSON.parse(raw);
     let launchArgs = Root.Arguments[0];
+    let captions = null;
+    let autoplay =
+      launchArgs.autoplay == undefined ? true : launchArgs.autoplay;
     if (launchArgs.app == "video") {
       let path = launchArgs.videoPath;
-      let captions = await findCaptions(path);
+      if (!launchArgs.isOnline) {
+        captions = await findCaptions(path);
+      }
       let displayName = null;
       if (launchArgs.displayName) {
         displayName = launchArgs.displayName;
       }
-      playVideo(path, captions, displayName);
+      playVideo(path, captions, displayName, !launchArgs.isOnline, autoplay);
     }
 
     Ui.init(

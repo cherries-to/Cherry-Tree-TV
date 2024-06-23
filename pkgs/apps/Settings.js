@@ -679,9 +679,29 @@ const pkg = {
         })
     );
 
+    new Html("h2").text("Picture calibration").appendTo(wrapper);
     const row4 = new Html("div").class("flex-list").appendTo(wrapper);
+    const row5 = new Html("div").class("flex-list").appendTo(wrapper);
 
     row4.appendMany(
+      new Html("button").text("Open test pattern").on("click", async () => {
+        await Root.Libs.startPkg(
+          "apps:VideoPlayer",
+          [
+            {
+              app: "video",
+              videoPath: "../../assets/video/color_bars.mp4",
+              displayName: "SMPTE test pattern",
+              isOnline: true,
+              autoplay: false,
+            },
+          ],
+          true
+        );
+      })
+    );
+
+    row5.appendMany(
       new Html("button").text("Quit Settings").on("click", async (e) => {
         await Root.end();
       })
@@ -696,6 +716,7 @@ const pkg = {
         row2.elm.children,
         row3.elm.children,
         row4.elm.children,
+        row5.elm.children,
       ],
       function (e) {
         if (e === "menu" || e === "back") {
