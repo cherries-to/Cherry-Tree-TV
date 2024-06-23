@@ -6,7 +6,8 @@ import {
 
 console.log(CaptionsRenderer);
 
-let wrapper, Ui, Pid, Sfx, volumeUpdate;
+let wrapper, Ui, Users, Pid, Sfx, volumeUpdate;
+let friends = [];
 
 const pkg = {
   name: "Video Player",
@@ -16,7 +17,7 @@ const pkg = {
     Pid = Root.Pid;
 
     Ui = Root.Processes.getService("UiLib").data;
-
+    Users = Root.Processes.getService("UserSvc").data;
     wrapper = new Html("div").class("full-ui").appendTo("body");
 
     Ui.becomeTopUi(Pid, wrapper);
@@ -113,6 +114,10 @@ const pkg = {
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>',
       captionsOff:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions-off"><path d="M10.5 5H19a2 2 0 0 1 2 2v8.5"/><path d="M17 11h-.5"/><path d="M19 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/><path d="m2 2 20 20"/><path d="M7 11h4"/><path d="M7 15h2.5"/></svg>',
+      broadcast:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-radio"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>',
+      slider:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sliders-horizontal"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>',
     };
 
     function formatTime(timeInSeconds) {
@@ -182,21 +187,36 @@ const pkg = {
       });
       let fileName = path.split(/.*[\/|\\]/)[1];
       let noExt = fileName.replace(/\.[^/.]+$/, "");
-      // if (ws) {
-      //   ws.sendMessage({
-      //     type: "chat",
-      //     message: JSON.stringify({
-      //       type: "watchParty",
-      //       file: displayName ? displayName : noExt,
-      //     }),
-      //   });
-      // }
       new Html("h1")
         .text(displayName ? displayName : noExt)
         .appendTo(vidInfo)
         .styleJs({
           padding: "50px",
         });
+      new Html("button")
+        .html(icons["stepBack"])
+        .appendTo(bottom)
+        .on("click", () => {
+          console.log("click");
+          let currentVideoTime = videoElm.elm.currentTime
+            ? videoElm.elm.currentTime
+            : 0;
+          let newTime = currentVideoTime - 10;
+          if (newTime < 0) {
+            newTime = 0;
+          }
+          videoElm.elm.currentTime = newTime;
+        })
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0",
+        });
+      1;
       playPause = new Html("button")
         .html(icons["pause"])
         .appendTo(bottom)
@@ -211,6 +231,30 @@ const pkg = {
           }
         })
         .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0",
+        });
+      new Html("button")
+        .html(icons["stepForward"])
+        .appendTo(bottom)
+        .on("click", () => {
+          console.log("click");
+          let currentVideoTime = videoElm.elm.currentTime
+            ? videoElm.elm.currentTime
+            : 0;
+          let newTime = currentVideoTime + 10;
+          if (newTime > videoElm.elm.duration) {
+            newTime = videoElm.elm.duration;
+          }
+          videoElm.elm.currentTime = newTime;
+        })
+        .styleJs({
+          minWidth: "50px",
           height: "50px",
           display: "flex",
           flexDirection: "column",
@@ -239,77 +283,354 @@ const pkg = {
         color: "var(--current-player)",
         border: "none",
       });
-      new Html("button")
-        .html(icons["stepBack"])
-        .appendTo(bottom)
-        .on("click", () => {
-          console.log("click");
-          let currentVideoTime = videoElm.elm.currentTime
-            ? videoElm.elm.currentTime
-            : 0;
-          let newTime = currentVideoTime - 10;
-          if (newTime < 0) {
-            newTime = 0;
-          }
-          videoElm.elm.currentTime = newTime;
-        })
-        .styleJs({
-          height: "50px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0",
-        });
-      new Html("button")
-        .html(icons["stepForward"])
-        .appendTo(bottom)
-        .on("click", () => {
-          console.log("click");
-          let currentVideoTime = videoElm.elm.currentTime
-            ? videoElm.elm.currentTime
-            : 0;
-          let newTime = currentVideoTime + 10;
-          if (newTime > videoElm.elm.duration) {
-            newTime = videoElm.elm.duration;
-          }
-          videoElm.elm.currentTime = newTime;
-        })
-        .styleJs({
-          height: "50px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0",
-        });
       captionToggle = new Html("button")
         .html(icons["captionsOff"])
         .appendTo(bottom)
         .styleJs({
+          minWidth: "50px",
           height: "50px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           padding: "0",
+        });
+      new Html("button")
+        .html(icons["broadcast"])
+        .appendTo(bottom)
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0",
+        })
+        .on("click", async (e) => {
+          if (ws) {
+            friends = (await ws.sendMessage({ type: "get-friends" })).result;
+            console.log(friends);
+            let overlay = new Html("div")
+              .styleJs({
+                width: "350px",
+                height: "600px",
+                background: "rgba(0,0,0,0.5)",
+                position: "absolute",
+                top: "50px",
+                left: "50px",
+                zIndex: 1000000,
+                backdropFilter: "blur(50px)",
+                borderRadius: "10px",
+                display: "flex",
+                flexDirection: "column",
+                padding: "25px",
+                overflow: "scroll",
+                gap: "10px",
+              })
+              .appendTo(wrapper);
+            new Html("h1").text("Invite a friend").appendTo(overlay);
+            new Html("p")
+              .html(
+                `Get a friend to watch <strong>${
+                  displayName ? displayName : noExt
+                }</strong> with you`
+              )
+              .appendTo(overlay);
+            new Html("br").appendTo(overlay);
+            new Html("h2")
+              .text("Who's online")
+              .appendTo(overlay)
+              .styleJs({ paddingBottom: "10px" });
+            let tempUiElems = [];
+            let hasFriend = false;
+            friends.forEach((friend) => {
+              if (friend.status == 1) {
+                console.log(friend);
+                hasFriend = true;
+                let row = new Html("div")
+                  .class("flex-list")
+                  .appendTo(overlay)
+                  .styleJs({ width: "100%" });
+                new Html("button")
+                  .text(friend.name)
+                  .appendTo(row)
+                  .styleJs({ width: "100%" })
+                  .on("click", () => {
+                    let friendId = friend.id;
+                    console.log(friend.id);
+                    ws.sendMessage({
+                      type: "watchParty",
+                      id: friendId,
+                      message: JSON.stringify({
+                        name: displayName ? displayName : noExt,
+                      }),
+                    });
+                  });
+                tempUiElems.push(row.elm.children);
+              }
+            });
+            if (!hasFriend) {
+              let row = new Html("div")
+                .class("flex-list")
+                .appendTo(overlay)
+                .styleJs({ width: "100%" });
+              new Html("button")
+                .text("None of your friends are online")
+                .appendTo(row)
+                .styleJs({ width: "100%" });
+              tempUiElems.push(row.elm.children);
+            }
+            Sfx.playSfx("deck_ui_into_game_detail.wav");
+            Ui.transition("popIn", overlay);
+            bottom.styleJs({ opacity: "0" });
+            vidInfo.styleJs({ opacity: "0" });
+            captionOverlay.styleJs({ bottom: "48px" });
+            e.target.classList.remove("over");
+            Ui.init(Pid, "horizontal", tempUiElems, function (e) {
+              if (e === "menu" || e === "back") {
+                Sfx.playSfx("deck_ui_out_of_game_detail.wav");
+                Ui.transition("popOut", overlay);
+                setTimeout(() => {
+                  overlay.cleanup();
+                  bottom.styleJs({ opacity: "1" });
+                  vidInfo.styleJs({ opacity: "1" });
+                  captionOverlay.styleJs({
+                    bottom: "calc(48px + 3rem)",
+                  });
+                  Ui.init(
+                    Pid,
+                    "horizontal",
+                    [top.elm.children, bottom.elm.children],
+                    function (e) {
+                      if (e === "menu" || e === "back") {
+                        pkg.end();
+                      }
+                      setTimeout(() => {
+                        let atTop = invButton.elm.classList.contains("over");
+                        if (atTop) {
+                          bottom.styleJs({ opacity: "0" });
+                          vidInfo.styleJs({ opacity: "0" });
+                          captionOverlay.styleJs({ bottom: "48px" });
+                        } else {
+                          bottom.styleJs({ opacity: "1" });
+                          vidInfo.styleJs({ opacity: "1" });
+                          captionOverlay.styleJs({
+                            bottom: "calc(48px + 3rem)",
+                          });
+                        }
+                      }, 50);
+                    }
+                  );
+                }, 200);
+              }
+            });
+          }
+        });
+
+      new Html("button")
+        .html(icons["slider"])
+        .appendTo(bottom)
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0",
+        })
+        .on("click", (e) => {
+          let overlay = new Html("div")
+            .styleJs({
+              width: "350px",
+              height: "600px",
+              background: "rgba(0,0,0,0.5)",
+              position: "absolute",
+              top: "50px",
+              left: "50px",
+              zIndex: 1000000,
+              backdropFilter: "blur(50px)",
+              borderRadius: "10px",
+              display: "flex",
+              flexDirection: "column",
+              padding: "25px",
+              overflow: "scroll",
+              gap: "10px",
+            })
+            .appendTo(wrapper);
+          new Html("h1").text("Picture Adjustment").appendTo(overlay);
+          new Html("p")
+            .html(`Adjust picture settings to your liking.`)
+            .appendTo(overlay);
+          new Html("br").appendTo(overlay);
+          let tempUiElems = [];
+          let row = new Html("div")
+            .class("flex-list")
+            .appendTo(overlay)
+            .styleJs({ width: "100%" });
+          new Html("button")
+            .text("Adjust brightness")
+            .appendTo(row)
+            .styleJs({ width: "100%" });
+          let row2 = new Html("div")
+            .class("flex-list")
+            .appendTo(overlay)
+            .styleJs({ width: "100%" });
+          new Html("button")
+            .text("Adjust contrast")
+            .appendTo(row2)
+            .styleJs({ width: "100%" });
+          tempUiElems.push(row.elm.children);
+          tempUiElems.push(row2.elm.children);
+          Sfx.playSfx("deck_ui_into_game_detail.wav");
+          Ui.transition("popIn", overlay);
+          bottom.styleJs({ opacity: "0" });
+          vidInfo.styleJs({ opacity: "0" });
+          captionOverlay.styleJs({ bottom: "48px" });
+          e.target.classList.remove("over");
+          Ui.init(Pid, "horizontal", tempUiElems, function (e) {
+            if (e === "menu" || e === "back") {
+              Sfx.playSfx("deck_ui_out_of_game_detail.wav");
+              Ui.transition("popOut", overlay);
+              setTimeout(() => {
+                overlay.cleanup();
+                bottom.styleJs({ opacity: "1" });
+                vidInfo.styleJs({ opacity: "1" });
+                captionOverlay.styleJs({
+                  bottom: "calc(48px + 3rem)",
+                });
+                Ui.init(
+                  Pid,
+                  "horizontal",
+                  [top.elm.children, bottom.elm.children],
+                  function (e) {
+                    if (e === "menu" || e === "back") {
+                      pkg.end();
+                    }
+                    setTimeout(() => {
+                      let atTop = invButton.elm.classList.contains("over");
+                      if (atTop) {
+                        bottom.styleJs({ opacity: "0" });
+                        vidInfo.styleJs({ opacity: "0" });
+                        captionOverlay.styleJs({ bottom: "48px" });
+                      } else {
+                        bottom.styleJs({ opacity: "1" });
+                        vidInfo.styleJs({ opacity: "1" });
+                        captionOverlay.styleJs({
+                          bottom: "calc(48px + 3rem)",
+                        });
+                      }
+                    }, 50);
+                  }
+                );
+              }, 200);
+            }
+          });
         });
       if (captions != null) {
         let urlObj = new URL("http://127.0.0.1:9864/getFile");
         urlObj.searchParams.append("path", captions[0]);
         captionToggle.html(icons["captionsOn"]);
         loadNewTrack(urlObj.href);
-        captionToggle.on("click", () => {
-          let urlObj = new URL("http://127.0.0.1:9864/getFile");
-          let caption = captions[captionIndex++ % captions.length];
-          let fileName = caption.split(/.*[\/|\\]/)[1];
-          let noExt = fileName.replace(/\.[^/.]+$/, "");
-          urlObj.searchParams.append("path", caption);
-          loadNewTrack(urlObj.href);
-          Root.Libs.Notify.show(
-            `Captions toggled`,
-            `Now using caption ${noExt}`
-          );
+        captionToggle.on("click", (e) => {
+          let overlay = new Html("div")
+            .styleJs({
+              width: "350px",
+              height: "600px",
+              background: "rgba(0,0,0,0.5)",
+              position: "absolute",
+              top: "50px",
+              left: "50px",
+              zIndex: 1000000,
+              backdropFilter: "blur(50px)",
+              borderRadius: "10px",
+              display: "flex",
+              flexDirection: "column",
+              padding: "25px",
+              overflow: "scroll",
+              gap: "10px",
+            })
+            .appendTo(wrapper);
+          new Html("h1").text("Captions").appendTo(overlay);
+          new Html("p")
+            .html(
+              `Enable captions for <strong>${
+                displayName ? displayName : noExt
+              }</strong>`
+            )
+            .appendTo(overlay);
+          new Html("br").appendTo(overlay);
+          let tempUiElems = [];
+          captions.forEach((caption) => {
+            let fileName = caption.split(/.*[\/|\\]/)[1];
+            let noExt = fileName.replace(/\.[^/.]+$/, "");
+            let re = /(?:\.([^.]+))?$/;
+            let lang = re.exec(noExt)[1];
+            console.log(caption);
+            let row = new Html("div")
+              .class("flex-list")
+              .appendTo(overlay)
+              .styleJs({ width: "100%" });
+            new Html("button")
+              .text(lang)
+              .appendTo(row)
+              .styleJs({ width: "100%" })
+              .on("click", () => {
+                let urlObj = new URL("http://127.0.0.1:9864/getFile");
+                urlObj.searchParams.append("path", caption);
+                loadNewTrack(urlObj.href);
+                Root.Libs.Notify.show(
+                  `Captions toggled`,
+                  `Now using caption ${lang}`
+                );
+              });
+            tempUiElems.push(row.elm.children);
+          });
+          Sfx.playSfx("deck_ui_into_game_detail.wav");
+          Ui.transition("popIn", overlay);
+          bottom.styleJs({ opacity: "0" });
+          vidInfo.styleJs({ opacity: "0" });
+          captionOverlay.styleJs({ bottom: "48px" });
+          e.target.classList.remove("over");
+          Ui.init(Pid, "horizontal", tempUiElems, function (e) {
+            if (e === "menu" || e === "back") {
+              Sfx.playSfx("deck_ui_out_of_game_detail.wav");
+              Ui.transition("popOut", overlay);
+              setTimeout(() => {
+                overlay.cleanup();
+                bottom.styleJs({ opacity: "1" });
+                vidInfo.styleJs({ opacity: "1" });
+                captionOverlay.styleJs({
+                  bottom: "calc(48px + 3rem)",
+                });
+                Ui.init(
+                  Pid,
+                  "horizontal",
+                  [top.elm.children, bottom.elm.children],
+                  function (e) {
+                    if (e === "menu" || e === "back") {
+                      pkg.end();
+                    }
+                    setTimeout(() => {
+                      let atTop = invButton.elm.classList.contains("over");
+                      if (atTop) {
+                        bottom.styleJs({ opacity: "0" });
+                        vidInfo.styleJs({ opacity: "0" });
+                        captionOverlay.styleJs({ bottom: "48px" });
+                      } else {
+                        bottom.styleJs({ opacity: "1" });
+                        vidInfo.styleJs({ opacity: "1" });
+                        captionOverlay.styleJs({
+                          bottom: "calc(48px + 3rem)",
+                        });
+                      }
+                    }, 50);
+                  }
+                );
+              }, 200);
+            }
+          });
         });
       } else {
         captionToggle.on("click", () => {
@@ -416,15 +737,6 @@ const pkg = {
             captionOverlay.styleJs({ bottom: "calc(48px + 3rem)" });
           }
         }, 50);
-        // if (e.x === -1 && videoElm) {
-        //   videoElm.elm.controls = true;
-        //   videoElm.elm.pause();
-        // }
-        // if (e.x === 0 && videoElm) {
-        //   videoElm.elm.controls = false;
-        //   videoElm.elm.play();
-        // }
-        // console.log(e);
       }
     );
   },
