@@ -13,6 +13,7 @@ An open-source TV-style front-end for your HTPC that can run on Chrome & Firefox
 # To-do
 
 - [x] Movies support
+- [ ] App store
 - [ ] Friend chats
 - [ ] Watch parties (IN DEVELOPMENT)
 - [ ] Picture adjustments (IN DEVELOPMENT)
