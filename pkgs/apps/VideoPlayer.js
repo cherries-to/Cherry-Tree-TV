@@ -113,29 +113,86 @@ const pkg = {
     }
 
     async function hostWatchParty(videoElm, captions) {
-      let stream = videoElm.mozCaptureStream
-        ? videoElm.mozCaptureStream()
-        : videoElm.captureStream();
-      peer = new Peer(hostCode);
-      peer.on("connection", (conn) => {
-        let peerId = conn.peer;
-        videoElm.addEventListener("timeupdate", () => {
-          conn.send({
-            type: "timeupdate",
-            currentTime: videoElm.currentTime,
-            duration: videoElm.duration,
+      return new Promise((resolve, reject) => {
+        if (peer) {
+          resolve(peer);
+        }
+        let stream = videoElm.mozCaptureStream
+          ? videoElm.mozCaptureStream()
+          : videoElm.captureStream();
+        peer = new Peer(hostCode);
+        peer.on("open", () => {
+          resolve(peer);
+        });
+        peer.on("error", (e) => {
+          reject(e);
+        });
+        peer.on("connection", (conn) => {
+          let peerId = conn.peer;
+          videoElm.addEventListener("timeupdate", () => {
+            conn.send({
+              type: "timeupdate",
+              currentTime: videoElm.currentTime,
+              duration: videoElm.duration,
+            });
           });
-        });
-        videoElm.addEventListener("pause", () => {
-          conn.send({ type: "pause" });
-        });
-        videoElm.addEventListener("play", () => {
-          conn.send({ type: "play" });
-        });
-        conn.on("data", (data) => {
-          if (data.type == "connect") {
-            peer.call(peerId, stream);
-          }
+          videoElm.addEventListener("pause", () => {
+            conn.send({ type: "pause" });
+          });
+          videoElm.addEventListener("play", () => {
+            conn.send({ type: "play" });
+          });
+          conn.on("data", (data) => {
+            if (data.type == "connect") {
+              if (!data.username) {
+                conn.send({
+                  type: "error",
+                  message: "Please identify yourself",
+                });
+                conn.close();
+              } else {
+                Root.Libs.Notify.show(
+                  `${data.username} has joined the party 🎉`,
+                  `They're now watching with you.`
+                );
+                peer.call(peerId, stream);
+              }
+            }
+            if (data.type == "getCaptions") {
+              conn.send({ type: "captions", captions: captions });
+            }
+            if (data.type == "loadCaption") {
+              if (!data.index) {
+                conn.send({
+                  type: "error",
+                  message: "Please provide which caption to fetch",
+                });
+                conn.close();
+              } else {
+                let caption = captions[data.index];
+                let urlObj = new URL("http://127.0.0.1:9864/getFile");
+                urlObj.searchParams.append("path", caption);
+                let fileName = caption.split(/.*[\/|\\]/)[1];
+                let noExt = fileName.replace(/\.[^/.]+$/, "");
+                let re = /(?:\.([^.]+))?$/;
+                let lang = re.exec(noExt)[1]
+                  ? re.exec(noExt)[1]
+                  : "No language specified";
+                let captionData = getTrack(urlObj.href);
+                conn.send({
+                  type: "captionData",
+                  captionName: lang,
+                  captionData: captionData,
+                });
+              }
+            }
+          });
+          conn.on("close", () => {
+            Root.Libs.Notify.show(
+              "User left",
+              `This user has left the watch party.`
+            );
+          });
         });
       });
     }
@@ -509,16 +566,27 @@ const pkg = {
       );
     }
 
+    async function getTrack(captionPath) {
+      return new Promise((resolve, reject) => {
+        try {
+          trackFetchAbort?.abort();
+          const signal = (trackFetchAbort = new AbortController()).signal;
+          fetch(captionPath, { signal })
+            .then((res) => res.text())
+            .then((text) => resolve(text));
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
+
     async function loadNewTrack(captionPath) {
       try {
         trackFetchAbort?.abort();
-
         const signal = (trackFetchAbort = new AbortController()).signal;
-
         const { regions, cues } = await parseResponse(
           fetch(captionPath, { signal })
         );
-
         renderer.changeTrack({ regions, cues });
       } catch (e) {
         console.log(`Aborted loading subtitle track!`, e);
@@ -607,14 +675,22 @@ const pkg = {
             .on("click", async () => {
               let friendId = friend.id;
               console.log(friend.id);
+              await hostWatchParty(videoElm.elm);
               let result = await ws.sendMessage({
                 type: "watchParty",
                 userId: friendId,
                 message: JSON.stringify({
                   name: displayName ? displayName : noExt,
+                  partyId: hostCode,
                 }),
               });
               console.log(result);
+              if (result.type == "success") {
+                Root.Libs.Notify.show(
+                  "Successfully invited",
+                  `${friend.name} has been invited to your watch party.`
+                );
+              }
             });
           tempUiElems.push(row.elm.children);
         }
@@ -718,7 +794,9 @@ const pkg = {
         let fileName = caption.split(/.*[\/|\\]/)[1];
         let noExt = fileName.replace(/\.[^/.]+$/, "");
         let re = /(?:\.([^.]+))?$/;
-        let lang = re.exec(noExt)[1];
+        let lang = re.exec(noExt)[1]
+          ? re.exec(noExt)[1]
+          : "No language specified";
         console.log(caption);
         let row = new Html("div")
           .class("flex-list")
@@ -734,7 +812,7 @@ const pkg = {
             loadNewTrack(urlObj.href);
             Root.Libs.Notify.show(
               `Captions toggled`,
-              `Now using caption ${lang}`
+              `Now using caption: ${lang}`
             );
           });
         tempUiElems.push(row.elm.children);
