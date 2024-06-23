@@ -36,13 +36,13 @@ const langManager = {
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       if (typeof current[part] === "undefined") {
-        return null;
+        return path;
       }
       current = current[part];
     }
     if (typeof current === "string") {
       for (const key in replacements) {
-        current.replace(`%${key}%`, replacements[key]);
+        current = current.replace(`%${key}%`, replacements[key]);
       }
     }
     if (current === null || current === undefined) {

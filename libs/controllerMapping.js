@@ -101,6 +101,92 @@ export default {
       button15: "left",
     },
   },
+  labels: {
+    default: {
+      up: "Up",
+      down: "Down",
+      left: "Left",
+      right: "Right",
+      button0: "A",
+      button1: "B",
+      button2: "X",
+      button3: "Y",
+      button12: "D-Pad Up",
+      button13: "D-Pad Down",
+      button14: "D-Pad Left",
+      button15: "D-Pad Right",
+      button16: "Start",
+      button8: "Select",
+      button9: "Start",
+    },
+    "Wii Classic Controller": "JC-W01U",
+    "JC-W01U": {
+      up: "up",
+      down: "down",
+      left: "left",
+      right: "right",
+      button3: "A",
+      button2: "B",
+      button0: "Y",
+      button1: "X",
+      button8: "Select",
+      button9: "Start",
+    },
+    "Switch Pro Controller": {
+      // L stick
+      up1: "L Up",
+      down1: "L Down",
+      up0: "L Left",
+      down0: "L Right",
+      // ABXY
+      button1: "A",
+      button0: "B",
+      button2: "X",
+      button3: "Y",
+      // SELECT / START
+      button8: "Select",
+      button9: "Start",
+      // d-pad
+      button12: "D-Pad Up",
+      button13: "D-Pad Down",
+      button14: "D-Pad Left",
+      button15: "D-Pad Right",
+      // home & capture
+      // button16: "home",
+      // button17: "capture",
+    },
+    "SNES Controller": {
+      up: "D-Pad Up",
+      down: "D-Pad Down",
+      left: "D-Pad Left",
+      right: "D-Pad Right",
+      button1: "A",
+      button2: "B",
+      button3: "Y",
+      button0: "X",
+      button8: "Select",
+      button9: "Start",
+    },
+    "GameCube Controller": {
+      // L stick
+      up: "L Up",
+      down: "L Down",
+      left: "L Lef",
+      right: "L Right",
+      // ABXY
+      button1: "A",
+      button2: "B",
+      button0: "X",
+      button3: "Y",
+      // SELECT / START
+      button9: "Start",
+      // d-pad
+      button12: "D-Pad Up",
+      button13: "D-Pad Right",
+      button14: "D-Pad Down",
+      button15: "D-Pad Left",
+    },
+  },
   parseControllerId(id) {
     const userAgent = navigator.userAgent;
 

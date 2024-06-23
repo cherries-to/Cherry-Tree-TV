@@ -234,11 +234,25 @@ import "/libs/gamecontroller.js";
       // console.log("Input:", type);
       this.listeners[type][this.focusedApp] &&
         this.listeners[type][this.focusedApp](playerId);
+      window.currentPlayerId = playerId;
+      window.gpListeners[type].forEach((l) => l());
       // this.listeners[type].forEach((l) => l(this.focusedApp));
     },
     // Focused app determines which menu is on top and should be controllable
     // (PID-based)
     focusedApp: null,
+  };
+
+  window.gpListeners = {
+    left: [],
+    right: [],
+    up: [],
+    down: [],
+    confirm: [],
+    back: [],
+    act: [],
+    alt: [],
+    menu: [],
   };
 
   window.onkeydown = function (e) {

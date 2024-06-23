@@ -102,7 +102,7 @@ const pkg = {
                 console.log(s);
                 root.Libs.Notify.show(
                   `${s.from.name} is hosting a watch party!`,
-                  `Press the MENU button to handle the invite.`
+                  `Press the %menu% button to handle the invite.`
                 );
               } else if (s.type === "error" && s.reason) {
                 if (s.reason === "SocketClosedBadJwt") {

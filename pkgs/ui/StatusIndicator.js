@@ -90,6 +90,8 @@ const pkg = {
       "pauseMedia",
     ];
 
+    window.remoteState = false;
+
     function connectPeerJs() {
       let str = "";
       for (let i = 0; i < 4; i++) {
@@ -111,6 +113,7 @@ const pkg = {
           `A remote control has connected.`
         );
         code.text("");
+        window.remoteState = true;
 
         document.addEventListener(
           "CherryTree.Input.ShowKeyboardPrompt",
@@ -175,6 +178,9 @@ const pkg = {
             }
           } catch (_) {}
         });
+        conn.on('disconnect', () => {
+          window.remoteState = false;
+        })
       });
     }
 

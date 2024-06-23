@@ -1,6 +1,7 @@
 import vfs from "/libs/vfs.js";
 import Html from "/libs/html.js";
 import LangManager from "../../libs/l10n/manager.js";
+import langManager from "../../libs/l10n/manager.js";
 
 let Pid, Ui, wrapper, Sfx, cb;
 
@@ -74,7 +75,7 @@ const pkg = {
               left: "50%",
               transform: "translate(-50%,-50%)",
             })
-            .html(svg),
+            .html(svg)
           // Still needs a button on the page...
           // new Html("div")
           //   .class("button-row")
@@ -85,7 +86,12 @@ const pkg = {
         barButtons: {
           // Buttons call a page
           left: [],
-          right: [{ text: "Get started", goto: "controllerSetup" }],
+          right: [
+            {
+              text: langManager.getString("system.oobe.getStarted"),
+              goto: "phoneLinkSetup",
+            },
+          ],
         },
       },
       // setup: {
@@ -457,7 +463,7 @@ const pkg = {
       //     ],
       //   },
       // },
-      controllerSetup: {
+      phoneLinkSetup: {
         // Main parent element on top
         elm: new Html("div").class("flex-list", "oobe-spaced").appendMany(
           new Html("div").class("flex-col").appendMany(
@@ -468,20 +474,29 @@ const pkg = {
               LangManager.getString("system.oobe.phoneLink.description")
             ),
             new Html("div").class("button-row").appendMany(
-              new Html("button").text("Help").on("click", async (e) => {
-                Root.Libs.Modal.Show({
-                  title: LangManager.getString(
-                    "system.oobe.phoneLink.helpText"
-                  ),
-                  description: LangManager.getString(
-                    "system.oobe.phoneLink.helpInfo",
-                    { url: `${location.protocol}//${ip}:${location.port}/link` }
-                  ),
-                  parent: document.body,
-                  pid: Root.Pid,
-                  buttons: [{ type: "primary", text: "OK" }],
-                });
-              })
+              new Html("button")
+                .text(langManager.getString("label.help"))
+                .on("click", async (e) => {
+                  Root.Libs.Modal.Show({
+                    title: LangManager.getString(
+                      "system.oobe.phoneLink.helpText"
+                    ),
+                    description: LangManager.getString(
+                      "system.oobe.phoneLink.helpInfo",
+                      {
+                        url: `${location.protocol}//${ip}:${location.port}/link`,
+                      }
+                    ),
+                    parent: document.body,
+                    pid: Root.Pid,
+                    buttons: [
+                      {
+                        type: "primary",
+                        text: langManager.getString("actions.ok"),
+                      },
+                    ],
+                  });
+                })
             )
           ),
           new Html("div").class("flex-col").appendMany(
@@ -499,8 +514,12 @@ const pkg = {
         // bottom bar buttons
         barButtons: {
           // Buttons call a page
-          left: [{ text: "Back", goto: "welcome" }],
-          right: [{ text: "Next", goto: "account" }],
+          left: [
+            { text: langManager.getString("actions.back"), goto: "welcome" },
+          ],
+          right: [
+            { text: langManager.getString("actions.next"), goto: "account" },
+          ],
         },
       },
       // controllerHelp: {
@@ -525,7 +544,7 @@ const pkg = {
       //   // bottom bar buttons
       //   barButtons: {
       //     // Buttons call a page
-      //     left: [{ text: "Back", goto: "controllerSetup" }],
+      //     left: [{ text: "Back", goto: "phoneLinkSetup" }],
       //   },
       // },
       account: {
@@ -534,39 +553,59 @@ const pkg = {
           new Html("div")
             .class("flex-col")
             .appendMany(
-              new Html("h1").text("Register with Cherries."),
-              new Html("p").text("Please  or register with Cherries.")
+              new Html("h1").text(
+                LangManager.getString("system.oobe.account.title")
+              ),
+              new Html("p").text(
+                LangManager.getString("system.oobe.account.description")
+              )
             ),
           new Html("div").class("flex-col").appendMany(
             new Html("div").class("button-row").appendMany(
-              new Html("button").text("Login").on("click", (e) => {
-                switchPage("login");
-              })
+              new Html("button")
+                .text(LangManager.getString("actions.login"))
+                .on("click", (e) => {
+                  switchPage("login");
+                })
             ),
             new Html("div").class("button-row").appendMany(
-              new Html("button").text("Register").on("click", (e) => {
-                switchPage("register");
-              })
+              new Html("button")
+                .text(LangManager.getString("actions.register"))
+                .on("click", (e) => {
+                  switchPage("register");
+                })
             )
           )
         ),
         // bottom bar buttons
         barButtons: {
           // Buttons call a page
-          left: [{ text: "Back", goto: "controllerSetup" }],
+          left: [
+            {
+              text: langManager.getString("actions.back"),
+              goto: "phoneLinkSetup",
+            },
+          ],
           right: [
             {
-              text: "Skip",
+              text: langManager.getString("actions.skip"),
               goto: async function () {
                 let result = await Root.Libs.Modal.Show({
-                  title: "Are you really sure you want to skip?",
-                  description:
-                    "You won't be logged in and will miss out on some features.",
+                  title: langManager.getString("system.oobe.modal.skip.title"),
+                  description: langManager.getString(
+                    "system.oobe.modal.skip.description"
+                  ),
                   pid: Root.Pid,
                   parent: document.body,
                   buttons: [
-                    { type: "primary", text: "No" },
-                    { type: "primary", text: "Yes" },
+                    {
+                      type: "primary",
+                      text: langManager.getString("actions.no"),
+                    },
+                    {
+                      type: "primary",
+                      text: langManager.getString("actions.yes"),
+                    },
                   ],
                 });
 
@@ -584,18 +623,24 @@ const pkg = {
           new Html("div")
             .class("flex-col")
             .appendMany(
-              new Html("h1").text("Login with Cherries."),
+              new Html("h1").text(
+                langManager.getString("system.oobe.login.title")
+              ),
               new Html("p").html(
-                "By signing in you agree and comply<br>with our Legal Information over at<br><a href='https://cherries.to'>cherries.to/legal/</a>"
+                langManager.getString("system.oobe.login.description")
               )
             ),
           new Html("div").class("flex-col").appendMany(
             new Html("div").class("button-row", "flex-col").appendMany(
-              new Html("span").text("username/email"),
+              new Html("span").text(
+                langManager.getString("label.usernameOrEmail")
+              ),
               new Html("button").class("input-box").on("click", (e) => {
                 promptForInput(
-                  "Username",
-                  "Your Cherries account username",
+                  langManager.getString("system.oobe.modal.username.title"),
+                  langManager.getString(
+                    "system.oobe.modal.username.description"
+                  ),
                   e.target,
                   false,
                   "login_username"
@@ -603,11 +648,13 @@ const pkg = {
               })
             ),
             new Html("div").class("button-row", "flex-col").appendMany(
-              new Html("span").text("password"),
+              new Html("span").text(langManager.getString("label.password")),
               new Html("button").class("input-box").on("click", (e) => {
                 promptForInput(
-                  "Password",
-                  "Your Cherries account password",
+                  langManager.getString("system.oobe.modal.password.title"),
+                  langManager.getString(
+                    "system.oobe.modal.password.description"
+                  ),
                   e.target,
                   true,
                   "login_password"
@@ -674,18 +721,22 @@ const pkg = {
           new Html("div")
             .class("flex-col")
             .appendMany(
-              new Html("h1").text("Register with Cherries."),
+              new Html("h1").text(
+                langManager.getString("system.oobe.register.title")
+              ),
               new Html("p").html(
-                "By registering in you agree and comply<br>with our Legal Information over at<br><a href='https://cherries.to'>cherries.to/legal/</a>"
+                langManager.getString("system.oobe.register.description")
               )
             ),
           new Html("div").class("flex-col").appendMany(
             new Html("div").class("button-row", "flex-col").appendMany(
-              new Html("span").text("username"),
+              new Html("span").text(langManager.getString("label.username")),
               new Html("button").class("input-box").on("click", (e) => {
                 promptForInput(
-                  "Username",
-                  "Your Cherries account username",
+                  langManager.getString("system.oobe.modal.username.title"),
+                  langManager.getString(
+                    "system.oobe.modal.username.description"
+                  ),
                   e.target,
                   false,
                   "register_username"
@@ -693,11 +744,11 @@ const pkg = {
               })
             ),
             new Html("div").class("button-row", "flex-col").appendMany(
-              new Html("span").text("email"),
+              new Html("span").text(langManager.getString("label.email")),
               new Html("button").class("input-box").on("click", (e) => {
                 promptForInput(
-                  "Email",
-                  "Your Cherries account email",
+                  langManager.getString("system.oobe.modal.email.title"),
+                  langManager.getString("system.oobe.modal.email.description"),
                   e.target,
                   false,
                   "register_email"
@@ -705,11 +756,13 @@ const pkg = {
               })
             ),
             new Html("div").class("button-row", "flex-col").appendMany(
-              new Html("span").text("password"),
+              new Html("span").text(langManager.getString("label.password")),
               new Html("button").class("input-box").on("click", (e) => {
                 promptForInput(
-                  "Password",
-                  "Your Cherries account password",
+                  langManager.getString("system.oobe.modal.password.title"),
+                  langManager.getString(
+                    "system.oobe.modal.password.description"
+                  ),
                   e.target,
                   true,
                   "register_password"
@@ -721,10 +774,12 @@ const pkg = {
         // bottom bar buttons
         barButtons: {
           // Buttons call a page
-          left: [{ text: "Back", goto: "account" }],
+          left: [
+            { text: langManager.getString("actions.back"), goto: "account" },
+          ],
           right: [
             {
-              text: "Next",
+              text: langManager.getString("actions.next"),
               goto: async function (e) {
                 e.target.disabled = true;
                 let result;
@@ -784,7 +839,9 @@ const pkg = {
           .appendMany(
             new Html("div")
               .class("flex-col")
-              .appendMany(new Html("h1").text("Logging in...")),
+              .appendMany(
+                new Html("h1").text(langManager.getString("status.loggingIn"))
+              ),
             new Html("div")
               .class("flex-col")
               .html(
@@ -798,37 +855,27 @@ const pkg = {
       },
       thanks: {
         // Main parent element on top
-        elm: new Html("div").class("flex-row", "oobe-spaced").appendMany(
-          new Html("div")
-            .class("flex-col")
-            .appendMany(
-              new Html("h1").text("Thank you"),
-              new Html("p").html(
-                "We hope you enjoy your Home, Entertainment and Experience. Your support means the world."
+        elm: new Html("div")
+          .class("flex-row", "oobe-spaced")
+          .appendMany(
+            new Html("div")
+              .class("flex-col")
+              .appendMany(
+                new Html("h1").text(
+                  langManager.getString("system.oobe.thanks.title")
+                ),
+                new Html("p").html(
+                  langManager.getString("system.oobe.thanks.description")
+                )
               )
-            )
-          // new Html("div").class("flex-col").appendMany(
-          //   new Html("div").class("button-row", "flex-col").appendMany(
-          //     new Html("span").text("password"),
-          //     new Html("button").class("input-box").on("click", (e) => {
-          //       promptForInput(
-          //         "Password",
-          //         "Your Cherries account password",
-          //         e.target,
-          //         true,
-          //         "register_password"
-          //       );
-          //     })
-          //   )
-          // )
-        ),
+          ),
         // bottom bar buttons
         barButtons: {
           // Buttons call a page
           left: [],
           right: [
             {
-              text: "Finish",
+              text: langManager.getString("actions.finish"),
               goto: async function () {
                 Root.end();
                 return true;

@@ -949,3 +949,13 @@ iframe {
 /* .invisible {
   display: none;
 } */
+kbd {
+  border: 0.1rem solid #fff4;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+  background: #fff2;
+  font: inherit;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}

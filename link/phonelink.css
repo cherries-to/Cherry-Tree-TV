@@ -82,14 +82,14 @@ input[type="text"]:focus {
   align-items: center;
 }
 [data-ui="remote"] button[data-action="back"]:hover,
-[data-ui="remote"] button[data-action="mic"]:hover,
+[data-ui="remote"] button[data-action="menu"]:hover,
 [data-ui="remote"] button[data-action="volUp"]:hover,
 [data-ui="remote"] button[data-action="volDown"]:hover,
 [data-ui="remote"] button:not(#bg):hover {
   background: #222 !important;
 }
 [data-ui="remote"] button[data-action="back"]:active,
-[data-ui="remote"] button[data-action="mic"]:active,
+[data-ui="remote"] button[data-action="menu"]:active,
 [data-ui="remote"] button[data-action="volUp"]:active,
 [data-ui="remote"] button[data-action="volDown"]:active,
 [data-ui="remote"] button:not(#bg):active {
@@ -123,13 +123,13 @@ input[type="text"]:focus {
 [data-ui="remote"] button[data-action="back"],
 [data-ui="remote"] button[data-action="volUp"],
 [data-ui="remote"] button[data-action="volDown"],
-[data-ui="remote"] button[data-action="mic"] {
+[data-ui="remote"] button[data-action="menu"] {
   background: #111;
 }
 [data-ui="remote"] button[data-action="back"] svg,
 [data-ui="remote"] button[data-action="volUp"] svg,
 [data-ui="remote"] button[data-action="volDown"] svg,
-[data-ui="remote"] button[data-action="mic"] svg {
+[data-ui="remote"] button[data-action="menu"] svg {
   width: 36px;
   height: 36px;
 }

@@ -720,7 +720,7 @@ const pkg = {
       ],
       function (e) {
         if (e === "menu" || e === "back") {
-          pkg.end();
+          Root.end();
         }
       }
     );
