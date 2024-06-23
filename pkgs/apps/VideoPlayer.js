@@ -370,7 +370,7 @@ const pkg = {
                     console.log(friend.id);
                     ws.sendMessage({
                       type: "watchParty",
-                      id: friendId,
+                      userId: friendId,
                       message: JSON.stringify({
                         name: displayName ? displayName : noExt,
                       }),

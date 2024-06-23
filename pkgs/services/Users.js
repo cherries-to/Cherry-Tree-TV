@@ -100,6 +100,10 @@ const pkg = {
                 root.Libs.Notify.show(s.data.title, s.data.description);
               } else if (s.type === "watchParty") {
                 console.log(s);
+                root.Libs.Notify.show(
+                  `${s.from.name} is hosting a watch party!`,
+                  `Press the MENU button to handle the invite.`
+                );
               } else if (s.type === "error" && s.reason) {
                 if (s.reason === "SocketClosedBadJwt") {
                   // Somehow callback with false ?
