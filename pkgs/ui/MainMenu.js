@@ -47,6 +47,50 @@ const pkg = {
       logStep("No WebSocket detected");
     }
 
+    document.addEventListener("CherryTree.WebSocket.Message", (e) => {
+      let s = e.detail;
+      console.log("WS message on MainMenu", s);
+      if (s.type === "watchParty") {
+        console.log(s);
+        let parsedData = JSON.parse(s.text);
+        Root.Libs.Notify.show(
+          `${s.from.name} is hosting a watch party!`,
+          `Press the %menu% button to handle the invite.`,
+          "menu",
+          async () => {
+            let userResult = await Root.Libs.Modal.Show({
+              title: "Watch Party Invite",
+              description: `${s.from.name} has invited you to watch\n ${parsedData.name}`,
+              parent: document.body,
+              pid: await ui.data.getTopUi(),
+              buttons: [
+                { type: "default", text: "Accept" },
+                { type: "default", text: "Ignore" },
+              ],
+            });
+            console.log(userResult);
+            if (!userResult.cancelled) {
+              const accepted = userResult.id === 0 ? true : false;
+              if (accepted) {
+                await Root.Libs.startPkg(
+                  "apps:VideoPlayer",
+                  [
+                    {
+                      app: "video",
+                      watchParty: true,
+                      partyCode: parsedData.partyId,
+                      partyName: parsedData.name,
+                    },
+                  ],
+                  true
+                );
+              }
+            }
+          }
+        );
+      }
+    });
+
     await vfs.importFS();
 
     logStep("FileSystem loaded");

@@ -103,6 +103,7 @@ const pkg = {
     let trackFetchAbort;
 
     let peer = null;
+    let conn = null;
 
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
@@ -143,6 +144,7 @@ const pkg = {
             conn.send({ type: "play" });
           });
           conn.on("data", (data) => {
+            console.log(data);
             if (data.type == "connect") {
               if (!data.username) {
                 conn.send({
@@ -226,17 +228,24 @@ const pkg = {
       };
     }
 
-    function createVideoElement(path, isLocal) {
+    function createVideoElement(path, isLocal, isWatchParty = false) {
       let url = path;
       if (isLocal) {
         let urlObj = new URL("http://127.0.0.1:9864/getFile");
         urlObj.searchParams.append("path", path);
         url = urlObj.href;
       }
-      videoElm = new Html("video")
-        .appendTo(wrapper)
-        .styleJs({ width: "100%", height: "100%", position: "absolute" })
-        .attr({ src: url, crossorigin: "anonymous" });
+      if (!isWatchParty) {
+        videoElm = new Html("video")
+          .appendTo(wrapper)
+          .styleJs({ width: "100%", height: "100%", position: "absolute" })
+          .attr({ src: url, crossorigin: "anonymous" });
+      } else {
+        videoElm = new Html("video")
+          .appendTo(wrapper)
+          .styleJs({ width: "100%", height: "100%", position: "absolute" })
+          .attr({ crossorigin: "anonymous" });
+      }
       videoElm.elm.controls = false;
       return videoElm;
     }
@@ -297,8 +306,11 @@ const pkg = {
         background: "linear-gradient(to top, #0000, #000f)",
         transition: "all 0.1s linear",
       });
-      let fileName = path.split(/.*[\/|\\]/)[1];
-      let noExt = fileName.replace(/\.[^/.]+$/, "");
+      let noExt = "undefined";
+      if (path) {
+        let fileName = path.split(/.*[\/|\\]/)[1];
+        noExt = fileName.replace(/\.[^/.]+$/, "");
+      }
       new Html("h1")
         .text(displayName ? displayName : noExt)
         .appendTo(vidInfo)
@@ -443,6 +455,25 @@ const pkg = {
       return captionToggle;
     }
 
+    function createPartyCaptionToggleButton(bottom, callback) {
+      captionToggle = new Html("button")
+        .html(icons["captionsOn"])
+        .appendTo(bottom)
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0",
+        });
+      captionToggle.on("click", (e) => {
+        callback();
+      });
+      return captionToggle;
+    }
+
     function createBroadcastButton(bottom, displayName, noExt) {
       new Html("button")
         .html(icons["broadcast"])
@@ -528,6 +559,51 @@ const pkg = {
       });
     }
 
+    function addPartyEventListeners(conn, partyName) {
+      conn.on("data", async (data) => {
+        if (data.type == "timeupdate") {
+          const videoDuration = Math.round(data.duration);
+          const duration = formatTime(videoDuration);
+          const videoElapsed = Math.round(data.currentTime);
+          const elapsed = formatTime(videoElapsed);
+          timeElapsedFront.text(`${elapsed.minutes}:${elapsed.seconds}`);
+          timeElapsedBack.text(`${duration.minutes}:${duration.seconds}`);
+          progress.attr({
+            type: "range",
+            min: 0,
+            max: data.duration,
+            value: data.currentTime,
+          });
+          renderer.currentTime = data.currentTime;
+        }
+        if (data.type == "play") {
+          Sfx.playSfx("deck_ui_switch_toggle_on.wav");
+          stopBgm();
+        }
+        if (data.type == "pause") {
+          Sfx.playSfx("deck_ui_switch_toggle_off.wav");
+          playBgm();
+        }
+        if (data.type == "captionData") {
+          const { regions, cues } = await parseResponse(data.captionData);
+          renderer.changeTrack({ regions, cues });
+          Root.Libs.Notify.show(
+            "Captions toggled",
+            `Now using caption ${data.captionName}`
+          );
+        }
+        if (data.type == "captions") {
+          console.log(data.captions);
+          openPartyCaptionsMenu(data.captions, conn, partyName);
+        }
+      });
+      videoElm.elm.volume = Sfx.getVolume();
+      volumeUpdate = (e) => {
+        videoElm.elm.volume = e.detail / 100;
+      };
+      document.addEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
+    }
+
     function playVideo(
       path,
       captions = null,
@@ -564,6 +640,46 @@ const pkg = {
         [top.elm.children, bottom.elm.children],
         handleUiNavigation
       );
+    }
+
+    async function connectToParty(watchCode, partyName) {
+      createVideoElement("", false, true);
+      createTopBar();
+      let bottom = createBottomBar();
+      createCaptionOverlay();
+      createVideoInfo(partyName, null);
+      createTimeElapsed(bottom);
+      createProgressSlider(bottom);
+      peer = new Peer();
+      peer.on("open", async () => {
+        let info = await Users.getUserInfo(await Root.Security.getToken());
+        let conn = peer.connect(watchCode);
+        conn.on("open", () => {
+          conn.send({ type: "connect", username: info.name });
+          conn.on("data", (data) => {
+            console.log(data);
+          });
+          createPartyCaptionToggleButton(bottom, function () {
+            conn.send({ type: "getCaptions" });
+          });
+          createPictureAdjustButton(bottom);
+          addPartyEventListeners(conn, partyName);
+          Ui.transition("popIn", wrapper);
+          Ui.init(
+            Pid,
+            "horizontal",
+            [top.elm.children, bottom.elm.children],
+            handleUiNavigation
+          );
+          peer.on("call", (call) => {
+            call.answer();
+            call.on("stream", (stream) => {
+              videoElm.elm.srcObject = stream;
+              videoElm.elm.play();
+            });
+          });
+        });
+      });
     }
 
     async function getTrack(captionPath) {
@@ -675,7 +791,7 @@ const pkg = {
             .on("click", async () => {
               let friendId = friend.id;
               console.log(friend.id);
-              await hostWatchParty(videoElm.elm);
+              await hostWatchParty(videoElm.elm, captions);
               let result = await ws.sendMessage({
                 type: "watchParty",
                 userId: friendId,
@@ -822,6 +938,60 @@ const pkg = {
       e.target.classList.remove("over");
     }
 
+    function openPartyCaptionsMenu(captions, conn, partyName) {
+      let overlay = new Html("div")
+        .styleJs({
+          width: "350px",
+          height: "600px",
+          background: "rgba(0,0,0,0.5)",
+          position: "absolute",
+          top: "50px",
+          left: "50px",
+          zIndex: 1000000,
+          backdropFilter: "blur(50px)",
+          borderRadius: "10px",
+          display: "flex",
+          flexDirection: "column",
+          padding: "25px",
+          overflow: "scroll",
+          gap: "10px",
+        })
+        .appendTo(wrapper);
+      new Html("h1").text("Captions").appendTo(overlay);
+      new Html("p")
+        .html(
+          `Enable captions for <strong>${
+            partyName ? partyName : "this watch party."
+          }</strong>`
+        )
+        .appendTo(overlay);
+      new Html("br").appendTo(overlay);
+      let tempUiElems = [];
+      captions.forEach((caption, index) => {
+        let fileName = caption.split(/.*[\/|\\]/)[1];
+        let noExt = fileName.replace(/\.[^/.]+$/, "");
+        let re = /(?:\.([^.]+))?$/;
+        let lang = re.exec(noExt)[1]
+          ? re.exec(noExt)[1]
+          : "No language specified";
+        console.log(caption);
+        let row = new Html("div")
+          .class("flex-list")
+          .appendTo(overlay)
+          .styleJs({ width: "100%" });
+        new Html("button")
+          .text(lang)
+          .appendTo(row)
+          .styleJs({ width: "100%" })
+          .on("click", () => {
+            conn.send({ type: "loadCaption", index: index });
+          });
+        tempUiElems.push(row.elm.children);
+      });
+
+      openMenu(overlay, tempUiElems);
+    }
+
     function handleUiNavigation(e) {
       if (e === "back") {
         pkg.end();
@@ -846,14 +1016,18 @@ const pkg = {
       launchArgs.autoplay == undefined ? true : launchArgs.autoplay;
     if (launchArgs.app == "video") {
       let path = launchArgs.videoPath;
-      if (!launchArgs.isOnline) {
+      if (!launchArgs.isOnline && !launchArgs.watchParty) {
         captions = await findCaptions(path);
       }
       let displayName = null;
       if (launchArgs.displayName) {
         displayName = launchArgs.displayName;
       }
-      playVideo(path, captions, displayName, !launchArgs.isOnline, autoplay);
+      if (launchArgs.watchParty) {
+        connectToParty(launchArgs.partyCode, launchArgs.partyName);
+      } else {
+        playVideo(path, captions, displayName, !launchArgs.isOnline, autoplay);
+      }
     }
   },
 
