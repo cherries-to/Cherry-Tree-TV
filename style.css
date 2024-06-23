@@ -21,8 +21,8 @@
   --background-lightest: #fff2;
   --background-lighting: #fff2;
   --background-lighter: #fff2;
-  --background-light: #fff2;
-  --background-default: #fff2;
+  --background-light: #fff1;
+  --background-default: #000a;
   --background-dim: #000;
   --background-dimmer: #000;
   --background-dimming: #000;
@@ -736,6 +736,19 @@ input[type="range"] {
   gap: 2.5rem;
 }
 
+.main-menu-container .left .buttons a {
+  transition-property: color, font-size, text-decoration-thickness;
+  transition-duration: 0.4s;
+  transition-timing-function: var(--easing-function);
+}
+
+.main-menu-container .left .buttons:has(.over) :not(.over) {
+  color: var(--text-dimmest);
+}
+.main-menu-container .left .buttons:has(.over) a {
+  font-size: 1.7em;
+}
+
 .main-menu-container .right,
 .main-menu-container .right .buttons {
   display: flex;
@@ -809,9 +822,12 @@ input[type="range"] {
 a.hv {
   text-decoration: none;
   border: 0;
+  text-decoration-thickness: 0rem;
 }
-/* a.hv.over {} */
 a.hv.selected {
+  text-decoration: none;
+}
+a.hv.over {
   text-decoration: underline;
   text-decoration-thickness: 0.2rem;
   border: 0 !important;

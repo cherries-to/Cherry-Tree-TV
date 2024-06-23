@@ -1,6 +1,9 @@
-import Html from "/libs/html.js";
-import Keyboard from "/libs/keyboard.js";
-import vfs from "/libs/vfs.js";
+// this is a test...
+const ROOT = location.protocol + "//" + location.host;
+const loadModule = async (module) => (await import(`${ROOT}${module}`)).default;
+const Html = await loadModule("/libs/html.js");
+const Keyboard = await loadModule("/libs/keyboard.js");
+const vfs = await loadModule("/libs/vfs.js");
 
 let wrapper, Ui, Pid, Sfx;
 

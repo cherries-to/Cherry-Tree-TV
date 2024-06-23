@@ -587,6 +587,7 @@ const pkg = {
     },
     updatePos(pid, cursor) {
       UiInfo[pid].cursor = cursor;
+      pkg.data.focus.unfocusAll(pid);
       pkg.data.focus.focusCurrent(pid);
     },
     get(pid) {
