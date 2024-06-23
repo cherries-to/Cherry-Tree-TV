@@ -22,7 +22,7 @@
   --background-lighting: #fff2;
   --background-lighter: #fff2;
   --background-light: #fff1;
-  --background-default: #000a;
+  --background-default: #0006;
   --background-dim: #000;
   --background-dimmer: #000;
   --background-dimming: #000;
@@ -736,17 +736,8 @@ input[type="range"] {
   gap: 2.5rem;
 }
 
-.main-menu-container .left .buttons a {
-  transition-property: color, font-size, text-decoration-thickness;
-  transition-duration: 0.4s;
-  transition-timing-function: var(--easing-function);
-}
-
 .main-menu-container .left .buttons:has(.over) :not(.over) {
   color: var(--text-dimmest);
-}
-.main-menu-container .left .buttons:has(.over) a {
-  font-size: 1.7em;
 }
 
 .main-menu-container .right,
@@ -796,7 +787,7 @@ input[type="range"] {
 }
 
 .notify-box > .notify {
-  background-color: var(--background-default);
+  background-color: var(--background-lighter);
   border: 0.125rem solid var(--current-player);
   border-radius: 0.32rem;
   padding: 0.75rem 0.8rem;
