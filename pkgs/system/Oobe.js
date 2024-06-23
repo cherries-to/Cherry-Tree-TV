@@ -1,5 +1,6 @@
 import vfs from "/libs/vfs.js";
 import Html from "/libs/html.js";
+import LangManager from "../../libs/l10n/manager.js";
 
 let Pid, Ui, wrapper, Sfx, cb;
 
@@ -75,408 +76,407 @@ const pkg = {
             })
             .html(svg),
           // Still needs a button on the page...
-          new Html("div")
-            .class("button-row")
-            .style({ display: "none" })
-            .appendMany(new Html("button").text("..."))
+          // new Html("div")
+          //   .class("button-row")
+          //   .style({ display: "none" })
+          //   .appendMany(new Html("button").text("..."))
         ),
         // bottom bar buttons
         barButtons: {
           // Buttons call a page
-          left: [{ text: "Configure", goto: "setup" }],
+          left: [],
           right: [{ text: "Get started", goto: "controllerSetup" }],
         },
       },
-      setup: {
-        // Main parent element on top
-        elm: new Html("div").class("flex-row").appendMany(
-          // Still needs a button on the page...
-          new Html("div").class("button-row", "flex-row").appendMany(
-            new Html("button").text("UI scaling").on("click", async (e) => {
-              let getScaleValue = Ui.scaling.getScaleValue;
+      // setup: {
+      //   // Main parent element on top
+      //   elm: new Html("div").class("flex-row").appendMany(
+      //     // Still needs a button on the page...
+      //     new Html("div").class("button-row", "flex-row").appendMany(
+      //       new Html("button").text("UI scaling").on("click", async (e) => {
+      //         let getScaleValue = Ui.scaling.getScaleValue;
 
-              let values = [
-                {
-                  label: "70%",
-                  scale: getScaleValue(70),
-                },
-                {
-                  label: "85%",
-                  scale: getScaleValue(85),
-                },
-                {
-                  label: "100%",
-                  scale: "16px",
-                },
-                {
-                  label: "125%",
-                  scale: getScaleValue(125),
-                },
-                {
-                  label: "150%",
-                  scale: getScaleValue(150),
-                },
-                {
-                  label: "175%",
-                  scale: getScaleValue(175),
-                },
-                {
-                  label: "200%",
-                  scale: getScaleValue(200),
-                },
-              ];
+      //         let values = [
+      //           {
+      //             label: "70%",
+      //             scale: getScaleValue(70),
+      //           },
+      //           {
+      //             label: "85%",
+      //             scale: getScaleValue(85),
+      //           },
+      //           {
+      //             label: "100%",
+      //             scale: "16px",
+      //           },
+      //           {
+      //             label: "125%",
+      //             scale: getScaleValue(125),
+      //           },
+      //           {
+      //             label: "150%",
+      //             scale: getScaleValue(150),
+      //           },
+      //           {
+      //             label: "175%",
+      //             scale: getScaleValue(175),
+      //           },
+      //           {
+      //             label: "200%",
+      //             scale: getScaleValue(200),
+      //           },
+      //         ];
 
-              const result = await Root.Libs.Modal.Show({
-                parent: wrapper,
-                pid: Root.Pid,
-                title: "Configure UI scaling",
-                description: "Select the zoom level",
-                buttons: values.map((m) => {
-                  return {
-                    type: "primary",
-                    text: m.label,
-                  };
-                }),
-              });
+      //         const result = await Root.Libs.Modal.Show({
+      //           parent: wrapper,
+      //           pid: Root.Pid,
+      //           title: "Configure UI scaling",
+      //           description: "Select the zoom level",
+      //           buttons: values.map((m) => {
+      //             return {
+      //               type: "primary",
+      //               text: m.label,
+      //             };
+      //           }),
+      //         });
 
-              if (result.canceled === true) return;
-              document.documentElement.style.fontSize = values[result.id].scale;
-              await localforage.setItem(
-                "settings__uiScale",
-                values[result.id].scale
-              );
-            }),
-            new Html("button").text("Background").on("click", async (e) => {
-              const result = await Root.Libs.Modal.Show({
-                parent: wrapper,
-                pid: Root.Pid,
-                title: "Configure background",
-                description: "Select the background type you prefer.",
-                buttons: [
-                  {
-                    type: "primary",
-                    text: "Basic",
-                  },
-                  {
-                    type: "primary",
-                    text: "Space",
-                  },
-                ],
-              });
+      //         if (result.canceled === true) return;
+      //         document.documentElement.style.fontSize = values[result.id].scale;
+      //         await localforage.setItem(
+      //           "settings__uiScale",
+      //           values[result.id].scale
+      //         );
+      //       }),
+      //       new Html("button").text("Background").on("click", async (e) => {
+      //         const result = await Root.Libs.Modal.Show({
+      //           parent: wrapper,
+      //           pid: Root.Pid,
+      //           title: "Configure background",
+      //           description: "Select the background type you prefer.",
+      //           buttons: [
+      //             {
+      //               type: "primary",
+      //               text: "Basic",
+      //             },
+      //             {
+      //               type: "primary",
+      //               text: "Space",
+      //             },
+      //           ],
+      //         });
 
-              if (result.canceled === true) return;
+      //         if (result.canceled === true) return;
 
-              const value = result.id === 1 ? true : false;
+      //         const value = result.id === 1 ? true : false;
 
-              await Background.toggle(value);
+      //         await Background.toggle(value);
 
-              await localforage.setItem(
-                "settings__backgroundType",
-                value === true ? "stars" : "none"
-              );
-            }),
-            new Html("button")
-              .text("Sound effects settings")
-              .on("click", async (e) => {
-                let sfxPack = await localforage.getItem("settings__sfxPack");
+      //         await localforage.setItem(
+      //           "settings__backgroundType",
+      //           value === true ? "stars" : "none"
+      //         );
+      //       }),
+      //       new Html("button")
+      //         .text("Sound effects settings")
+      //         .on("click", async (e) => {
+      //           let sfxPack = await localforage.getItem("settings__sfxPack");
 
-                async function promptDone() {
-                  await Root.Libs.Modal.Show({
-                    parent: wrapper,
-                    pid: Root.Pid,
-                    title: "Completed",
-                    description: "Your new sound effect pack has been applied.",
-                    buttons: [
-                      {
-                        type: "primary",
-                        text: "OK",
-                      },
-                    ],
-                  });
-                }
+      //           async function promptDone() {
+      //             await Root.Libs.Modal.Show({
+      //               parent: wrapper,
+      //               pid: Root.Pid,
+      //               title: "Completed",
+      //               description: "Your new sound effect pack has been applied.",
+      //               buttons: [
+      //                 {
+      //                   type: "primary",
+      //                   text: "OK",
+      //                 },
+      //               ],
+      //             });
+      //           }
 
-                const menuResult = await Root.Libs.Modal.Show({
-                  parent: wrapper,
-                  pid: Root.Pid,
-                  title: "Configure sounds",
-                  description: "Which setting would you like to configure?",
-                  buttons: [
-                    {
-                      type: "primary",
-                      text: "Change sound pack",
-                    },
-                  ],
-                });
+      //           const menuResult = await Root.Libs.Modal.Show({
+      //             parent: wrapper,
+      //             pid: Root.Pid,
+      //             title: "Configure sounds",
+      //             description: "Which setting would you like to configure?",
+      //             buttons: [
+      //               {
+      //                 type: "primary",
+      //                 text: "Change sound pack",
+      //               },
+      //             ],
+      //           });
 
-                if (menuResult.canceled === true) return;
-                if (menuResult.id === 0) {
-                  const result = await Root.Libs.Modal.Show({
-                    parent: wrapper,
-                    pid: Root.Pid,
-                    title: "Configure sound effects",
-                    description: "Select the sound pack to be used.",
-                    buttons: [
-                      {
-                        type: "primary",
-                        text: "Dreamy SFX (default)",
-                      },
-                      {
-                        type: "primary",
-                        text: "Steam Deck",
-                      },
-                      {
-                        type: "primary",
-                        text: "round sounds (cadecomposer)",
-                      },
-                      {
-                        type: "primary",
-                        text: "Material Sounds (NoctenUI)",
-                      },
-                      {
-                        type: "primary",
-                        text: "PS Sounds (PS5)",
-                      },
-                    ],
-                  });
+      //           if (menuResult.canceled === true) return;
+      //           if (menuResult.id === 0) {
+      //             const result = await Root.Libs.Modal.Show({
+      //               parent: wrapper,
+      //               pid: Root.Pid,
+      //               title: "Configure sound effects",
+      //               description: "Select the sound pack to be used.",
+      //               buttons: [
+      //                 {
+      //                   type: "primary",
+      //                   text: "Dreamy SFX (default)",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "Steam Deck",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "round sounds (cadecomposer)",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "Material Sounds (NoctenUI)",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "PS Sounds (PS5)",
+      //                 },
+      //               ],
+      //             });
 
-                  if (result.canceled === true) return;
+      //             if (result.canceled === true) return;
 
-                  switch (result.id) {
-                    case 0:
-                      sfxPack = "/assets/audio/sfx_dreamy.zip";
-                      break;
-                    case 1:
-                      sfxPack = "/assets/audio/sfx_deck.zip";
-                      break;
-                    case 2:
-                      sfxPack = "/assets/audio/sfx_floating.zip";
-                      break;
-                    case 3:
-                      sfxPack = "/assets/audio/sfx_nocturn.zip";
-                      break;
-                    case 4:
-                      sfxPack = "/assets/audio/sfx_ps.zip";
-                      break;
-                  }
+      //             switch (result.id) {
+      //               case 0:
+      //                 sfxPack = "/assets/audio/sfx_dreamy.zip";
+      //                 break;
+      //               case 1:
+      //                 sfxPack = "/assets/audio/sfx_deck.zip";
+      //                 break;
+      //               case 2:
+      //                 sfxPack = "/assets/audio/sfx_floating.zip";
+      //                 break;
+      //               case 3:
+      //                 sfxPack = "/assets/audio/sfx_nocturn.zip";
+      //                 break;
+      //               case 4:
+      //                 sfxPack = "/assets/audio/sfx_ps.zip";
+      //                 break;
+      //             }
 
-                  await localforage.setItem("settings__sfxPack", sfxPack);
+      //             await localforage.setItem("settings__sfxPack", sfxPack);
 
-                  let A;
+      //             let A;
 
-                  await Root.Libs.Modal.showWithoutButtons(
-                    "Loading",
-                    "Downloading content...",
-                    wrapper,
-                    Root.Pid,
-                    function (a) {
-                      A = a;
-                    }
-                  );
+      //             await Root.Libs.Modal.showWithoutButtons(
+      //               "Loading",
+      //               "Downloading content...",
+      //               wrapper,
+      //               Root.Pid,
+      //               function (a) {
+      //                 A = a;
+      //               }
+      //             );
 
-                  await Sfx.init(sfxPack);
-                  await A();
+      //             await Sfx.init(sfxPack);
+      //             await A();
 
-                  await promptDone();
-                }
-              }),
-            new Html("button")
-              .text("Background music settings")
-              .on("click", async (e) => {
-                let playBgm = await localforage.getItem("settings__playBgm");
-                let bgmSong = await localforage.getItem("settings__bgmSong");
+      //             await promptDone();
+      //           }
+      //         }),
+      //       new Html("button")
+      //         .text("Background music settings")
+      //         .on("click", async (e) => {
+      //           let playBgm = await localforage.getItem("settings__playBgm");
+      //           let bgmSong = await localforage.getItem("settings__bgmSong");
 
-                async function promptDone() {
-                  await Root.Libs.Modal.Show({
-                    parent: wrapper,
-                    pid: Root.Pid,
-                    title: "Completed",
-                    description: "Your changes have been applied.",
-                    buttons: [
-                      {
-                        type: "primary",
-                        text: "OK",
-                      },
-                    ],
-                  });
-                }
+      //           async function promptDone() {
+      //             await Root.Libs.Modal.Show({
+      //               parent: wrapper,
+      //               pid: Root.Pid,
+      //               title: "Completed",
+      //               description: "Your changes have been applied.",
+      //               buttons: [
+      //                 {
+      //                   type: "primary",
+      //                   text: "OK",
+      //                 },
+      //               ],
+      //             });
+      //           }
 
-                const menuResult = await Root.Libs.Modal.Show({
-                  parent: wrapper,
-                  pid: Root.Pid,
-                  title: "Configure background music",
-                  description: "Which setting would you like to configure?",
-                  buttons: [
-                    {
-                      type: "primary",
-                      text: "Enable/disable music",
-                    },
-                    {
-                      type: "primary",
-                      text: "Change music",
-                    },
-                  ],
-                });
+      //           const menuResult = await Root.Libs.Modal.Show({
+      //             parent: wrapper,
+      //             pid: Root.Pid,
+      //             title: "Configure background music",
+      //             description: "Which setting would you like to configure?",
+      //             buttons: [
+      //               {
+      //                 type: "primary",
+      //                 text: "Enable/disable music",
+      //               },
+      //               {
+      //                 type: "primary",
+      //                 text: "Change music",
+      //               },
+      //             ],
+      //           });
 
-                if (menuResult.canceled === true) return;
-                if (menuResult.id === 0) {
-                  if (playBgm === null) playBgm = true;
+      //           if (menuResult.canceled === true) return;
+      //           if (menuResult.id === 0) {
+      //             if (playBgm === null) playBgm = true;
 
-                  const result = await Root.Libs.Modal.Show({
-                    parent: wrapper,
-                    pid: Root.Pid,
-                    title: "Configure background music",
-                    description:
-                      "Background music is currently " +
-                      (playBgm === true ? "enabled" : "disabled") +
-                      ".",
-                    buttons: [
-                      {
-                        type: "primary",
-                        text: "On",
-                      },
-                      {
-                        type: "primary",
-                        text: "Off",
-                      },
-                    ],
-                  });
+      //             const result = await Root.Libs.Modal.Show({
+      //               parent: wrapper,
+      //               pid: Root.Pid,
+      //               title: "Configure background music",
+      //               description:
+      //                 "Background music is currently " +
+      //                 (playBgm === true ? "enabled" : "disabled") +
+      //                 ".",
+      //               buttons: [
+      //                 {
+      //                   type: "primary",
+      //                   text: "On",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "Off",
+      //                 },
+      //               ],
+      //             });
 
-                  if (result.canceled === true)
-                    return await Root.Libs.Modal.Show({
-                      parent: wrapper,
-                      pid: Root.Pid,
-                      title: "Setting not changed",
-                      description:
-                        "The modal was closed, so the setting was not modified.",
-                      buttons: [
-                        {
-                          type: "primary",
-                          text: "OK",
-                        },
-                      ],
-                    });
-                  else {
-                    const value = result.id === 0 ? true : false;
-                    await localforage.setItem("settings__playBgm", value);
+      //             if (result.canceled === true)
+      //               return await Root.Libs.Modal.Show({
+      //                 parent: wrapper,
+      //                 pid: Root.Pid,
+      //                 title: "Setting not changed",
+      //                 description:
+      //                   "The modal was closed, so the setting was not modified.",
+      //                 buttons: [
+      //                   {
+      //                     type: "primary",
+      //                     text: "OK",
+      //                   },
+      //                 ],
+      //               });
+      //             else {
+      //               const value = result.id === 0 ? true : false;
+      //               await localforage.setItem("settings__playBgm", value);
 
-                    const audio = Sfx.getAudio();
-                    if (value === true) {
-                      audio.play();
-                    } else {
-                      audio.pause();
-                    }
-                  }
+      //               const audio = Sfx.getAudio();
+      //               if (value === true) {
+      //                 audio.play();
+      //               } else {
+      //                 audio.pause();
+      //               }
+      //             }
 
-                  await promptDone();
-                } else if (menuResult.id === 1) {
-                  const result = await Root.Libs.Modal.Show({
-                    parent: wrapper,
-                    pid: Root.Pid,
-                    title: "Configure background music",
-                    description:
-                      "Select the background music song to be played.",
-                    buttons: [
-                      {
-                        type: "primary",
-                        text: "Dreamy Ambience (default)",
-                      },
-                      {
-                        type: "primary",
-                        text: "Shopping Centre",
-                      },
-                      {
-                        type: "primary",
-                        text: "floating alone (cadecomposer)",
-                      },
-                      {
-                        type: "primary",
-                        text: "Ambient (NoctenUI)",
-                      },
-                      {
-                        type: "primary",
-                        text: "Homebrew Channel",
-                      },
-                      {
-                        type: "primary",
-                        text: "PS Music (PS5)",
-                      },
-                    ],
-                  });
+      //             await promptDone();
+      //           } else if (menuResult.id === 1) {
+      //             const result = await Root.Libs.Modal.Show({
+      //               parent: wrapper,
+      //               pid: Root.Pid,
+      //               title: "Configure background music",
+      //               description:
+      //                 "Select the background music song to be played.",
+      //               buttons: [
+      //                 {
+      //                   type: "primary",
+      //                   text: "Dreamy Ambience (default)",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "Shopping Centre",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "floating alone (cadecomposer)",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "Ambient (NoctenUI)",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "Homebrew Channel",
+      //                 },
+      //                 {
+      //                   type: "primary",
+      //                   text: "PS Music (PS5)",
+      //                 },
+      //               ],
+      //             });
 
-                  if (result.canceled === true) return;
+      //             if (result.canceled === true) return;
 
-                  switch (result.id) {
-                    case 0:
-                      bgmSong = "/assets/audio/bgm_dreamy.mp3";
-                      break;
-                    case 1:
-                      bgmSong = "/assets/audio/bgm_shop.mp3";
-                      break;
-                    case 2:
-                      bgmSong = "/assets/audio/bgm_floating.mp3";
-                      break;
-                    case 3:
-                      bgmSong = "/assets/audio/bgm_nocturn.mp3";
-                      break;
-                    case 4:
-                      bgmSong = "/assets/audio/homebrew.mp3";
-                      break;
-                    case 5:
-                      bgmSong = "/assets/audio/bgm_ps.mp3";
-                      break;
-                  }
+      //             switch (result.id) {
+      //               case 0:
+      //                 bgmSong = "/assets/audio/bgm_dreamy.mp3";
+      //                 break;
+      //               case 1:
+      //                 bgmSong = "/assets/audio/bgm_shop.mp3";
+      //                 break;
+      //               case 2:
+      //                 bgmSong = "/assets/audio/bgm_floating.mp3";
+      //                 break;
+      //               case 3:
+      //                 bgmSong = "/assets/audio/bgm_nocturn.mp3";
+      //                 break;
+      //               case 4:
+      //                 bgmSong = "/assets/audio/homebrew.mp3";
+      //                 break;
+      //               case 5:
+      //                 bgmSong = "/assets/audio/bgm_ps.mp3";
+      //                 break;
+      //             }
 
-                  await localforage.setItem("settings__bgmSong", bgmSong);
+      //             await localforage.setItem("settings__bgmSong", bgmSong);
 
-                  let A;
+      //             let A;
 
-                  await Root.Libs.Modal.showWithoutButtons(
-                    "Loading",
-                    "Downloading content...",
-                    wrapper,
-                    Root.Pid,
-                    function (a) {
-                      A = a;
-                    }
-                  );
+      //             await Root.Libs.Modal.showWithoutButtons(
+      //               langManager.getString("status.loading"),
+      //               langManager.getString("status.downloadingContent"),
+      //               wrapper,
+      //               Root.Pid,
+      //               function (a) {
+      //                 A = a;
+      //               }
+      //             );
 
-                  await Sfx.changeBgm(bgmSong);
+      //             await Sfx.changeBgm(bgmSong);
 
-                  await A();
-                  await promptDone();
-                }
-              })
-          )
-        ),
-        // bottom bar buttons
-        barButtons: {
-          // Buttons call a page
-          right: [{ text: "Back", goto: "welcome" }],
-        },
-      },
+      //             await A();
+      //             await promptDone();
+      //           }
+      //         })
+      //     )
+      //   ),
+      //   // bottom bar buttons
+      //   barButtons: {
+      //     // Buttons call a page
+      //     right: [
+      //       { text: langManager.getString("actions.back"), goto: "welcome" },
+      //     ],
+      //   },
+      // },
       controllerSetup: {
         // Main parent element on top
         elm: new Html("div").class("flex-list", "oobe-spaced").appendMany(
           new Html("div").class("flex-col").appendMany(
-            new Html("h1").text("Phone Link Setup"),
+            new Html("h1").text(
+              LangManager.getString("system.oobe.phoneLink.title")
+            ),
             new Html("p").text(
-              "Want to use your phone as a TV remote? \n Scan the QR code shown on screen."
+              LangManager.getString("system.oobe.phoneLink.description")
             ),
             new Html("div").class("button-row").appendMany(
               new Html("button").text("Help").on("click", async (e) => {
                 Root.Libs.Modal.Show({
-                  title: "Phone Link Help",
-                  description:
-                    `On your phone, go to this URL: ${location.protocol}//${ip}:${location.port}/link\n\n` +
-                    `Once you connect, you should see a prompt asking you to enter a code. Use the code in the top right of the screen, or find it in Settings.`,
-                  // description: `On your phone, go to this URL: ${
-                  //   location.protocol
-                  // }//${location.host}/phonelink\n\n${
-                  //   location.hostname === "127.0.0.1" ||
-                  //   location.hostname === "localhost"
-                  //     ? "You are using localhost. On your phone, you will not be able to connect to localhost or 127.0.0.1. Please use your local IP address to reach your cherry tree instance."
-                  //     : "You are running off of your local IP already so you should be fine"
-                  // }\n\nOnce you connect, you should see a prompt asking you to enter a code. Use the code in the top right of the screen, or find it in Settings.`,
+                  title: LangManager.getString(
+                    "system.oobe.phoneLink.helpText"
+                  ),
+                  description: LangManager.getString(
+                    "system.oobe.phoneLink.helpInfo",
+                    { url: `${location.protocol}//${ip}:${location.port}/link` }
+                  ),
                   parent: document.body,
                   pid: Root.Pid,
                   buttons: [{ type: "primary", text: "OK" }],
