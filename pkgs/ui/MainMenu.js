@@ -1,6 +1,7 @@
 import Html from "/libs/html.js";
 import { timeDifference } from "/libs/time.js";
 import vfs from "/libs/vfs.js";
+import LangManager from "../../libs/l10n/manager.js";
 
 let wrapper;
 
@@ -124,18 +125,17 @@ const pkg = {
     });
 
     let topBarButtonList = [
-      { label: "games" },
-      { label: "friends" },
-      { label: "settings" },
+      { label: LangManager.getString("menu.apps") },
+      { label: LangManager.getString("menu.store") },
+      { label: LangManager.getString("menu.more") },
     ];
 
     let topBarButtons = topBarButtonList.map((button) => {
       return new Html("a").class("btn").text(button.label);
     });
 
-    let friendsCount = new Html("label").class("friends-count").text("0");
-
-    topBarButtons[1].append(friendsCount);
+    // let friendsCount = new Html("label").class("friends-count").text("0");
+    // topBarButtons[1].append(friendsCount);
 
     const topBar = new Html("div")
       .class("main-menu-container")
@@ -178,6 +178,17 @@ const pkg = {
 
     const topBarBtnHtml = topBarButtons.map((m) => m.elm);
 
+    let moreButtonsFirstRow = new Html("div").class("flex-row").appendMany(
+      new Html("button").text("Open Settings").on("click", async (e) => {
+        await giveUpToApp("apps:Settings");
+      })
+    );
+
+    const moreList = new Html("div")
+      .class("home-menu-section", "main-menu-attached", "flex-col")
+      .appendMany(moreButtonsFirstRow)
+      .appendTo(wrapper);
+
     console.log(friendsList);
 
     let friendListWrapper = new Html("div").class("flex-list");
@@ -188,9 +199,9 @@ const pkg = {
 
     let friendListWrapperWrapper, outgoingFriendList, incomingFriendList;
 
-    const friendList = new Html("div")
-      .class("flex-col", "main-menu-attached", "hidden")
-      .appendTo(wrapper);
+    new Html("h1").text("Friends").appendTo(moreList);
+
+    const friendList = new Html("div").class("flex-col").appendTo(moreList);
 
     function rerenderFriends() {
       friendListHtml = [];
@@ -215,7 +226,7 @@ const pkg = {
         return nameA.localeCompare(nameB);
       });
 
-      friendsCount.text(mergedFriends.filter((u) => u.status === 1).length);
+      // friendsCount.text(mergedFriends.filter((u) => u.status === 1).length);
 
       console.log(updatedFriends);
 
@@ -246,7 +257,7 @@ const pkg = {
                         display: "flex",
                         "justify-content": "center",
                         "align-items": "center",
-                        "font-size": "1.5rem",
+                        "font-size": "2.5rem",
                         flex: "1",
                       })
                       .text(f.id)
@@ -389,7 +400,7 @@ const pkg = {
         ];
       }
 
-      friendListHtml.push(
+      friendListHtml.unshift(
         new Html("button")
           .class("auto", "flex-col", "transparent")
           .styleJs({ alignSelf: "flex-start" })
@@ -402,7 +413,7 @@ const pkg = {
                 borderRadius: "0.15rem",
               })
               .html(
-                `<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                `<svg style="width: 8rem;height: 8rem;" width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 100C0 44.7715 44.7715 0 100 0V0C155.228 0 200 44.7715 200 100V100C200 155.228 155.228 200 100 200V200C44.7715 200 0 155.228 0 100V100Z" fill="#2E2C3A"/>
                     <path d="M68.5 100H131.5" stroke="white" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M100 68.5V131.5" stroke="white" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
@@ -472,15 +483,6 @@ const pkg = {
 
     rerenderFriends();
 
-    const settingsList = new Html("div")
-      .class("home-menu-section", "main-menu-attached", "flex-row")
-      .appendMany(
-        new Html("button").text("Open Settings").on("click", async (e) => {
-          await giveUpToApp("apps:Settings");
-        })
-      )
-      .appendTo(wrapper);
-
     // const buttonList = new Html("div")
     //   .class("flex-row", "home-menu-section")
     //   .appendTo(wrapper)
@@ -499,40 +501,36 @@ const pkg = {
     //     //   })
     //   );
 
-    let y1Tabs = [
-      gameList.elm.children,
-      friendListWrapper.elm.children,
-      settingsList.elm.children,
-    ];
+    // let y1Tabs = [
+    //   gameList.elm.children,
+    //   friendListWrapper.elm.children,
+    //   moreList.elm.children,
+    // ];
 
     function showTabs(x) {
       switch (x) {
         case 0:
           // Show games list
           gameList.classOff("hidden");
-          friendList.classOn("hidden");
-          settingsList.classOn("hidden");
+          // friendList.classOn("hidden");
+          moreList.classOn("hidden");
           break;
         case 1:
           // Show friend list
           gameList.classOn("hidden");
-          friendList.classOff("hidden");
-          settingsList.classOn("hidden");
+          // friendList.classOff("hidden");
+          moreList.classOn("hidden");
           break;
         case 2:
           // Show friend list
           gameList.classOn("hidden");
-          friendList.classOn("hidden");
-          settingsList.classOff("hidden");
+          // friendList.classOn("hidden");
+          moreList.classOff("hidden");
           break;
       }
     }
 
-    const lastXPositions = {
-      row1: 0,
-      row2: 0,
-      row3: 0,
-    };
+    const lastXPositions = [0, 0, 0];
 
     let curY = 0;
     let lastY = 0;
@@ -554,68 +552,59 @@ const pkg = {
 
     Ui.transition("popIn", wrapper);
 
+    let lastX;
+
     Ui.init(
       Root.Pid,
       "horizontal",
-      [topBarBtnHtml, ...currentMenuList], //buttonList.elm.children],
-      function parentCallback(n) {
+      [topBarBtnHtml, ...currentMenuList],
+      async function parentCallback(n) {
         // This is called after the input
         lastY = n.y;
+        let curX = n.x;
+
         if (lastY !== curY) {
-          // console.log("Y difference");
           if (lastY === 0) {
-            curY = n.y;
-            console.log("Moved up to top tab?");
+            if (selectedTab !== curX) {
+              Ui.updatePos(Root.Pid, { x: selectedTab, y: 0 });
+            }
 
-            Ui.updatePos(Root.Pid, { x: selectedTab, y: 0 });
-            Ui.focus.unfocusAll(Root.Pid);
-            Ui.focus.focusCurrent(Root.Pid);
+            curX = selectedTab;
 
-            // return;
+            console.log("Moved up to top tab?", selectedTab);
           }
-          curY = n.y;
         }
-        if (n.y === 0) {
-          lastSelectedTab = n.x;
-          if (lastSelectedTab !== selectedTab) {
+        curY = n.y;
+        if (curY === 0) {
+          if (lastSelectedTab !== curX) {
             Sfx.playSfx("deck_ui_tab_transition_01.wav");
-            selectedTab = n.x;
+            selectedTab = curX;
           }
-          // Top tab-list
-          // console.log("X:", n.x, "Y:", n.y);
+          lastSelectedTab = selectedTab;
+
           topBarBtnHtml.forEach((c) => c.classList.remove("selected"));
-          topBarBtnHtml[n.x].classList.add("selected");
+          topBarBtnHtml[selectedTab].classList.add("selected");
 
-          uiArrays = [
-            topBarBtnHtml,
-            // ...currentMenuList,
-            // buttonList.elm.children,
-          ];
+          uiArrays = [topBarBtnHtml];
 
-          if (selectedTab === 1) {
+          if (selectedTab === 0) {
+            uiArrays[1] = gameList.elm.children;
+          } else if (selectedTab === 2) {
             // Agh
             uFriendList = User.getFriendList();
             rerenderFriends();
             uiArrays = [
               topBarBtnHtml,
+              moreButtonsFirstRow.elm.children,
               friendListWrapper.elm.children,
               outgoingFriendListHtml.map((m) => m.elm),
               incomingFriendListHtml.map((m) => m.elm),
             ];
           }
-
-          // Update UI to Show X tab
-          uiArrays[1] = y1Tabs[selectedTab];
           showTabs(selectedTab);
           Ui.update(Root.Pid, uiArrays);
-          justOnTabs = true;
         } else {
-          if (justOnTabs) {
-            Ui.updatePos(Root.Pid, { x: 0, y: n.y });
-            Ui.focus.unfocusAll(Root.Pid);
-            Ui.focus.focusCurrent(Root.Pid);
-            justOnTabs = false;
-          }
+          lastXPositions[selectedTab] = curX;
         }
       }
     );

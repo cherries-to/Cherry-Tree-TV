@@ -1,4 +1,5 @@
 import Html from "/libs/html.js";
+import LangManager from "../../libs/l10n/manager.js";
 
 let wrapper;
 
