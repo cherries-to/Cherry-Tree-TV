@@ -15,5 +15,5 @@ An open-source TV-style front-end for your HTPC that can run on Chrome & Firefox
 - [x] Movies support
 - [ ] App store
 - [ ] Friend chats
-- [ ] Watch parties (IN DEVELOPMENT)
+- [ ] Watch parties (IN DEVELOPMENT, PARTIALLY FUNCTIONAL)
 - [ ] Picture adjustments (IN DEVELOPMENT)
