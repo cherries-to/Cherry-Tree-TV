@@ -37,7 +37,7 @@ export function getFriendlyButtonName(playerNumber, button) {
         }
       }
 
-      return "Unknown";
+      return button;
 
     case 4: // Keyboard
       switch (button) {
@@ -60,7 +60,7 @@ export function getFriendlyButtonName(playerNumber, button) {
         case "menu":
           return "Escape";
         default:
-          return "Unknown";
+          return button;
       }
     case 5: // TV Remote
       switch (button) {
@@ -112,9 +112,9 @@ export function getFriendlyButtonName(playerNumber, button) {
         case "alt":
           return "No button available :(";
         default:
-          return "Unknown";
+          return button;
       }
     default:
-      return "None";
+      return button;
   }
 }

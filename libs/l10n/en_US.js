@@ -61,7 +61,7 @@ export default {
         },
         password: {
           title: "Password",
-          description: "Your Cherries account username",
+          description: "Your Cherries account password",
         },
         email: {
           title: "Email",
