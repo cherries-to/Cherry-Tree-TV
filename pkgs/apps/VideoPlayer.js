@@ -668,6 +668,16 @@ const pkg = {
       createVideoInfo(partyName, null);
       createTimeElapsed(bottom);
       createProgressSlider(bottom);
+      let closeModalCb = null;
+      await Root.Libs.Modal.showWithoutButtons(
+        "Loading",
+        "Joining Watch Party...",
+        wrapper,
+        Root.Pid,
+        function (a) {
+          closeModalCb = a;
+        }
+      );
       peer = new Peer();
       function closePeer() {
         peer.destroy();
@@ -697,6 +707,7 @@ const pkg = {
           peer.on("call", (call) => {
             call.answer();
             call.on("stream", (stream) => {
+              closeModalCb();
               videoElm.elm.srcObject = stream;
               videoElm.elm.play();
             });
