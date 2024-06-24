@@ -2,6 +2,7 @@ import Html from "/libs/html.js";
 import { timeDifference } from "/libs/time.js";
 import vfs from "/libs/vfs.js";
 import LangManager from "../../libs/l10n/manager.js";
+import { colors, idToColor, idToEmoji } from "../../libs/userTables.js";
 
 let wrapper;
 
@@ -247,6 +248,34 @@ const pkg = {
 
     const friendList = new Html("div").class("flex-col").appendTo(moreList);
 
+    function renderUserButton(user) {
+      return new Html("button").class("auto", "flex-col", "transparent").appendMany(
+        new Html("div")
+          .class("flex-list", "flex-center")
+          .style({
+            width: "12.5rem",
+            height: "12.5rem",
+            background: `${idToColor(user.id)}`,
+            "border-radius": "0.15rem",
+          })
+          .append(
+            new Html("span")
+              .style({
+                "background-color": "rgba(0,0,0,0.2)",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                "justify-content": "center",
+                "align-items": "center",
+                "font-size": "4.5rem",
+                flex: "1",
+              })
+              .text(idToEmoji(user.id))
+          ),
+        new Html("span").class("title").text(user.name)
+      );
+    }
+
     function rerenderFriends() {
       friendListHtml = [];
       incomingFriendListHtml = [];
@@ -281,34 +310,7 @@ const pkg = {
 
             // console.log("Friend", f);
 
-            button = new Html("button")
-              .class("auto", "flex-col", "transparent")
-              .appendMany(
-                new Html("div")
-                  .class("flex-list", "flex-center")
-                  .style({
-                    width: "12.5rem",
-                    height: "12.5rem",
-                    background: `var(--controller-color-${f.id % 5})`,
-                    "border-radius": "0.15rem",
-                  })
-                  .append(
-                    new Html("span")
-                      .style({
-                        "background-color": "rgba(0,0,0,0.5)",
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        "justify-content": "center",
-                        "align-items": "center",
-                        "font-size": "2.5rem",
-                        flex: "1",
-                      })
-                      .text(f.id)
-                  ),
-                new Html("span").class("title").text(f.name)
-              );
-
+            button = renderUserButton(f);
             // console.log(f);
 
             // if (f.lastOnline) {
@@ -347,7 +349,7 @@ const pkg = {
         ...uFriendList
           .filter((f) => f.type === "outgoing")
           .map((f, n) => {
-            console.log("Outgoing friend request", f);
+
             return new Html("button")
               .class("auto", "flex-col", "transparent")
               .appendMany(

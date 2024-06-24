@@ -33,9 +33,15 @@ const pkg = {
     let barRight = new Html("div").class("right").appendTo(bar);
 
     let svg = await (await fetch("/assets/img/oobe/welcome_row.svg")).text();
-    const ip = await fetch("http://localhost:9864/local_ip").then((t) =>
-      t.text()
-    );
+    let ip;
+    try {
+      let a = await fetch("http://localhost:9864/local_ip").then((t) =>
+        t.text()
+      );
+      ip = a;
+    } catch (e) {
+      ip = "127.0.0.1";
+    }
 
     let textData = {};
 
