@@ -20,20 +20,12 @@ let templateFsLayout = {
               launchPkg: "apps:Movies&TV",
             },
             {
-              name: "Debug",
-              color: "hsl(280, 65%, 62%)",
-              lastPlayed: Date.now() - 1_000,
+              name: "YouTube",
+              color: "hsl(0, 100%, 55%)",
+              lastPlayed: Date.now() - 100,
               image:
-                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1oYW1tZXIiPjxwYXRoIGQ9Im0xNSAxMi04LjM3MyA4LjM3M2ExIDEgMCAxIDEtMy0zTDEyIDkiLz48cGF0aCBkPSJtMTggMTUgNC00Ii8+PHBhdGggZD0ibTIxLjUgMTEuNS0xLjkxNC0xLjkxNEEyIDIgMCAwIDEgMTkgOC4xNzJWN2wtMi4yNi0yLjI2YTYgNiAwIDAgMC00LjIwMi0xLjc1Nkw5IDIuOTZsLjkyLjgyQTYuMTggNi4xOCAwIDAgMSAxMiA4LjRWMTBsMiAyaDEuMTcyYTIgMiAwIDAgMSAxLjQxNC41ODZMMTguNSAxNC41Ii8+PC9zdmc+",
-              launchPkg: "apps:DebugApp",
-            },
-            {
-              name: "Novello",
-              color: "hsl(220, 65%, 62%)",
-              lastPlayed: Date.now() - 1_000,
-              image:
-                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1ib29rLWhlYXJ0Ij48cGF0aCBkPSJNNCAxOS41di0xNUEyLjUgMi41IDAgMCAxIDYuNSAySDIwdjIwSDYuNWEyLjUgMi41IDAgMCAxIDAtNUgyMCIvPjxwYXRoIGQ9Ik0xNiA4LjJDMTYgNyAxNSA2IDEzLjggNmMtLjggMC0xLjQuMy0xLjguOS0uNC0uNi0xLS45LTEuOC0uOUM5IDYgOCA3IDggOC4yYzAgLjYuMyAxLjIuNyAxLjZDMTAgMTEuMSAxMiAxMyAxMiAxM3MyLTEuOSAzLjMtMy4xYy40LS40LjctMSAuNy0xLjd6Ii8+PC9zdmc+",
-              launchPkg: "apps:Novello",
+                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJleHRlcm5hbC1pY29uIiB2aWV3Qm94PSIwIDAgMjguNTcgIDIwIiBmb2N1c2FibGU9ImZhbHNlIiBzdHlsZT0icG9pbnRlci1ldmVudHM6IG5vbmU7IGRpc3BsYXk6IGJsb2NrOyB3aWR0aDogMTAwJTsgaGVpZ2h0OiAxMDAlOyI+CiAgPHN2ZyB2aWV3Qm94PSIwIDAgMjguNTcgMjAiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTI3Ljk3MjcgMy4xMjMyNEMyNy42NDM1IDEuODkzMjMgMjYuNjc2OCAwLjkyNjYyMyAyNS40NDY4IDAuNTk3MzY2QzIzLjIxOTcgMi4yNDI4OGUtMDcgMTQuMjg1IDAgMTQuMjg1IDBDMTQuMjg1IDAgNS4zNTA0MiAyLjI0Mjg4ZS0wNyAzLjEyMzIzIDAuNTk3MzY2QzEuODkzMjMgMC45MjY2MjMgMC45MjY2MjMgMS44OTMyMyAwLjU5NzM2NiAzLjEyMzI0QzIuMjQyODhlLTA3IDUuMzUwNDIgMCAxMCAwIDEwQzAgMTAgMi4yNDI4OGUtMDcgMTQuNjQ5NiAwLjU5NzM2NiAxNi44NzY4QzAuOTI2NjIzIDE4LjEwNjggMS44OTMyMyAxOS4wNzM0IDMuMTIzMjMgMTkuNDAyNkM1LjM1MDQyIDIwIDE0LjI4NSAyMCAxNC4yODUgMjBDMTQuMjg1IDIwIDIzLjIxOTcgMjAgMjUuNDQ2OCAxOS40MDI2QzI2LjY3NjggMTkuMDczNCAyNy42NDM1IDE4LjEwNjggMjcuOTcyNyAxNi44NzY4QzI4LjU3MDEgMTQuNjQ5NiAyOC41NzAxIDEwIDI4LjU3MDEgMTBDMjguNTcwMSAxMCAyOC41Njc3IDUuMzUwNDIgMjcuOTcyNyAzLjEyMzI0WiIgZmlsbD0iI0ZGMDAwMDAwIj48L3BhdGg+CiAgICAgIDxwYXRoIGQ9Ik0xMS40MjUzIDE0LjI4NTRMMTguODQ3NyAxMC4wMDA0TDExLjQyNTMgNS43MTUzM1YxNC4yODU0WiIgZmlsbD0id2hpdGUiPjwvcGF0aD4KICAgIDwvZz4KICA8L3N2Zz4KPC9zdmc+",
+              launchPkg: "apps:YouTube",
             },
             {
               name: "File Manager",
