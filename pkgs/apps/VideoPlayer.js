@@ -103,34 +103,37 @@ const pkg = {
     let renderer;
     let trackFetchAbort;
 
+    // let call = null;
     let peer = null;
-    let conn = null;
 
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
 
-    let hostCode = "watchParty-";
-    for (let i = 0; i < 10; i++) {
-      hostCode += chars[Math.floor(Math.random() * chars.length)];
-    }
+    let stream;
 
     async function hostWatchParty(videoElm, captions) {
+      let hostCode = "watchParty-";
+      for (let i = 0; i < 10; i++) {
+        hostCode += chars[Math.floor(Math.random() * chars.length)];
+      }
       return new Promise((resolve, reject) => {
-        if (peer) {
-          resolve(peer);
+        let peer = new Peer(hostCode);
+        function closePeer() {
+          peer.destroy();
+          document.removeEventListener(
+            "CherryTree.VideoPlayer.Close",
+            closePeer
+          );
         }
-        let stream = videoElm.mozCaptureStream
-          ? videoElm.mozCaptureStream()
-          : videoElm.captureStream();
-        peer = new Peer(hostCode);
+        document.addEventListener("CherryTree.VideoPlayer.Close", closePeer);
         peer.on("open", () => {
-          resolve(peer);
+          resolve(hostCode);
         });
         peer.on("error", (e) => {
           reject(e);
         });
         peer.on("connection", (conn) => {
-          let peerId = conn.peer;
+          console.log(conn);
           videoElm.addEventListener("timeupdate", () => {
             conn.send({
               type: "timeupdate",
@@ -158,7 +161,17 @@ const pkg = {
                   `${data.username} has joined the party 🎉`,
                   `They're now watching with you.`
                 );
-                peer.call(peerId, stream);
+                console.log(stream);
+                let call = peer.call(conn.peer, stream);
+
+                call.on("close", () => {
+                  console.log("User disconnected, destroying peer object");
+                  conn.close();
+                });
+                call.on("disconnect", () => {
+                  console.log("User disconnected, destroying peer object");
+                  conn.close();
+                });
               }
             }
             if (data.type == "getCaptions") {
@@ -187,12 +200,11 @@ const pkg = {
               "User left",
               `This user has left the watch party.`
             );
+            peer.destroy();
           });
         });
       });
     }
-
-    console.log(hostCode);
 
     let icons = {
       play: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
@@ -593,6 +605,13 @@ const pkg = {
           openPartyCaptionsMenu(data.captions, conn, partyName);
         }
       });
+      conn.on("close", () => {
+        Root.Libs.Notify.show(
+          "Watch party ended",
+          `This watch party has ended.`
+        );
+        pkg.end();
+      });
       videoElm.elm.volume = Sfx.getVolume();
       volumeUpdate = (e) => {
         videoElm.elm.volume = e.detail / 100;
@@ -625,6 +644,9 @@ const pkg = {
       addVideoEventListeners();
 
       Ui.transition("popIn", wrapper);
+      stream = videoElm.elm.mozCaptureStream
+        ? videoElm.elm.mozCaptureStream()
+        : videoElm.elm.captureStream();
       if (autoplay) {
         playPause.html(icons["pause"]);
         videoElm.elm.play();
@@ -647,6 +669,11 @@ const pkg = {
       createTimeElapsed(bottom);
       createProgressSlider(bottom);
       peer = new Peer();
+      function closePeer() {
+        peer.destroy();
+        document.removeEventListener("CherryTree.VideoPlayer.Close", closePeer);
+      }
+      document.addEventListener("CherryTree.VideoPlayer.Close", closePeer);
       peer.on("open", async () => {
         let info = await Users.getUserInfo(await Root.Security.getToken());
         let conn = peer.connect(watchCode);
@@ -787,7 +814,7 @@ const pkg = {
             .on("click", async () => {
               let friendId = friend.id;
               console.log(friend.id);
-              await hostWatchParty(videoElm.elm, captions);
+              let hostCode = await hostWatchParty(videoElm.elm, captions);
               let result = await ws.sendMessage({
                 type: "watchParty",
                 userId: friendId,
@@ -1034,6 +1061,13 @@ const pkg = {
     Ui.giveUpUi(Pid);
     wrapper.cleanup();
     document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
+    document.dispatchEvent(
+      new CustomEvent("CherryTree.VideoPlayer.Close", {
+        detail: {
+          destroyPeer: true,
+        },
+      })
+    );
   },
 };
 
