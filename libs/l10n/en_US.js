@@ -9,6 +9,7 @@ export default {
   },
   status: {
     loading: "Loading...",
+    checking: "Checking...",
     downloadingContent: "Downloading content...",
     loggingIn: "Logging in...",
   },
@@ -17,7 +18,7 @@ export default {
     usernameOrEmail: "Username/Email",
     password: "Password",
     email: "Email",
-    help: "Help"
+    help: "Help",
   },
   actions: {
     ok: "OK",
