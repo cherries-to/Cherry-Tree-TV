@@ -28,20 +28,19 @@ let templateFsLayout = {
               launchPkg: "apps:DebugApp",
             },
             {
-              name: "Novello",
-              color: "hsl(220, 65%, 62%)",
-              lastPlayed: Date.now() - 1_000,
-              image:
-                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1ib29rLWhlYXJ0Ij48cGF0aCBkPSJNNCAxOS41di0xNUEyLjUgMi41IDAgMCAxIDYuNSAySDIwdjIwSDYuNWEyLjUgMi41IDAgMCAxIDAtNUgyMCIvPjxwYXRoIGQ9Ik0xNiA4LjJDMTYgNyAxNSA2IDEzLjggNmMtLjggMC0xLjQuMy0xLjguOS0uNC0uNi0xLS45LTEuOC0uOUM5IDYgOCA3IDggOC4yYzAgLjYuMyAxLjIuNyAxLjZDMTAgMTEuMSAxMiAxMyAxMiAxM3MyLTEuOSAzLjMtMy4xYy40LS40LjctMSAuNy0xLjd6Ii8+PC9zdmc+",
-              launchPkg: "apps:Novello",
-            },
-            {
               name: "File Manager",
               color: "hsl(130, 65%, 62%)",
               lastPlayed: Date.now() - 1_000,
               image:
                 "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1mb2xkZXIiPjxwYXRoIGQ9Ik0yMCAyMGEyIDIgMCAwIDAgMi0yVjhhMiAyIDAgMCAwLTItMmgtNy45YTIgMiAwIDAgMS0xLjY5LS45TDkuNiAzLjlBMiAyIDAgMCAwIDcuOTMgM0g0YTIgMiAwIDAgMC0yIDJ2MTNhMiAyIDAgMCAwIDIgMloiLz48L3N2Zz4=",
               launchPkg: "apps:FileManager",
+            },
+            {
+              name: "YouTube",
+              color: "hsl(0, 0%, 15.7%)",
+              lastPlayed: Date.now() - 1_000,
+              image: "../assets/img/logos/yt_logo_rgb_dark.png",
+              launchPkg: "apps:YouTube",
             },
           ],
         }),

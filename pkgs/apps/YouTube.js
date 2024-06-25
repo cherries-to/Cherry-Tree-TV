@@ -31,17 +31,17 @@ const pkg = {
 
     const row = new Html("div")
       .class("flex-list")
-      .class("flex-row")
-      .class("game-list")
-      .style({
+      .styleJs({
         overflow: "auto",
-        "align-items": "flex-end",
+        // "align-items": "flex-end",
         width: "100%",
-        "min-height": "300px",
+        // "min-height": "300px",
       })
       .appendTo(wrapper);
 
-    let title = new Html("h1").text("Early Alpha Youtube Client").appendTo(topBar);
+    let title = new Html("h1")
+      .text("Early Alpha Youtube Client")
+      .appendTo(topBar);
 
     let options = {
       title: "YouTube Search Query",
@@ -59,20 +59,38 @@ const pkg = {
     ).then((t) => t.json());
     ytQuery.items.forEach((i) => {
       console.log(i);
-      let thumbnailWrapper = new Html("div").class("thumbnail").class("game");
-      thumbnailWrapper.style({
-        "background-image": `url(https://i.ytimg.com/vi/${i.id}/maxresdefault.jpg)`,
-        position: "relative",
-        overflow: "visible",
-        "scroll-snap-align": "center",
+      let thumbnailWrapper = new Html("button");
+      thumbnailWrapper.styleJs({
+        background: "transparent",
+        scrollSnapAlign: "center",
+        objectFit: "contain",
+        minWidth: "22rem",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
       });
-      let title = new Html("span").text(i.title).class("thumbnail-title");
+      let img = new Html("img")
+        .appendTo(thumbnailWrapper)
+        .attr({ src: `https://i.ytimg.com/vi/${i.id}/maxresdefault.jpg` })
+        .styleJs({
+          aspectRatio: "16 / 9",
+          minWidth: "20rem",
+          height: "11.25rem",
+          borderRadius: "10px",
+        });
+      let title = new Html("p").text(i.title).styleJs({
+        width: "100%",
+        textAlign: "left",
+        padding: "10px",
+      });
       title.appendTo(thumbnailWrapper);
       thumbnailWrapper.on("click", async () => {
         // temporary player
 
         audio.pause();
 
+        Ui.transition("popOut", wrapper);
         let player = new Html("iframe")
           .attr({
             src: `https://youtube.com/embed/${i.id}?autoplay=1`,
@@ -82,8 +100,12 @@ const pkg = {
             width: "100%",
           })
           .appendTo(wrapper);
+        player.on("load", () => {
+          Ui.transition("popIn", wrapper);
+        });
       });
       thumbnailWrapper.appendTo(row);
+      Ui.transition("popIn", thumbnailWrapper);
     });
 
     console.log(row);
@@ -91,12 +113,12 @@ const pkg = {
     Ui.init(
       Pid,
       "horizontal",
-      [topBar.elm.children, row.elm.children]
-      // function (e) {
-      //   if (e === "back") {
-      //     pkg.end();
-      //   }
-      // }
+      [topBar.elm.children, row.elm.children],
+      function (e) {
+        if (e === "back") {
+          pkg.end();
+        }
+      }
     );
   },
   end: async function () {
