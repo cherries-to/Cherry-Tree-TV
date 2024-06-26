@@ -1,6 +1,6 @@
 import Html from "/libs/html.js";
 
-let wrapper, Ui, Pid, Sfx;
+let wrapper, Ui, Pid, Sfx, volumeUpdate;
 
 const pkg = {
   name: "GamepadRemapping",
@@ -28,6 +28,23 @@ const pkg = {
     const audio = Sfx.getAudio();
 
     const topBar = new Html("div").appendTo(wrapper);
+
+    function loadScript(url) {
+      // script probably already exists
+      if (Html.qs('script[src="' + url + '"]')) {
+        return false;
+      }
+
+      return new Promise((resolve, reject) => {
+        new Html("script")
+          .attr({ src: url })
+          .on("load", () => resolve(true))
+          .appendTo("body");
+      });
+      return true;
+    }
+
+    await loadScript("https://www.youtube.com/iframe_api");
 
     const row = new Html("div")
       .class("flex-list")
@@ -91,17 +108,39 @@ const pkg = {
         audio.pause();
 
         Ui.transition("popOut", wrapper);
-        let player = new Html("iframe")
-          .attr({
-            src: `https://youtube.com/embed/${i.id}?autoplay=1`,
-          })
+        let player = new Html("div")
+          .id("player")
           .style({
             height: "100%",
             width: "100%",
           })
           .appendTo(wrapper);
-        player.on("load", () => {
-          Ui.transition("popIn", wrapper);
+        wrapper.class("full-ui");
+        let playerFrame = new YT.Player("player", {
+          height: window.innerHeight,
+          width: window.innerWidth,
+          videoId: i.id,
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+          },
+          events: {
+            onReady: () => {
+              console.log("player ready");
+              Ui.transition("popIn", wrapper);
+              playerFrame.setVolume(Sfx.getVolume() * 100);
+              volumeUpdate = (e) => {
+                playerFrame.setVolume(e.detail);
+              };
+              document.addEventListener(
+                "CherryTree.Ui.VolumeChange",
+                volumeUpdate
+              );
+            },
+            onStateChange: (e) => {
+              console.log("state change", e);
+            },
+          },
         });
       });
       thumbnailWrapper.appendTo(row);
@@ -126,6 +165,7 @@ const pkg = {
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
     // await Ui.transition("popOut", wrapper);
+    document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
     Ui.giveUpUi(Pid);
     wrapper.cleanup();
   },
