@@ -11,6 +11,16 @@ console.log(CaptionsRenderer);
 let wrapper, Ui, Users, Pid, Sfx, volumeUpdate;
 let friends = [];
 
+let brightness = localStorage.getItem("videoBrightness")
+  ? parseInt(localStorage.getItem("videoBrightness"))
+  : 100;
+let contrast = localStorage.getItem("videoContrast")
+  ? parseInt(localStorage.getItem("videoContrast"))
+  : 100;
+let saturation = localStorage.getItem("videoSaturation")
+  ? parseInt(localStorage.getItem("videoSaturation"))
+  : 100;
+
 const pkg = {
   name: "Video Player",
   type: "app",
@@ -222,6 +232,9 @@ const pkg = {
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-radio"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>',
       slider:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sliders-horizontal"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>',
+      plus: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
+      minus:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><path d="M5 12h14"/></svg>',
     };
 
     function formatTime(timeInSeconds) {
@@ -235,22 +248,26 @@ const pkg = {
 
     function createVideoElement(path, isLocal, isWatchParty = false) {
       let url = path;
+      let filterStr = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
       if (isLocal) {
         let urlObj = new URL("http://127.0.0.1:9864/getFile");
         urlObj.searchParams.append("path", path);
         url = urlObj.href;
       }
-      if (!isWatchParty) {
-        videoElm = new Html("video")
-          .appendTo(wrapper)
-          .styleJs({ width: "100%", height: "100%", position: "absolute" })
-          .attr({ src: url, crossorigin: "anonymous" });
-      } else {
-        videoElm = new Html("video")
-          .appendTo(wrapper)
-          .styleJs({ width: "100%", height: "100%", position: "absolute" })
-          .attr({ crossorigin: "anonymous" });
+      let attr = { src: url, crossorigin: "anonymous" };
+      if (isWatchParty) {
+        attr = { crossorigin: "anonymous" };
       }
+      videoElm = new Html("video")
+        .appendTo(wrapper)
+        .styleJs({
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          filter: filterStr,
+        })
+        .attr(attr);
+
       videoElm.elm.controls = false;
       return videoElm;
     }
@@ -884,27 +901,173 @@ const pkg = {
       new Html("p")
         .html(`Adjust picture settings to your liking.`)
         .appendTo(overlay);
+      function previewChanges() {
+        brightness = localStorage.getItem("videoBrightness")
+          ? parseInt(localStorage.getItem("videoBrightness"))
+          : 100;
+        contrast = localStorage.getItem("videoContrast")
+          ? parseInt(localStorage.getItem("videoContrast"))
+          : 100;
+        let filterStr = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+        videoElm.styleJs({ filter: filterStr });
+      }
+      function changeBrightness(plus, text) {
+        if (plus) {
+          brightness = brightness + 1;
+        } else {
+          brightness = brightness - 1;
+        }
+        localStorage.setItem("videoBrightness", brightness.toString());
+        text.text(`${brightness}%`);
+        previewChanges();
+      }
+      function changeContrast(plus, text) {
+        if (plus) {
+          contrast = contrast + 1;
+        } else {
+          contrast = contrast - 1;
+        }
+        localStorage.setItem("videoContrast", contrast.toString());
+        text.text(`${contrast}%`);
+        previewChanges();
+      }
+      function changeSaturation(plus, text) {
+        if (plus) {
+          saturation = saturation + 1;
+        } else {
+          saturation = saturation - 1;
+        }
+        localStorage.setItem("videoSaturation", saturation.toString());
+        text.text(`${saturation}%`);
+        previewChanges();
+      }
       new Html("br").appendTo(overlay);
+      new Html("h2").text("Brightness").appendTo(overlay);
+      let brightnessInd;
       let tempUiElems = [];
       let row = new Html("div")
         .class("flex-list")
         .appendTo(overlay)
         .styleJs({ width: "100%" });
       new Html("button")
-        .text("Adjust brightness")
+        .html(icons["minus"])
         .appendTo(row)
-        .styleJs({ width: "100%" });
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyItems: "center",
+        })
+        .on("click", () => {
+          changeBrightness(false, brightnessInd);
+        });
+      brightnessInd = new Html("p")
+        .text(`${brightness}%`)
+        .appendTo(row)
+        .styleJs({
+          width: "calc(100% - 100px)",
+          textAlign: "center",
+        });
+      new Html("button")
+        .html(icons["plus"])
+        .appendTo(row)
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyItems: "center",
+        })
+        .on("click", () => {
+          changeBrightness(true, brightnessInd);
+        });
+      new Html("br").appendTo(overlay);
+      new Html("h2").text("Contrast").appendTo(overlay);
+      let contrastInd;
       let row2 = new Html("div")
         .class("flex-list")
         .appendTo(overlay)
         .styleJs({ width: "100%" });
       new Html("button")
-        .text("Adjust contrast")
+        .html(icons["minus"])
         .appendTo(row2)
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyItems: "center",
+        })
+        .on("click", () => {
+          changeContrast(false, contrastInd);
+        });
+      contrastInd = new Html("p").text(`${contrast}%`).appendTo(row2).styleJs({
+        width: "calc(100% - 100px)",
+        textAlign: "center",
+      });
+      new Html("button")
+        .html(icons["plus"])
+        .appendTo(row2)
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyItems: "center",
+        })
+        .on("click", () => {
+          changeContrast(true, contrastInd);
+        });
+      new Html("br").appendTo(overlay);
+      new Html("h2").text("Saturation").appendTo(overlay);
+      let saturationInd;
+      let row3 = new Html("div")
+        .class("flex-list")
+        .appendTo(overlay)
         .styleJs({ width: "100%" });
+      new Html("button")
+        .html(icons["minus"])
+        .appendTo(row3)
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyItems: "center",
+        })
+        .on("click", () => {
+          changeSaturation(false, saturationInd);
+        });
+      saturationInd = new Html("p")
+        .text(`${saturation}%`)
+        .appendTo(row3)
+        .styleJs({
+          width: "calc(100% - 100px)",
+          textAlign: "center",
+        });
+      new Html("button")
+        .html(icons["plus"])
+        .appendTo(row3)
+        .styleJs({
+          minWidth: "50px",
+          height: "50px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyItems: "center",
+        })
+        .on("click", () => {
+          changeSaturation(true, saturationInd);
+        });
       tempUiElems.push(row.elm.children);
       tempUiElems.push(row2.elm.children);
-
+      tempUiElems.push(row3.elm.children);
       openMenu(overlay, tempUiElems);
       e.target.classList.remove("over");
     }
