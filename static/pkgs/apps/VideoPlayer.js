@@ -3,7 +3,7 @@ import {
   CaptionsRenderer,
   parseResponse,
   parseText,
-} from "../../node_modules/media-captions/dist/prod.js";
+} from "/libs/media-captions/dist/prod.js";
 import { Peer } from "https://esm.sh/peerjs@1.5.4?bundle-deps";
 
 console.log(CaptionsRenderer);
