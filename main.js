@@ -95,8 +95,8 @@ app.whenReady().then(() => {
             respData.push({
               name: file,
               type: fileStats.isFile() ? "file" : "folder",
-              created: fileStats.ctime,
-              modified: fileStats.mtime,
+              created: new Date(fileStats.ctime).getTime(),
+              modified: new Date(fileStats.mtime).getTime(),
             });
           } catch (error) {
             console.error(`Error reading file ${file}: ${error.message}`);
