@@ -2,7 +2,7 @@
 
 An open-source TV-style front-end for your HTPC that can run on Chrome & Firefox.
 
-![Running instance of Cherry Tree](assets/img/readme-1.png)
+![Running instance of Cherry Tree](static/assets/img/readme-1.png)
 
 # Features
 
