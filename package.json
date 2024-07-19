@@ -27,5 +27,8 @@
   "homepage": "https://github.com/skywarspro15/Cherry-Tree#readme",
   "dependencies": {
     "media-captions": "^0.0.18"
+  },
+  "devDependencies": {
+    "electron": "^31.2.1"
   }
 }
