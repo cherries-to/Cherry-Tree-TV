@@ -14,7 +14,7 @@ let local_ip = null;
 const s = dgram.createSocket("udp4");
 s.connect(80, "8.8.8.8", () => {
   local_ip = s.address().address;
-  console.log("Local IP:", local_ip);
+  console.log("[SERVER] Fetched local IP");
   s.close();
 });
 
@@ -44,6 +44,7 @@ app.whenReady().then(() => {
     });
   });
   server.get("/drives", (req, res) => {
+    console.log("[FILE] Requesting drives");
     nodeDiskInfo
       .getDiskInfo()
       .then((disks) => {
@@ -59,7 +60,7 @@ app.whenReady().then(() => {
   });
   server.post("/list", (req, res) => {
     const dir = req.body.dir;
-    console.log(dir);
+    console.log("[FILE] Requested directory:", dir);
 
     if (!dir) {
       return res
@@ -109,6 +110,7 @@ app.whenReady().then(() => {
   });
   server.get("/getFile", (req, res) => {
     const fPath = req.query.path;
+    console.log("[FILE] Requested file:", fPath);
 
     if (!fPath) {
       return res
@@ -141,7 +143,7 @@ app.whenReady().then(() => {
   });
   server.use(express.static("public"));
   server.listen(port, () => {
-    console.log(`Cherry Tree server listening on port ${port}`);
+    console.log(`[SERVER] Cherry Tree server listening on port ${port}`);
     createWindow();
   });
 });
