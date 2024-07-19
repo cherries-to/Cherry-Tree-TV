@@ -9,6 +9,7 @@ An open-source, web-based front-end for your HTPC that can runs as an app using 
 - Use your phone as a remote
 - Add movies & shows to your library
 - Send friend requests to users
+- Watch videos with friends
 
 # To-do
 
