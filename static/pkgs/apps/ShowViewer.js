@@ -298,9 +298,41 @@ const pkg = {
             .class("flex-list")
             .appendTo(wrapper)
             .styleJs({ width: "100%" });
-          new Html("button")
+          let thumbnailURL = new URL("http://localhost:9864/thumbnail");
+          thumbnailURL.searchParams.set(
+            "path",
+            launchArgs.showFolder + item.name
+          );
+          let showPreview = new Html("img")
+            .styleJs({
+              aspectRatio: "16 / 9",
+              height: "85%",
+              borderRadius: "5px",
+            })
+            .attr({ src: thumbnailURL.toString() });
+          let showCountName = new Html("div").styleJs({
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+          });
+          new Html("h1")
+            .text(episodes[item.name])
+            .appendTo(showCountName)
+            .styleJs({ textAlign: "left", fontSize: "4em" });
+          new Html("p")
             .text(item.name.replace(/\.[^/.]+$/, ""))
-            .styleJs({ width: "100%" })
+            .appendTo(showCountName)
+            .styleJs({ textAlign: "left" });
+          new Html("button")
+            .appendMany(showPreview, showCountName)
+            .styleJs({
+              width: "100%",
+              height: "200px",
+              display: "flex",
+              gap: "15px",
+              alignItems: "center",
+              justifyContent: "center",
+            })
             .appendTo(row)
             .on("click", async () => {
               console.log(item);
