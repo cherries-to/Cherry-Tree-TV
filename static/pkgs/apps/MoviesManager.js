@@ -172,13 +172,11 @@ const pkg = {
 
         button
           .styleJs({
-            display: "Flex",
+            display: "flex",
             flexDirection: "column",
             width: "40px",
             height: "100%",
             gap: "10px",
-            alignItems: "center",
-            padding: "10px",
           })
           .on("click", () => {
             movieName.text(movie.original_title);
@@ -207,8 +205,7 @@ const pkg = {
           });
 
         title.styleJs({ textAlign: "center", width: "100%" });
-
-        img.styleJs({ width: "70%" });
+        img.styleJs({ width: "100%" });
 
         if (movie.adult) {
           img.styleJs({ filter: "blur(20px)" });
@@ -262,8 +259,6 @@ const pkg = {
       .class("flex-list")
       .appendTo(wrapper)
       .styleJs({
-        overflowX: "scroll",
-        height: "150vh",
         display: "none",
       });
 
