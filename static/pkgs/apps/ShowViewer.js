@@ -314,6 +314,7 @@ const pkg = {
             display: "flex",
             flexDirection: "column",
             gap: "5px",
+            width: "50%",
           });
           new Html("h1")
             .text(episodes[item.name])

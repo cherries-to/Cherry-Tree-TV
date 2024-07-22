@@ -60,7 +60,7 @@ app.whenReady().then(() => {
       if (data.success) {
         res.sendFile(data.path, { root: __dirname });
       } else {
-        res.send(500).send({ error: true, error_msg: data.error_msg });
+        res.status(500).send({ error: true, error_msg: data.error_msg });
       }
     });
     worker.on("error", (msg) => {
