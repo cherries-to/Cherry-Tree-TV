@@ -51,20 +51,21 @@ fs.stat(fPath, (err, stats) => {
     return;
   }
 
-  if (fs.existsSync(`thumbnails/${fName}.png`)) {
-    parentPort.postMessage({ success: true, path: `thumbnails/${fName}.png` });
+  if (fs.existsSync(`thumbnails/${fName}/tn.png`)) {
+    parentPort.postMessage({
+      success: true,
+      path: `thumbnails/${fName}/tn.png`,
+    });
     return;
   }
 
   new ffmpeg(fPath)
     .on("end", () => {
-      fs.rename("thumbnails/tn.png", `thumbnails/${fName}.png`, () => {
-        parentPort.postMessage({
-          success: true,
-          path: `thumbnails/${fName}.png`,
-        });
-        return;
+      parentPort.postMessage({
+        success: true,
+        path: `thumbnails/${fName}/tn.png`,
       });
+      return;
     })
     .on("error", function (err, stdout, stderr) {
       console.log("Cannot process video: " + err.message);
@@ -74,6 +75,6 @@ fs.stat(fPath, (err, stats) => {
         count: 1,
         timemarks: ["50%"], // number of seconds
       },
-      "thumbnails"
+      `thumbnails/${fName}`
     );
 });
