@@ -309,7 +309,7 @@ const pkg = {
               height: "85%",
               borderRadius: "5px",
             })
-            .attr({ src: thumbnailURL.toString() });
+            .attr({ "data-src": thumbnailURL.toString(), class: "lazyload" });
           let showCountName = new Html("div").styleJs({
             display: "flex",
             flexDirection: "column",
