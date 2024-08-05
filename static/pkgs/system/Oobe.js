@@ -532,6 +532,11 @@ const pkg = {
         },
       },
     };
+
+    // skip phone setup if server isn't running
+    if (ip === "127.0.0.1") {
+      pages["welcome"].barButtons.right[0].goto = "account";
+    }
     pages["loading"] = loadingPage;
 
     Object.keys(pages).forEach((k) => {
