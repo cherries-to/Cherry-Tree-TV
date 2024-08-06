@@ -149,14 +149,11 @@ const pkg = {
         let result = await fetch(
           "https://tree.cherries.to/api/v1/validate_jwt",
           {
-            mode: "no-cors",
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
-        )
-          .then((j) => j.json())
-          .catch(undefined);
+        ).then((j) => j.json());
         return result;
       } catch (e) {
         return false;
