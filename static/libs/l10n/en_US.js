@@ -24,6 +24,12 @@ export default {
     ok: "OK",
     yes: "Yes",
     no: "No",
+    on: "On",
+    off: "Off",
+    enable: "Enable",
+    disable: "Disable",
+    move: "Move",
+    confirm: "Confirm",
     cancel: "Cancel",
     back: "Back",
     next: "Next",
@@ -40,6 +46,11 @@ export default {
     register: "Register",
   },
   system: {
+    offline: {
+      title: "Running in offline mode",
+      description:
+        "We were unable to reach the Cherry Tree service. You are temporarily in offline mode.",
+    },
     oobe: {
       configuration: "Configuration",
       getStarted: "Get started",
@@ -104,6 +115,23 @@ export default {
           logout: "Log out of your account",
           logoutTitle: "Are you sure you want to log out?",
           logoutDescription: "You will have to log in again.",
+        },
+      },
+      display: {
+        title: "Display",
+        description: "Configure visual and accessibility settings.",
+        items: {
+          uiScaling: "UI Scaling",
+          background: "Background",
+        },
+      },
+      audio: {
+        title: "Audio",
+        description: "Configure audio-related settings.",
+        items: {
+          volume: "Change system volume",
+          sfx: "Sound effects settings",
+          bgm: "Background music settings",
         },
       },
     },

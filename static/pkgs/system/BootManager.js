@@ -1,5 +1,5 @@
 import Html from "/libs/html.js";
-import LangManager from "../../libs/l10n/manager.js";
+import langManager from "../../libs/l10n/manager.js";
 
 let wrapper;
 
@@ -95,11 +95,26 @@ const pkg = {
       let t = await Root.Security.getToken();
       if (t !== "") {
         let result = await userSvc.validateJwt(t);
+
         if (result.success === true) {
           Root.Security.setSecureVariable(
             "CHERRY_TREE_WS",
             await userSvc.subscribe(t)
           );
+          await Root.Core.pkg.run("ui:MainMenu", [], true);
+        } else if (result === false) {
+          await Root.Libs.Modal.Show({
+            parent: document.body,
+            pid: -1,
+            title: langManager.getString("system.offline.title"),
+            description: langManager.getString("system.offline.description"),
+            buttons: [
+              {
+                type: "primary",
+                text: langManager.getString("actions.ok"),
+              },
+            ],
+          });
           await Root.Core.pkg.run("ui:MainMenu", [], true);
         } else {
           runOobe();

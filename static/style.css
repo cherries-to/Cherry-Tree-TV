@@ -275,6 +275,26 @@ ul {
     opacity: 0;
   }
 }
+@keyframes slideDownIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes slideDownOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
 @keyframes pop {
   from {
     transform: scale(1);
@@ -344,6 +364,14 @@ ul {
 .slideUpOut {
   pointer-events: none;
   animation: slideUpOut 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+.slideDownIn {
+  pointer-events: none;
+  animation: slideDownIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+.slideDownOut {
+  pointer-events: none;
+  animation: slideDownOut 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 .fadeIn {
   pointer-events: none;
@@ -958,4 +986,37 @@ kbd {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+}
+
+.controller-status-bar {
+  position: fixed;
+  bottom: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 0.1rem solid var(--background-lighter);
+  padding-top: 1rem;
+  gap: 2.5rem;
+  z-index: 9999999;
+}
+.controller-status-bar .csb-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+}
+.csb-button span {
+  display: flex;
+  align-items: center;
+  width: 2rem;
+  height: 2rem;
+}
+.csb-button svg {
+  width: 100%;
+  height: 100%;
+}
+.csb-button kbd {
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
 }

@@ -1,3 +1,5 @@
+import controllerStatusBar from "./controllerStatusBar.js";
+import langManager from "./l10n/manager.js";
 import Html from "/libs/html.js";
 import Keyboard from "/libs/keyboard.js";
 
@@ -41,6 +43,12 @@ export default {
         throw new Error("customType is required");
       }
 
+      let csb = new controllerStatusBar(
+        { type: "any-dir", label: "Move" },
+        { type: "confirm", label: langManager.getString('actions.confirm') },
+        { type: "back", label: langManager.getString('actions.cancel') }
+      );
+
       numb--;
       let num = numb;
 
@@ -65,6 +73,7 @@ export default {
         // giving up Top UI control to the parent.
         Sfx.playSfx("deck_ui_hide_modal.wav");
         Ui.transition("fadeOut", modalContainer);
+        csb.cleanup();
         await Ui.transition("popOut", modalContent);
         await Ui.giveUpUi(num, false);
         Ui.becomeTopUi(data.pid);

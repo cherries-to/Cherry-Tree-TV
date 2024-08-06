@@ -1,7 +1,7 @@
 import vfs from "/libs/vfs.js";
 import Html from "/libs/html.js";
-import LangManager from "../../libs/l10n/manager.js";
 import langManager from "../../libs/l10n/manager.js";
+import settingsLib from "../../libs/settingsLib.js";
 
 let Pid, Ui, wrapper, Sfx, cb;
 
@@ -23,6 +23,30 @@ const pkg = {
 
     // Your user token
     let token = "";
+
+    // test!!!
+    let isOnline = true;
+    try {
+      let tempResult = await fetch("https://tree.cherries.to/")
+        .then((r) => r.text())
+        .catch((e) => undefined);
+
+      if (tempResult === undefined) throw new Error();
+    } catch (e) {
+      isOnline = false;
+      await Root.Libs.Modal.Show({
+        parent: document.body,
+        pid: Pid,
+        title: langManager.getString("system.offline.title"),
+        description: langManager.getString("system.offline.description"),
+        buttons: [
+          {
+            type: "primary",
+            text: langManager.getString("actions.ok"),
+          },
+        ],
+      });
+    }
 
     wrapper = new Html("div").class("full-ui").appendTo("body");
 
@@ -134,20 +158,20 @@ const pkg = {
         elm: new Html("div").class("flex-list", "oobe-spaced").appendMany(
           new Html("div").class("flex-col").appendMany(
             new Html("h1").text(
-              LangManager.getString("system.oobe.phoneLink.title")
+              langManager.getString("system.oobe.phoneLink.title")
             ),
             new Html("p").text(
-              LangManager.getString("system.oobe.phoneLink.description")
+              langManager.getString("system.oobe.phoneLink.description")
             ),
             new Html("div").class("button-row").appendMany(
               new Html("button")
                 .text(langManager.getString("label.help"))
                 .on("click", async (e) => {
                   Root.Libs.Modal.Show({
-                    title: LangManager.getString(
+                    title: langManager.getString(
                       "system.oobe.phoneLink.helpText"
                     ),
-                    description: LangManager.getString(
+                    description: langManager.getString(
                       "system.oobe.phoneLink.helpInfo",
                       {
                         url: `${location.protocol}//${ip}:${location.port}/link`,
@@ -173,7 +197,10 @@ const pkg = {
                 // src: `${location.protocol}//${location.hostname}:9864/qr?url=${location.protocol}//${ip}:${location.port}/link/index.html?code=${window.phoneLinkCode}`,
               })
               .styleJs({
-                borderRadius: "5px",
+                borderRadius: "0.5rem",
+                width: '16rem',
+                height: '16rem',
+                imageRendering: 'pixelated'
               })
           )
         ),
@@ -184,7 +211,10 @@ const pkg = {
             { text: langManager.getString("actions.back"), goto: "welcome" },
           ],
           right: [
-            { text: langManager.getString("actions.next"), goto: "account" },
+            {
+              text: langManager.getString("actions.next"),
+              goto: "configuration",
+            },
           ],
         },
       },
@@ -213,6 +243,121 @@ const pkg = {
       //     left: [{ text: "Back", goto: "phoneLinkSetup" }],
       //   },
       // },
+      configuration: {
+        // Main parent element on top
+        elm: new Html("div").class("flex-row", "oobe-spaced").appendMany(
+          new Html("div").class("flex-col").appendMany(
+            new Html("h1").text("Configuration"),
+            new Html("p").html(
+              "Modify some settings before you get into the app."
+            ),
+            new Html("div").class("button-row", "flex-list").appendMany(
+              new Html("button")
+                .text(
+                  langManager.getString("settings.categories.display.title")
+                )
+                .on("click", async () => {
+                  let result = await Root.Libs.Modal.Show({
+                    parent: wrapper,
+                    pid: Root.Pid,
+                    title: langManager.getString(
+                      "settings.categories.display.title"
+                    ),
+                    description: langManager.getString(
+                      "settings.categories.display.description"
+                    ),
+                    buttons: [
+                      {
+                        type: "primary",
+                        text: langManager.getString(
+                          "settings.categories.display.items.uiScaling"
+                        ),
+                      },
+                      {
+                        type: "primary",
+                        text: langManager.getString(
+                          "settings.categories.display.items.background"
+                        ),
+                      },
+                    ],
+                  });
+
+                  switch (result.id) {
+                    case 0:
+                      settingsLib.uiScaling(Root.Pid, wrapper, Ui);
+                      break;
+                    case 1:
+                      settingsLib.background(Root.Pid, wrapper, Background);
+                      break;
+                  }
+                }),
+              new Html("button")
+                .text(langManager.getString("settings.categories.audio.title"))
+                .on("click", async () => {
+                  let result = await Root.Libs.Modal.Show({
+                    parent: wrapper,
+                    pid: Root.Pid,
+                    title: langManager.getString(
+                      "settings.categories.audio.title"
+                    ),
+                    description: langManager.getString(
+                      "settings.categories.audio.description"
+                    ),
+                    buttons: [
+                      {
+                        type: "primary",
+                        text: langManager.getString(
+                          "settings.categories.audio.items.volume"
+                        ),
+                      },
+                      {
+                        type: "primary",
+                        text: langManager.getString(
+                          "settings.categories.audio.items.sfx"
+                        ),
+                      },
+                      {
+                        type: "primary",
+                        text: langManager.getString(
+                          "settings.categories.audio.items.bgm"
+                        ),
+                      },
+                    ],
+                  });
+
+                  switch (result.id) {
+                    case 0:
+                      settingsLib.changeVolume(Root.Pid, wrapper, Sfx);
+                      break;
+                    case 1:
+                      settingsLib.sfx(Root.Pid, wrapper, Sfx);
+                      break;
+                    case 2:
+                      settingsLib.bgm(Root.Pid, wrapper, Sfx);
+                      break;
+                  }
+                })
+            ),
+            new Html("p").html("You can modify these later in Settings.")
+          )
+        ),
+        // bottom bar buttons
+        barButtons: {
+          // Buttons call a page
+          left: [
+            {
+              text: langManager.getString("actions.back"),
+              goto: "phoneLinkSetup",
+            },
+          ],
+          right: [
+            {
+              text: langManager.getString("actions.next"),
+              goto: "account",
+            },
+          ],
+        },
+      },
       account: {
         // Main parent element on top
         elm: new Html("div").class("flex-list", "oobe-spaced").appendMany(
@@ -220,23 +365,23 @@ const pkg = {
             .class("flex-col")
             .appendMany(
               new Html("h1").text(
-                LangManager.getString("system.oobe.account.title")
+                langManager.getString("system.oobe.account.title")
               ),
               new Html("p").text(
-                LangManager.getString("system.oobe.account.description")
+                langManager.getString("system.oobe.account.description")
               )
             ),
           new Html("div").class("flex-col").appendMany(
             new Html("div").class("button-row").appendMany(
               new Html("button")
-                .text(LangManager.getString("actions.login"))
+                .text(langManager.getString("actions.login"))
                 .on("click", (e) => {
                   switchPage("login");
                 })
             ),
             new Html("div").class("button-row").appendMany(
               new Html("button")
-                .text(LangManager.getString("actions.register"))
+                .text(langManager.getString("actions.register"))
                 .on("click", (e) => {
                   switchPage("register");
                 })
@@ -499,7 +644,6 @@ const pkg = {
           ],
         },
       },
-
       thanks: {
         // Main parent element on top
         elm: new Html("div")
@@ -535,7 +679,12 @@ const pkg = {
 
     // skip phone setup if server isn't running
     if (ip === "127.0.0.1") {
-      pages["welcome"].barButtons.right[0].goto = "account";
+      pages["welcome"].barButtons.right[0].goto = "configuration";
+      pages["configuration"].barButtons.left[0].goto = "welcome";
+    }
+    // offline mode
+    if (isOnline === false) {
+      pages["configuration"].barButtons.right[0].goto = "thanks";
     }
     pages["loading"] = loadingPage;
 

@@ -130,25 +130,41 @@ const pkg = {
       });
     },
     async getUserInfo(token) {
-      let result = await fetch("https://tree.cherries.to/api/v1/user/profile", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return await result.json();
+      try {
+        let result = await fetch(
+          "https://tree.cherries.to/api/v1/user/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        return await result.json();
+      } catch (e) {
+        return false;
+      }
     },
     async validateJwt(token) {
-      let result = await fetch("https://tree.cherries.to/api/v1/validate_jwt", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return await result.json();
+      try {
+        let result = await fetch(
+          "https://tree.cherries.to/api/v1/validate_jwt",
+          {
+            mode: "no-cors",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+          .then((j) => j.json())
+          .catch(undefined);
+        return result;
+      } catch (e) {
+        return false;
+      }
     },
   },
   end: async function () {
     // Close the window when the process is exited
-    myWindow.close();
   },
 };
 
