@@ -645,13 +645,18 @@ const pkg = {
             // Agh
             uFriendList = User.getFriendList();
             rerenderFriends();
-            uiArrays = [
-              topBarBtnHtml,
-              moreButtonsFirstRow.elm.children,
-              friendListWrapper.elm.children,
-              outgoingFriendListHtml.map((m) => m.elm),
-              incomingFriendListHtml.map((m) => m.elm),
-            ];
+            // oops
+            if (window.isOffline) {
+              uiArrays = [topBarBtnHtml, moreButtonsFirstRow.elm.children];
+            } else {
+              uiArrays = [
+                topBarBtnHtml,
+                moreButtonsFirstRow.elm.children,
+                friendListWrapper.elm.children,
+                outgoingFriendListHtml.map((m) => m.elm),
+                incomingFriendListHtml.map((m) => m.elm),
+              ];
+            }
           }
           showTabs(selectedTab);
           Ui.update(Root.Pid, uiArrays);
