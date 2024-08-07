@@ -1,16 +1,23 @@
+const YouTubeCastReceiver = require("yt-cast-receiver");
 const { app, BrowserWindow } = require("electron");
 const nodeDiskInfo = require("node-disk-info");
+const { Player } = require("yt-cast-receiver");
 const { Worker } = require("worker_threads");
+const { Server } = require("socket.io");
 const ffmpeg = require("fluent-ffmpeg");
+const express = require("express");
 const mime = require("mime-types");
 const qrcode = require("qrcode");
 const dgram = require("dgram");
-const express = require("express");
 const path = require("path");
 const cors = require("cors");
+const http = require("http");
 const fs = require("fs");
-const server = express();
+
 const port = 9864;
+const server = express();
+const serverHttp = http.createServer(server);
+const io = new Server(serverHttp);
 
 if (!fs.existsSync("thumbnails/")) {
   fs.mkdirSync("thumbnails");
@@ -63,7 +70,124 @@ const createWindow = () => {
   });
 };
 
+class SocketPlayer extends Player {
+  constructor(socket) {
+    super();
+    this.socket = socket;
+    this.volume = { level: 100, muted: false };
+    this.position = 0;
+    this.duration = 0;
+  }
+  doPause() {
+    return new Promise((resolve, reject) => {
+      console.log("pause");
+      this.socket.emit("pause");
+      resolve(true);
+    });
+  }
+  doPlay(video, position) {
+    return new Promise((resolve, reject) => {
+      console.log("play", video);
+      this.socket.emit("play", video);
+      resolve(true);
+    });
+  }
+  doResume() {
+    return new Promise((resolve, reject) => {
+      console.log("resume");
+      this.socket.emit("resume");
+      resolve(true);
+    });
+  }
+  doStop() {
+    return new Promise((resolve, reject) => {
+      console.log("stop");
+      this.position = 0;
+      this.socket.emit("stop");
+      resolve(true);
+    });
+  }
+  doSeek(position) {
+    return new Promise((resolve, reject) => {
+      console.log("seek", position);
+      this.position = position;
+      this.socket.emit("seek", position);
+      resolve(true);
+    });
+  }
+  doSetVolume(volume) {
+    return new Promise((resolve, reject) => {
+      console.log("volume", volume);
+      this.volume = volume;
+      this.socket.emit("volume", volume);
+      resolve(true);
+    });
+  }
+  doGetVolume() {
+    return new Promise((resolve, reject) => {
+      resolve(this.volume);
+    });
+  }
+  doGetPosition() {
+    return new Promise((resolve, reject) => {
+      resolve(this.position);
+    });
+  }
+  doGetDuration() {
+    return new Promise((resolve, reject) => {
+      resolve(this.duration);
+    });
+  }
+  setDuration(duration) {
+    // console.log(duration);
+    this.duration = duration;
+  }
+  setPosition(position) {
+    // console.log(position);
+    this.position = position;
+  }
+  setVolume(volume) {
+    // console.log(volume);
+    this.volume = volume;
+  }
+}
+
 app.whenReady().then(() => {
+  io.on("connection", async (socket) => {
+    console.log("connection attempt");
+    const details = socket.handshake.auth;
+    const player = new SocketPlayer(socket);
+    const receiver = new YouTubeCastReceiver(player, {
+      device: {
+        name: details.name,
+        screenName: details.screenName,
+        brand: details.brand,
+        model: details.model,
+      },
+    });
+    receiver.on("senderConnect", (sender) => {
+      socket.emit("clientConnected", sender);
+    });
+    receiver.on("senderDisconnect", (sender) => {
+      socket.emit("clientDisconnect", sender);
+    });
+    try {
+      await receiver.start();
+      socket.emit("success");
+    } catch (error) {
+      socket.emit("error", error);
+    }
+
+    socket.on("volume", (volume) => {
+      player.setVolume({ level: volume, muted: false });
+    });
+    socket.on("duration", (duration) => {
+      player.setDuration(duration);
+    });
+    socket.on("position", (position) => {
+      player.setPosition(position);
+    });
+  });
   server.get("/local_ip", (req, res) => {
     res.send(local_ip);
   });
@@ -190,7 +314,7 @@ app.whenReady().then(() => {
     });
   });
   server.use(express.static("public"));
-  server.listen(port, () => {
+  serverHttp.listen(port, () => {
     console.log(`[SERVER] Cherry Tree server listening on port ${port}`);
     createWindow();
   });

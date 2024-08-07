@@ -130,3 +130,6 @@ out
 
 # thumbnails
 thumbnails/
+
+# node-persist
+.node-persist/
