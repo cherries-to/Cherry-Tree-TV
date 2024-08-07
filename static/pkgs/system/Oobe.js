@@ -95,18 +95,6 @@ const pkg = {
       ip = a;
     } catch (e) {
       ip = "127.0.0.1";
-      await Root.Libs.Modal.Show({
-        parent: document.body,
-        pid: Pid,
-        title: langManager.getString("system.noLocalServer.title"),
-        description: langManager.getString("system.noLocalServer.description"),
-        buttons: [
-          {
-            type: "primary",
-            text: langManager.getString("actions.ok"),
-          },
-        ],
-      });
     }
 
     let textData = {};
@@ -211,9 +199,9 @@ const pkg = {
               })
               .styleJs({
                 borderRadius: "0.5rem",
-                width: '16rem',
-                height: '16rem',
-                imageRendering: 'pixelated'
+                width: "16rem",
+                height: "16rem",
+                imageRendering: "pixelated",
               })
           )
         ),
@@ -434,6 +422,8 @@ const pkg = {
                 });
 
                 if (result.id === 1) {
+                  // set offline mode since no login
+                  window.isOffline = true;
                   switchPage("thanks");
                 }
               },
@@ -779,6 +769,22 @@ const pkg = {
       // }
     );
     await switchPage("welcome");
+
+    // show modal here as previously the "checking" screen could be seen below it
+    if (ip === "127.0.0.1") {
+      await Root.Libs.Modal.Show({
+        parent: document.body,
+        pid: Pid,
+        title: langManager.getString("system.noLocalServer.title"),
+        description: langManager.getString("system.noLocalServer.description"),
+        buttons: [
+          {
+            type: "primary",
+            text: langManager.getString("actions.ok"),
+          },
+        ],
+      });
+    }
   },
   end: async function () {
     // Exit this UI when the process is exited
