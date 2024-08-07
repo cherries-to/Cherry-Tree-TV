@@ -14,6 +14,8 @@ export default {
     "Wireless Gamepad (Vendor: 0000 Product: 0000)": "Generic Controller",
     "0079-1843-MAYFLASH GameCube Controller Adapter": "GameCube Controller",
     "Backbone Labs, Inc. ": "Backbone Controller",
+    "18d1-9400-Unknown Gamepad": "Stadia Controller",
+    "18d1-9400-Stadia Controller rev. A": "Stadia Controller",
   },
   mappings: {
     default: {
@@ -100,6 +102,21 @@ export default {
       button13: "right",
       button14: "down",
       button15: "left",
+    },
+    "Stadia Controller": {
+      up: "up",
+      down: "down",
+      left: "left",
+      right: "right",
+      button0: "confirm",
+      button1: "back",
+      button3: "act",
+      button4: "alt",
+      button10: "menu",
+      button11: "menu",
+      button12: "menu",
+      button16: "menu",
+      button17: "menu",
     },
   },
   labels: {
