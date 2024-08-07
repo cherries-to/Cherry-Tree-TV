@@ -44,12 +44,18 @@ export default {
       }
 
       let csb;
-      if (data.buttons.length > 0) {
+      function initCsb() {
         csb = new controllerStatusBar(
           { type: "any-dir", label: "Move" },
-          { type: "confirm", label: langManager.getString('actions.confirm') },
-          { type: "back", label: langManager.getString('actions.cancel') }
+          { type: "confirm", label: langManager.getString("actions.confirm") },
+          { type: "back", label: langManager.getString("actions.cancel") }
         );
+      }
+
+      if (data.type === "custom") {
+        initCsb();
+      } else if (data.buttons.length > 0) {
+        initCsb();
       }
 
       numb--;
