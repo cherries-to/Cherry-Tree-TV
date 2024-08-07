@@ -408,39 +408,6 @@ export default {
       }, 1000);
     }
 
-    let holding = [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-    ];
-
-    function setHoldingTimeout(index, id) {
-      holding[index] = true;
-      // Delay before repeating
-      setTimeout(() => {
-        if (holding[index] === true) {
-          // Scroll
-          let x = setInterval(function () {
-            if (holding[index] === true) {
-              window.Libs.Input.pop(
-                id,
-                window.gps.findIndex((g) => g.id === gamepad.id)
-              );
-            } else clearInterval(x);
-          }, 100);
-        }
-      }, 350);
-    }
-
     function popInput(i) {
       const p = window.gps.findIndex((g) => g.id === gamepad.id);
       window.Libs.Input.pop(i, p);
@@ -456,6 +423,9 @@ export default {
       mapping = this.mappings[mapping];
     }
 
+    let holdingTimeouts = {};
+    let holdingIntervals = {};
+
     let holdableInputs = [
       "up",
       "down",
@@ -467,78 +437,34 @@ export default {
       "alt",
     ];
     let i = 0;
+
+    function beginHoldingTimeout(key) {
+      holdingTimeouts[key] = setTimeout(() => {
+        console.log(`${key} is still Held!`);
+        if (holdingIntervals[key]) clearInterval(holdingIntervals[key]);
+        holdingIntervals[key] = setInterval(() => {
+          popInput(mapping[key]);
+        }, 100);
+      }, 330);
+    }
+    function clearHoldingTimeout(key) {
+      clearTimeout(holdingTimeouts[key]);
+      clearInterval(holdingIntervals[key]);
+    }
+
     for (let key in mapping) {
       let j = parseInt(i);
-      // if (holdableInputs.includes(mapping[key])) {
-      //   gamepad.before(key, (_) => {
-      //     popInput(mapping[key]);
-      //     setHoldingTimeout(i, mapping[key]);
-      //   });
-      //   gamepad.after(key, (_) => {
-      //     console.log(i, j);
-      //     // holding[j] = false
-      //   });
-      // } else {
+
       gamepad.before(key, (_) => {
         popInput(mapping[key]);
+
+        beginHoldingTimeout(mapping[key]);
       });
-      // }
+      gamepad.after(key, (_) => {
+        clearHoldingTimeout(mapping[key]);
+      });
 
       i++;
     }
-
-    // gamepad.before("up", (_) => {
-    //   popInput("up");
-    //   setHoldingTimeout(0, "up");
-    // });
-    // gamepad.before("down", (_) => {
-    //   popInput("down");
-    //   setHoldingTimeout(1, "down");
-    // });
-    // gamepad.before("left", (_) => {
-    //   popInput("left");
-    //   setHoldingTimeout(2, "left");
-    // });
-    // gamepad.before("right", (_) => {
-    //   popInput("right");
-    //   setHoldingTimeout(3, "right");
-    // });
-    // gamepad.before("button0", (_) => {
-    //   popInput("confirm");
-    //   setHoldingTimeout(4, "confirm");
-    // });
-    // gamepad.before("button1", (_) => {
-    //   popInput("back");
-    //   setHoldingTimeout(5, "back");
-    // });
-    // gamepad.before("button2", (_) => {
-    //   popInput("act");
-    //   setHoldingTimeout(6, "act");
-    // });
-    // gamepad.before("button3", (_) => {
-    //   popInput("alt");
-    //   setHoldingTimeout(7, "alt");
-    // });
-    // gamepad.before("button12", (_) => popInput("up"));
-    // gamepad.before("button13", (_) => popInput("down"));
-    // gamepad.before("button14", (_) => popInput("left"));
-    // gamepad.before("button15", (_) => popInput("right"));
-
-    // gamepad.before("button16", (_) => popInput("menu"));
-    // gamepad.before("button8", (_) => popInput("menu"));
-    // gamepad.before("button9", (_) => popInput("menu"));
-
-    // gamepad.after("up", (_) => (holding[0] = false));
-    // gamepad.after("down", (_) => (holding[1] = false));
-    // gamepad.after("left", (_) => (holding[2] = false));
-    // gamepad.after("right", (_) => (holding[3] = false));
-    // gamepad.after("button0", (_) => (holding[4] = false));
-    // gamepad.after("button1", (_) => (holding[5] = false));
-    // gamepad.after("button2", (_) => (holding[6] = false));
-    // gamepad.after("button3", (_) => (holding[7] = false));
-    // gamepad.after("button12", (_) => (holding[8] = false));
-    // gamepad.after("button13", (_) => (holding[9] = false));
-    // gamepad.after("button14", (_) => (holding[10] = false));
-    // gamepad.after("button15", (_) => (holding[11] = false));
   },
 };
