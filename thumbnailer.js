@@ -1,12 +1,12 @@
-const ffmpeg = require("fluent-ffmpeg");
-const mime = require("mime-types");
-const path = require("path");
-const fs = require("fs");
+import ffmpeg from "fluent-ffmpeg";
+import mime from "mime-types";
+import path from "node:path";
+import fs from "node:fs";
 
 ffmpeg.setFfmpegPath("bin/ffmpeg.exe");
 ffmpeg.setFfprobePath("bin/ffprobe.exe");
 
-const { workerData, parentPort } = require("worker_threads");
+import { workerData, parentPort } from "node:worker_threads";
 
 const fPath = workerData.vidPath;
 const fName = path.basename(fPath);

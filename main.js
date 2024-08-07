@@ -1,18 +1,17 @@
-const YouTubeCastReceiver = require("yt-cast-receiver");
-const { app, BrowserWindow } = require("electron");
-const nodeDiskInfo = require("node-disk-info");
-const { Player } = require("yt-cast-receiver");
-const { Worker } = require("worker_threads");
-const { Server } = require("socket.io");
-const ffmpeg = require("fluent-ffmpeg");
-const express = require("express");
-const mime = require("mime-types");
-const qrcode = require("qrcode");
-const dgram = require("dgram");
-const path = require("path");
-const cors = require("cors");
-const http = require("http");
-const fs = require("fs");
+import YouTubeCastReceiver from "yt-cast-receiver";
+import { app, BrowserWindow } from "electron";
+import nodeDiskInfo from "node-disk-info";
+import { Player } from "yt-cast-receiver";
+import { Worker } from "worker_threads";
+import { Server } from "socket.io";
+import express from "express";
+import mime from "mime-types";
+import qrcode from "qrcode";
+import dgram from "dgram";
+import path from "node:path";
+import cors from "cors";
+import http from "node:http";
+import fs from "node:fs";
 
 const port = 9864;
 const server = express();
@@ -206,7 +205,7 @@ app.whenReady().then(() => {
     worker.on("message", (data) => {
       console.log(data);
       if (data.success) {
-        res.sendFile(data.path, { root: __dirname });
+        res.sendFile(data.path, { root: import.meta.dirname });
       } else {
         res.status(500).send({ error: true, error_msg: data.error_msg });
       }
