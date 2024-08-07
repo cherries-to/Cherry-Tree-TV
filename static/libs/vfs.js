@@ -28,6 +28,14 @@ let templateFsLayout = {
               launchPkg: "apps:DebugApp",
             },
             {
+              name: "Audio Player (Debug)",
+              color: "hsl(280, 65%, 62%)",
+              lastPlayed: Date.now() - 1_000,
+              image:
+                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-file-audio'%3E%3Cpath d='M17.5 22h.5a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3'/%3E%3Cpath d='M14 2v4a2 2 0 0 0 2 2h4'/%3E%3Cpath d='M2 19a2 2 0 1 1 4 0v1a2 2 0 1 1-4 0v-4a6 6 0 0 1 12 0v4a2 2 0 1 1-4 0v-1a2 2 0 1 1 4 0'/%3E%3C/svg%3E",
+              launchPkg: "apps:AudioPlayer",
+            },
+            {
               name: "File Manager",
               color: "hsl(130, 65%, 62%)",
               lastPlayed: Date.now() - 1_000,

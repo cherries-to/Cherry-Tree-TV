@@ -1,64 +1,20 @@
+import icons from "../../libs/icons.js";
 import Html from "/libs/html.js";
 
 let wrapper, Ui, Pid, Sfx, volumeUpdate;
 
 const pkg = {
-  name: "GamepadRemapping",
+  name: "YouTube",
   type: "app",
   privs: 0,
-  start: async function (Root) {
-    Pid = Root.Pid;
+  searchRow: new Html("div"),
 
-    Ui = Root.Processes.getService("UiLib").data;
+  resetRow: async function (row, appendTo) {
+    row.innerHTML = "";
+  },
 
-    wrapper = new Html("div").class("ui", "pad-top", "gap").appendTo("body");
-
-    Ui.transition("popIn", wrapper);
-
-    Ui.becomeTopUi(Pid, wrapper);
-
-    Sfx = Root.Processes.getService("SfxLib").data;
-
-    Sfx.playSfx("deck_ui_into_game_detail.wav");
-
-    const Background = Root.Processes.getService("Background").data;
-
-    console.log(Sfx);
-
-    const audio = Sfx.getAudio();
-
-    const topBar = new Html("div").appendTo(wrapper);
-
-    function loadScript(url) {
-      // script probably already exists
-      if (Html.qs('script[src="' + url + '"]')) {
-        return false;
-      }
-
-      return new Promise((resolve, reject) => {
-        new Html("script")
-          .attr({ src: url })
-          .on("load", () => resolve(true))
-          .appendTo("body");
-      });
-      return true;
-    }
-
-    await loadScript("https://www.youtube.com/iframe_api");
-
-    const row = new Html("div")
-      .class("flex-list")
-      .styleJs({
-        overflow: "auto",
-        // "align-items": "flex-end",
-        width: "100%",
-        // "min-height": "300px",
-      })
-      .appendTo(wrapper);
-
-    let title = new Html("h1")
-      .text("Early Alpha Youtube Client")
-      .appendTo(topBar);
+  searchAndQuery: async function (Root, audio, topBar) {
+    await this.resetRow(this.searchRow);
 
     let options = {
       title: "YouTube Search Query",
@@ -143,22 +99,129 @@ const pkg = {
           },
         });
       });
-      thumbnailWrapper.appendTo(row);
+      thumbnailWrapper.appendTo(this.searchRow);
       Ui.transition("popIn", thumbnailWrapper);
     });
 
-    console.log(row);
+    
+  },
 
-    Ui.init(
-      Pid,
-      "horizontal",
-      [topBar.elm.children, row.elm.children],
-      function (e) {
-        if (e === "back") {
-          pkg.end();
-        }
+  start: async function (Root) {
+    Pid = Root.Pid;
+
+    Ui = Root.Processes.getService("UiLib").data;
+
+    wrapper = new Html("div").class("ui", "pad-top", "gap").appendTo("body");
+
+    Ui.transition("popIn", wrapper);
+
+    Ui.becomeTopUi(Pid, wrapper);
+
+    Sfx = Root.Processes.getService("SfxLib").data;
+
+    Sfx.playSfx("deck_ui_into_game_detail.wav");
+
+    const Background = Root.Processes.getService("Background").data;
+
+    console.log(Sfx);
+
+    const audio = Sfx.getAudio();
+
+    const topBar = new Html("div").appendTo(wrapper);
+
+    function loadScript(url) {
+      // script probably already exists
+      if (Html.qs('script[src="' + url + '"]')) {
+        return false;
       }
-    );
+
+      return new Promise((resolve, reject) => {
+        new Html("script")
+          .attr({ src: url })
+          .on("load", () => resolve(true))
+          .appendTo("body");
+      });
+      return true;
+    }
+
+    await loadScript("https://www.youtube.com/iframe_api");
+
+    const row = new Html("div")
+      .class("flex-list")
+      .styleJs({
+        overflow: "auto",
+        // "align-items": "flex-end",
+        width: "100%",
+        // "min-height": "300px",
+      })
+      .appendTo(wrapper);
+
+    this.searchRow = new Html("div")
+      .class("flex-list")
+      .styleJs({
+        overflow: "auto",
+        // "align-items": "flex-end",
+        width: "100%",
+        // "min-height": "300px",
+      })
+      .appendTo(wrapper);
+
+    let actionList = [
+      {
+        name: "Search",
+        icon: icons.search,
+        action: () => {
+          this.searchAndQuery(Root, wrapper, audio, topBar);
+        },
+      },
+    ];
+
+    actionList.forEach((a) => {
+      let actionWrapper = new Html("button");
+      actionWrapper.styleJs({
+        background: "transparent",
+        scrollSnapAlign: "center",
+        objectFit: "contain",
+        minWidth: "22rem",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      });
+      let img = new Html("img")
+        .appendTo(actionWrapper)
+        .attr({ src: `data:image/svg+xml,${encodeURIComponent(a.icon)}` })
+        .styleJs({
+          aspectRatio: "16 / 9",
+          minWidth: "20rem",
+          height: "11.25rem",
+          borderRadius: "10px",
+          backgroundColor: "#222",
+        });
+      let actionTitle = new Html("p").text(a.name).styleJs({
+        width: "100%",
+        textAlign: "left",
+        padding: "10px",
+      });
+      actionTitle.appendTo(actionWrapper);
+      actionWrapper.on("click", a.action);
+      actionWrapper.appendTo(row);
+    });
+
+    let title = new Html("h1")
+      .text("Early Alpha Youtube Client")
+      .appendTo(topBar);
+
+      Ui.init(
+        Pid,
+        "horizontal",
+        [topBar.elm.children, this.searchRow.elm.children],
+        function (e) {
+          if (e === "back") {
+            pkg.end();
+          }
+        }
+      );
   },
   end: async function () {
     // Exit this UI when the process is exited
