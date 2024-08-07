@@ -95,6 +95,18 @@ const pkg = {
       ip = a;
     } catch (e) {
       ip = "127.0.0.1";
+      await Root.Libs.Modal.Show({
+        parent: document.body,
+        pid: Pid,
+        title: langManager.getString("system.noLocalServer.title"),
+        description: langManager.getString("system.noLocalServer.description"),
+        buttons: [
+          {
+            type: "primary",
+            text: langManager.getString("actions.ok"),
+          },
+        ],
+      });
     }
 
     let textData = {};

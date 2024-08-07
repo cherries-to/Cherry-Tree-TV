@@ -51,6 +51,10 @@ export default {
       description:
         "We were unable to reach the Cherry Tree service. You are temporarily in offline mode.",
     },
+    noLocalServer: {
+      title: "Unable to reach the local server",
+      description: "Your Cherry Tree client was unable to reach the local server, so some features may be unavailable. This experience is not fully recommended."
+    },
     oobe: {
       configuration: "Configuration",
       getStarted: "Get started",
