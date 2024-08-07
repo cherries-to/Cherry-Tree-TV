@@ -118,7 +118,16 @@ export default {
 
     if (result.canceled === true) return;
 
-    const value = result.id === 1 ? true : false;
+    let value;
+
+    switch (result.id) {
+      case 0:
+        value = "none";
+        break;
+        case 1:
+        value = "stars";
+        break;
+    }
 
     await Background.toggle(value);
 

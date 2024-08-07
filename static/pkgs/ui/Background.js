@@ -118,13 +118,13 @@ const pkg = {
     } else space.style({ opacity: "0" });
   },
   data: {
-    async toggle(state) {
-      if (state === false) {
+    async toggle(type) {
+      if (type === "none") {
         // Hide
         space.style({ opacity: "0" });
         await delay(1000);
         running = false;
-      } else {
+      } else if (type === "stars") {
         space.style({ opacity: "0.5" });
         running = true;
         animate();
