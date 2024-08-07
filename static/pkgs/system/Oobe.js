@@ -34,6 +34,7 @@ const pkg = {
       if (tempResult === undefined) throw new Error();
     } catch (e) {
       isOnline = false;
+      window.isOffline = true;
       await Root.Libs.Modal.Show({
         parent: document.body,
         pid: Pid,

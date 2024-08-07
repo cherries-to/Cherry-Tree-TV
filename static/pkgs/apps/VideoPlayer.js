@@ -105,7 +105,7 @@ const pkg = {
     let top;
     let bottom;
     let playPause;
-    let progress;
+    let progress, progressBarValue;
     let timeElapsed, timeElapsedFront, timeElapsedMiddle, timeElapsedBack;
     let captionToggle;
     let vidInfo;
@@ -337,7 +337,7 @@ const pkg = {
         .text(displayName ? displayName : noExt)
         .appendTo(vidInfo)
         .styleJs({
-          padding: "50px",
+          padding: "3.25rem",
         });
       return vidInfo;
     }
@@ -358,13 +358,13 @@ const pkg = {
           videoElm.elm.currentTime = newTime;
         })
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0",
+          padding: "0.8rem",
         });
 
       playPause = new Html("button")
@@ -381,13 +381,13 @@ const pkg = {
           }
         })
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0",
+          padding: "0.8rem",
         });
 
       new Html("button")
@@ -405,13 +405,13 @@ const pkg = {
           videoElm.elm.currentTime = newTime;
         })
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0",
+          padding: "0.8rem",
         });
       return playPause;
     }
@@ -437,12 +437,19 @@ const pkg = {
     }
 
     function createProgressSlider(bottom) {
-      progress = new Html("input").appendTo(bottom).styleJs({
-        "flex-grow": "1",
-        color: "var(--current-player)",
-        border: "none",
-      });
+      progress = new Html("div")
+        .class("vp-progress-bar")
+        .style({
+          "flex-grow": "1",
+        })
+        .appendTo(bottom);
+      progressBarValue = new Html("div")
+        .class("vp-progress-bar-value")
+        .appendTo(progress);
       return progress;
+    }
+    function updateProgressValue(val) {
+      progressBarValue.style({ width: `${val}%` });
     }
 
     function createCaptionToggleButton(bottom, captions, displayName, path) {
@@ -450,13 +457,13 @@ const pkg = {
         .html(captions ? icons["captionsOn"] : icons["captionsOff"])
         .appendTo(bottom)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0",
+          padding: "0.8rem",
         });
 
       if (captions != null) {
@@ -482,13 +489,13 @@ const pkg = {
         .html(icons["captionsOn"])
         .appendTo(bottom)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0",
+          padding: "0.8rem",
         });
       captionToggle.on("click", (e) => {
         callback();
@@ -501,13 +508,13 @@ const pkg = {
         .html(icons["broadcast"])
         .appendTo(bottom)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0",
+          padding: "0.8rem",
         })
         .on("click", async (e) => {
           if (ws) {
@@ -523,13 +530,13 @@ const pkg = {
         .html(icons["slider"])
         .appendTo(bottom)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0",
+          padding: "0.8rem",
         })
         .on("click", (e) => {
           openPictureAdjustMenu(e);
@@ -542,12 +549,7 @@ const pkg = {
         const time = formatTime(videoDuration);
         timeElapsedFront.text("00:00");
         timeElapsedBack.text(`${time.minutes}:${time.seconds}`);
-        progress.attr({
-          type: "range",
-          min: 0,
-          max: videoElm.elm.duration,
-          value: 0,
-        });
+        updateProgressValue(0);
       });
       videoElm.on("timeupdate", () => {
         const videoDuration = Math.round(videoElm.elm.duration);
@@ -556,12 +558,9 @@ const pkg = {
         const elapsed = formatTime(videoElapsed);
         timeElapsedFront.text(`${elapsed.minutes}:${elapsed.seconds}`);
         timeElapsedBack.text(`${duration.minutes}:${duration.seconds}`);
-        progress.attr({
-          type: "range",
-          min: 0,
-          max: videoElm.elm.duration,
-          value: videoElm.elm.currentTime,
-        });
+        updateProgressValue(
+          (videoElm.elm.currentTime / videoElm.elm.duration) * 100
+        );
         renderer.currentTime = videoElm.elm.currentTime;
       });
       videoElm.elm.volume = Sfx.getVolume();
@@ -590,12 +589,9 @@ const pkg = {
           const elapsed = formatTime(videoElapsed);
           timeElapsedFront.text(`${elapsed.minutes}:${elapsed.seconds}`);
           timeElapsedBack.text(`${duration.minutes}:${duration.seconds}`);
-          progress.attr({
-            type: "range",
-            min: 0,
-            max: data.duration,
-            value: data.currentTime,
-          });
+          updateProgressValue(
+            (data.currentTime / data.duration) * 100
+          );
           renderer.currentTime = data.currentTime;
         }
         if (data.type == "play") {
@@ -796,12 +792,12 @@ const pkg = {
     function openWatchPartyMenu(e, displayName, noExt) {
       let overlay = new Html("div")
         .styleJs({
-          width: "350px",
+          width: "33.25rem",
           height: "600px",
           background: "rgba(0,0,0,0.5)",
           position: "absolute",
-          top: "50px",
-          left: "50px",
+          top: "3.25rem",
+          left: "3.25rem",
           zIndex: 1000000,
           backdropFilter: "blur(50px)",
           borderRadius: "10px",
@@ -881,12 +877,12 @@ const pkg = {
     function openPictureAdjustMenu(e) {
       let overlay = new Html("div")
         .styleJs({
-          width: "350px",
+          width: "33.25rem",
           height: "600px",
           background: "rgba(0,0,0,0.5)",
           position: "absolute",
-          top: "50px",
-          left: "50px",
+          top: "3.25rem",
+          left: "3.25rem",
           zIndex: 1000000,
           backdropFilter: "blur(50px)",
           borderRadius: "10px",
@@ -953,8 +949,8 @@ const pkg = {
         .html(icons["minus"])
         .appendTo(row)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -974,8 +970,8 @@ const pkg = {
         .html(icons["plus"])
         .appendTo(row)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -995,8 +991,8 @@ const pkg = {
         .html(icons["minus"])
         .appendTo(row2)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -1013,8 +1009,8 @@ const pkg = {
         .html(icons["plus"])
         .appendTo(row2)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -1034,8 +1030,8 @@ const pkg = {
         .html(icons["minus"])
         .appendTo(row3)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -1055,8 +1051,8 @@ const pkg = {
         .html(icons["plus"])
         .appendTo(row3)
         .styleJs({
-          minWidth: "50px",
-          height: "50px",
+          minWidth: "3.25rem",
+          height: "3.25rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -1075,12 +1071,12 @@ const pkg = {
     function openCaptionsMenu(e, captions, displayName, path) {
       let overlay = new Html("div")
         .styleJs({
-          width: "350px",
+          width: "33.25rem",
           height: "600px",
           background: "rgba(0,0,0,0.5)",
           position: "absolute",
-          top: "50px",
-          left: "50px",
+          top: "3.25rem",
+          left: "3.25rem",
           zIndex: 1000000,
           backdropFilter: "blur(50px)",
           borderRadius: "10px",
@@ -1138,12 +1134,12 @@ const pkg = {
     function openPartyCaptionsMenu(captions, conn, partyName) {
       let overlay = new Html("div")
         .styleJs({
-          width: "350px",
+          width: "33.25rem",
           height: "600px",
           background: "rgba(0,0,0,0.5)",
           position: "absolute",
-          top: "50px",
-          left: "50px",
+          top: "3.25rem",
+          left: "3.25rem",
           zIndex: 1000000,
           backdropFilter: "blur(50px)",
           borderRadius: "10px",

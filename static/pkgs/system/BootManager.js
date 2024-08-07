@@ -103,6 +103,7 @@ const pkg = {
           );
           await Root.Core.pkg.run("ui:MainMenu", [], true);
         } else if (result === false) {
+          window.isOffline = true;
           await Root.Libs.Modal.Show({
             parent: document.body,
             pid: -1,

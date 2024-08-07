@@ -244,9 +244,14 @@ const pkg = {
 
     let friendListWrapperWrapper, outgoingFriendList, incomingFriendList;
 
-    new Html("h1").text("Friends").appendTo(moreList);
+    let friendTitle = new Html("h1").text("Friends").appendTo(moreList);
 
     const friendList = new Html("div").class("flex-col").appendTo(moreList);
+
+    if (window.isOffline) {
+      moreList.elm.removeChild(friendTitle.elm);
+      moreList.elm.removeChild(friendList.elm);
+    }
 
     function renderUserButton(user) {
       return new Html("button")

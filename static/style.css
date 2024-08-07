@@ -439,6 +439,10 @@ button {
   /* backdrop-filter: blur(0.5rem) brightness(0.5) contrast(1.05); */
   /* transition: border-color 0.05s linear; */
 }
+button svg {
+  width: 100%;
+  height: 100%;
+}
 .hv:hover,
 button:hover .hv.over,
 button.over {
@@ -1019,4 +1023,27 @@ kbd {
 .csb-button kbd {
   border-radius: 999px;
   padding: 0.3rem 0.75rem;
+}
+
+/* new progress bar */
+.vp-progress-bar {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 1.5rem;
+  border-radius: 10rem;
+  background: var(--background-light);
+  border: 0.1rem solid var(--background-lightest);
+  overflow: clip;
+}
+.vp-progress-bar-value {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  border-radius: 10rem;
+  background: var(--current-player);
+  border: 0.1rem solid var(--background-lightest);
 }
