@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "A web-based UI for your home theatre PC.",
   "main": "main.js",
-  "type": "module",
   "directories": {
     "doc": "docs"
   },

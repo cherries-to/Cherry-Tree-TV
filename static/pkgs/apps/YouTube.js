@@ -10,6 +10,7 @@ const pkg = {
   searchRow: new Html("div"),
   socket: null,
   intervalFunction: null,
+  volume: { level: 100, muted: false },
 
   resetRow: async function (row, appendTo) {
     row.innerHTML = "";
@@ -48,11 +49,10 @@ const pkg = {
         onReady: () => {
           console.log("player ready");
           Ui.transition("popIn", wrapper);
-          playerFrame.setVolume(Sfx.getVolume() * 100);
-          this.socket.emit("volume", Sfx.getVolume() * 100);
+          playerFrame.setVolume(this.volume.level);
           volumeUpdate = (e) => {
             playerFrame.setVolume(e.detail);
-            this.socket.emit("volume", e.detail);
+            this.volume.level = e.detail;
           };
           document.addEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
           this.socket.emit("duration", playerFrame.getDuration());
@@ -67,6 +67,7 @@ const pkg = {
           });
           this.socket.on("volume", (volume) => {
             playerFrame.setVolume(volume.level);
+            this.volume.level = volume.level;
           });
           this.intervalFunction = setInterval(() => {
             this.socket.emit("position", playerFrame.getCurrentTime());
@@ -74,6 +75,10 @@ const pkg = {
         },
         onStateChange: (e) => {
           console.log("state change", e);
+          if (e.data == YT.PlayerState.ENDED) {
+            console.log("The video has finished playing.");
+            this.socket.emit("finishedPlaying");
+          }
         },
       },
     });
@@ -152,6 +157,7 @@ const pkg = {
     console.log(Sfx);
 
     const audio = Sfx.getAudio();
+    this.volume.level = Sfx.getVolume() * 100;
 
     const topBar = new Html("div").appendTo(wrapper);
 
