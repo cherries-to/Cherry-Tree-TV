@@ -7,8 +7,8 @@ An open-source, web-based front-end for your HTPC that can runs as an app using 
 # Features
 
 - Use your phone as a remote
+- Cast YouTube videos
 - Add movies & shows to your library
-- Send friend requests to users
 - Watch videos with friends
 
 # To-do
@@ -18,3 +18,5 @@ An open-source, web-based front-end for your HTPC that can runs as an app using 
 - [x] Picture adjustments
 - [ ] App store
 - [ ] Friend chats
+- [ ] Fully functional YouTube app
+- [ ] Audio player
