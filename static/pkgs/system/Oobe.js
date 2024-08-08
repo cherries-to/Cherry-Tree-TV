@@ -395,7 +395,7 @@ const pkg = {
           left: [
             {
               text: langManager.getString("actions.back"),
-              goto: "phoneLinkSetup",
+              goto: "configuration",
             },
           ],
           right: [
@@ -684,6 +684,7 @@ const pkg = {
     if (ip === "127.0.0.1") {
       pages["welcome"].barButtons.right[0].goto = "configuration";
       pages["configuration"].barButtons.left[0].goto = "welcome";
+      // pages["account"].barButtons.left[0].goto = "configuration";
     }
     // offline mode
     if (isOnline === false) {

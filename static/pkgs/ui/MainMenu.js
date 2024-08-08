@@ -3,6 +3,8 @@ import { timeDifference } from "/libs/time.js";
 import vfs from "/libs/vfs.js";
 import LangManager from "../../libs/l10n/manager.js";
 import { colors, idToColor, idToEmoji } from "../../libs/userTables.js";
+import langManager from "../../libs/l10n/manager.js";
+import appLib from "../../libs/appLib.js";
 
 let wrapper;
 
@@ -63,7 +65,7 @@ const pkg = {
               title: "Watch Party Invite",
               description: `${s.from.name} has invited you to watch\n ${parsedData.name}`,
               parent: document.body,
-              pid: await ui.data.getTopUi(),
+              pid: await Ui.getTopUi(),
               buttons: [
                 { type: "default", text: "Accept" },
                 { type: "default", text: "Ignore" },
@@ -118,61 +120,10 @@ const pkg = {
       await Root.Libs.startPkg(launchPkg, launchArgs);
     }
 
-    let gameListData = JSON.parse(
-      await vfs.readFile("Root/CherryTree/user/games.json")
-    );
-
-    if (gameListData === null) {
-      // Attempt refresh of VFS to get a default gameListData.
-      await vfs.merge();
-      gameListData = JSON.parse(
-        await vfs.readFile("Root/CherryTree/user/games.json")
-      );
-    }
-
-    const gamesList = gameListData.list;
-
-    let gamesListHtml = gamesList.map((m) => {
-      return new Html("button")
-        .class("game")
-        .styleJs({
-          background: m.color,
-          backgroundPosition: "center",
-          backgroundSize: "45%",
-          backgroundRepeat: "no-repeat",
-          backgroundImage: `url("${m.image}")`,
-        })
-        .on("click", async (e) => {
-          if (m.launchPkg) {
-            await giveUpToApp(m.launchPkg, m.launchArgs);
-          } else if (m.launchUrl) {
-            // Click the URL.
-            let x = new Html("a")
-              .attr({ href: m.launchUrl })
-              .class("hidden")
-              .appendTo("body");
-            x.elm.click();
-            setTimeout(() => {
-              x.cleanup();
-            });
-          }
-        })
-        .appendMany(
-          new Html("span")
-            .class("game-under-text")
-            .appendMany(
-              new Html("span").class("game-name").text(m.name),
-              new Html("span")
-                .class("game-play-time")
-                .text("last played " + timeDifference(new Date(), m.lastPlayed))
-            )
-        );
-    });
-
     let topBarButtonList = [
       { label: LangManager.getString("menu.apps") },
       { label: LangManager.getString("menu.store") },
-      { label: LangManager.getString("menu.more") },
+      { label: LangManager.getString("menu.friends") },
     ];
 
     let topBarButtons = topBarButtonList.map((button) => {
@@ -219,20 +170,110 @@ const pkg = {
     const gameList = new Html("div")
       .class("flex-row", "game-list")
       .appendTo(wrapper)
-      .appendMany(...gamesListHtml);
+      .appendMany();
+
+    async function populateAppList() {
+      gameList.clear();
+      let gameListData = JSON.parse(
+        await vfs.readFile("Root/CherryTree/user/apps.json")
+      );
+
+      if (gameListData === null) {
+        // Attempt refresh of VFS to get a default gameListData.
+        await vfs.merge();
+        gameListData = JSON.parse(
+          await vfs.readFile("Root/CherryTree/user/apps.json")
+        );
+      }
+
+      const gamesList = gameListData.list;
+
+      let gamesListHtml = gamesList.map((m) => {
+        return new Html("button")
+          .class("game")
+          .styleJs({
+            background: m.color,
+            backgroundPosition: "center",
+            backgroundSize: "45%",
+            backgroundRepeat: "no-repeat",
+            backgroundImage: `url("${m.image}")`,
+          })
+          .on("click", async (e) => {
+            if (m.id !== undefined) {
+              await appLib.launchApp(m.id);
+              await appLib.sortAppList();
+              setTimeout(async () => {
+                await populateAppList();
+                Ui.update(Root.Pid, uiArrays);
+                Ui.updatePos(Root.Pid, { x: 0, y: 1 });
+              }, 500);
+            } else {
+              await appLib.resetAppList();
+              await Root.Libs.Modal.Show({
+                parent: document.body,
+                pid: Root.Pid,
+                title: langManager.getString("menu.missingAppId.title"),
+                description: langManager.getString(
+                  "menu.missingAppId.description"
+                ),
+                buttons: [
+                  {
+                    type: "primary",
+                    text: langManager.getString("actions.ok"),
+                  },
+                ],
+              });
+              location.reload();
+            }
+            if (m.launchPkg) {
+              await giveUpToApp(m.launchPkg, m.launchArgs);
+            } else if (m.launchUrl) {
+              // Click the URL.
+              let x = new Html("a")
+                .attr({ href: m.launchUrl })
+                .class("hidden")
+                .appendTo("body");
+              x.elm.click();
+              setTimeout(() => {
+                x.cleanup();
+              });
+            }
+          })
+          .appendMany(
+            new Html("span")
+              .class("game-under-text")
+              .appendMany(
+                new Html("span").class("game-name").text(m.name),
+                new Html("span")
+                  .class("game-play-time")
+                  .text(
+                    "last played " + timeDifference(new Date(), m.lastPlayed)
+                  )
+              )
+          );
+      });
+      gameList.appendMany(...gamesListHtml);
+    }
 
     const topBarBtnHtml = topBarButtons.map((m) => m.elm);
 
-    let moreButtonsFirstRow = new Html("div").class("flex-row").appendMany(
-      new Html("button").text("Open Settings").on("click", async (e) => {
-        await giveUpToApp("apps:Settings");
-      })
-    );
+    let storeList = new Html("div")
+      .class("flex-row", "game-list")
+      .appendTo(wrapper);
 
+    //#region More Tab
     const moreList = new Html("div")
       .class("home-menu-section", "main-menu-attached", "flex-col")
-      .appendMany(moreButtonsFirstRow)
       .appendTo(wrapper);
+
+    if (window.isOffline) {
+      new Html("h2")
+        .text(langManager.getString("system.offlineMenu.title"))
+        .appendTo(moreList);
+      new Html("p")
+        .text(langManager.getString("system.offlineMenu.description"))
+        .appendTo(moreList);
+    }
 
     console.log(friendsList);
 
@@ -534,49 +575,26 @@ const pkg = {
     }
 
     rerenderFriends();
-
-    // const buttonList = new Html("div")
-    //   .class("flex-row", "home-menu-section")
-    //   .appendTo(wrapper)
-    //   .appendMany(
-    //     new Html("button").text("Refresh page").on("click", (e) => {
-    //       location.reload();
-    //     })
-    //     // new Html("button")
-    //     //   .text("Exit main menu (??)")
-    //     //   .on("click", async (e) => {
-    //     //     Ui.cleanup(Root.Pid);
-    //     //     await Ui.transition("popOut", wrapper);
-    //     //     Ui.giveUpUi(Root.Pid);
-    //     //     wrapper.cleanup();
-    //     //     this.end();
-    //     //   })
-    //   );
-
-    // let y1Tabs = [
-    //   gameList.elm.children,
-    //   friendListWrapper.elm.children,
-    //   moreList.elm.children,
-    // ];
+    //#endregion
 
     function showTabs(x) {
       switch (x) {
         case 0:
           // Show games list
           gameList.classOff("hidden");
-          // friendList.classOn("hidden");
+          storeList.classOn("hidden");
           moreList.classOn("hidden");
           break;
         case 1:
           // Show friend list
           gameList.classOn("hidden");
-          // friendList.classOff("hidden");
+          storeList.classOff("hidden");
           moreList.classOn("hidden");
           break;
         case 2:
           // Show friend list
           gameList.classOn("hidden");
-          // friendList.classOn("hidden");
+          storeList.classOn("hidden");
           moreList.classOff("hidden");
           break;
       }
@@ -603,8 +621,6 @@ const pkg = {
     ];
 
     Ui.transition("popIn", wrapper);
-
-    let lastX;
 
     Ui.init(
       Root.Pid,
@@ -647,11 +663,10 @@ const pkg = {
             rerenderFriends();
             // oops
             if (window.isOffline) {
-              uiArrays = [topBarBtnHtml, moreButtonsFirstRow.elm.children];
+              uiArrays = [topBarBtnHtml];
             } else {
               uiArrays = [
                 topBarBtnHtml,
-                moreButtonsFirstRow.elm.children,
                 friendListWrapper.elm.children,
                 outgoingFriendListHtml.map((m) => m.elm),
                 incomingFriendListHtml.map((m) => m.elm),
@@ -665,6 +680,10 @@ const pkg = {
         }
       }
     );
+
+    await populateAppList();
+    Ui.update(Root.Pid, uiArrays);
+    Ui.updatePos(Root.Pid, { x: 0, y: 1 });
   },
   end: async function () {
     // Close the window when the process is exited

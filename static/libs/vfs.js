@@ -8,10 +8,11 @@ let templateFsLayout = {
     CherryTree: {
       user: {
         ".token": "",
-        "games.json": JSON.stringify({
+        "apps.json": JSON.stringify({
           last_updated: Date.now(),
           list: [
             {
+              id: "movies&tv",
               name: "Movies & TV",
               color: "hsl(0, 65%, 62%)",
               lastPlayed: Date.now() - 100,
@@ -20,22 +21,16 @@ let templateFsLayout = {
               launchPkg: "apps:Movies&TV",
             },
             {
-              name: "Debug",
-              color: "hsl(280, 65%, 62%)",
-              lastPlayed: Date.now() - 1_000,
-              image:
-                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1oYW1tZXIiPjxwYXRoIGQ9Im0xNSAxMi04LjM3MyA4LjM3M2ExIDEgMCAxIDEtMy0zTDEyIDkiLz48cGF0aCBkPSJtMTggMTUgNC00Ii8+PHBhdGggZD0ibTIxLjUgMTEuNS0xLjkxNC0xLjkxNEEyIDIgMCAwIDEgMTkgOC4xNzJWN2wtMi4yNi0yLjI2YTYgNiAwIDAgMC00LjIwMi0xLjc1Nkw5IDIuOTZsLjkyLjgyQTYuMTggNi4xOCAwIDAgMSAxMiA4LjRWMTBsMiAyaDEuMTcyYTIgMiAwIDAgMSAxLjQxNC41ODZMMTguNSAxNC41Ii8+PC9zdmc+",
-              launchPkg: "apps:DebugApp",
-            },
-            {
-              name: "Audio Player (Debug)",
-              color: "hsl(280, 65%, 62%)",
+              id: "audioplayer",
+              name: "Audio Player (WIP)",
+              color: "hsl(15, 65%, 62%)",
               lastPlayed: Date.now() - 1_000,
               image:
                 "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-file-audio'%3E%3Cpath d='M17.5 22h.5a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3'/%3E%3Cpath d='M14 2v4a2 2 0 0 0 2 2h4'/%3E%3Cpath d='M2 19a2 2 0 1 1 4 0v1a2 2 0 1 1-4 0v-4a6 6 0 0 1 12 0v4a2 2 0 1 1-4 0v-1a2 2 0 1 1 4 0'/%3E%3C/svg%3E",
               launchPkg: "apps:AudioPlayer",
             },
             {
+              id: "filemanager",
               name: "File Manager",
               color: "hsl(130, 65%, 62%)",
               lastPlayed: Date.now() - 1_000,
@@ -44,10 +39,30 @@ let templateFsLayout = {
               launchPkg: "apps:FileManager",
             },
             {
-              name: "YouTube",
-              color: "hsl(0, 0%, 15.7%)",
+              id: "systemsettings",
+              name: "System Settings",
+              color: "hsl(200, 65%, 62%)",
               lastPlayed: Date.now() - 1_000,
-              image: "../assets/img/logos/yt_logo_rgb_dark.png",
+              image:
+                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-settings'%3E%3Cpath d='M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E",
+              launchPkg: "apps:Settings",
+            },
+            {
+              id: "debug",
+              name: "Debug",
+              color: "hsl(280, 65%, 62%)",
+              lastPlayed: Date.now() - 1_000,
+              image:
+                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1oYW1tZXIiPjxwYXRoIGQ9Im0xNSAxMi04LjM3MyA4LjM3M2ExIDEgMCAxIDEtMy0zTDEyIDkiLz48cGF0aCBkPSJtMTggMTUgNC00Ii8+PHBhdGggZD0ibTIxLjUgMTEuNS0xLjkxNC0xLjkxNEEyIDIgMCAwIDEgMTkgOC4xNzJWN2wtMi4yNi0yLjI2YTYgNiAwIDAgMC00LjIwMi0xLjc1Nkw5IDIuOTZsLjkyLjgyQTYuMTggNi4xOCAwIDAgMSAxMiA4LjRWMTBsMiAyaDEuMTcyYTIgMiAwIDAgMSAxLjQxNC41ODZMMTguNSAxNC41Ii8+PC9zdmc+",
+              launchPkg: "apps:DebugApp",
+            },
+            {
+              id: "youtube",
+              name: "YouTube",
+              color: "hsl(0, 65%, 62%)",
+              lastPlayed: Date.now() - 1_000,
+              image:
+                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-tv-minimal-play'%3E%3Cpath d='M10 7.75a.75.75 0 0 1 1.142-.638l3.664 2.249a.75.75 0 0 1 0 1.278l-3.664 2.25a.75.75 0 0 1-1.142-.64z'/%3E%3Cpath d='M7 21h10'/%3E%3Crect width='20' height='14' x='2' y='3' rx='2'/%3E%3C/svg%3E",
               launchPkg: "apps:YouTube",
             },
           ],

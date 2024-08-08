@@ -18,7 +18,7 @@ const pkg = {
     const statusBar = new Html("div")
       .style({
         position: "fixed",
-        top: "2.5rem",
+        top: "4.5rem",
         right: "4rem",
         "z-index": 1000000,
       })

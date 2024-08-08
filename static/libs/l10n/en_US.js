@@ -5,7 +5,12 @@ export default {
   menu: {
     apps: "apps",
     store: "store",
-    more: "more",
+    friends: "friends",
+    missingAppId: {
+      title: "App Launch Error",
+      description:
+        "Your main menu is out of date. We will refresh the app listing for you.",
+    },
   },
   status: {
     loading: "Loading...",
@@ -39,6 +44,7 @@ export default {
     addFavorite: "Favorite",
     delFavorite: "Unfavorite",
     delete: "Delete",
+    space: "Space",
     deleteConfirm: "Are you sure you want to delete this app?",
     deleteConfirmDescription: "You will lose all settings related to this app.",
     login: "Login",
@@ -51,9 +57,14 @@ export default {
       description:
         "We were unable to reach the Cherry Tree service. You are temporarily in offline mode.",
     },
+    offlineMenu: {
+      title: "You're in offline mode",
+      description: "You cannot add or view the friends list.",
+    },
     noLocalServer: {
       title: "Unable to reach the local server",
-      description: "Your Cherry Tree client was unable to reach the local server, so some features may be unavailable. This experience is not fully recommended."
+      description:
+        "Your Cherry Tree client was unable to reach the local server, so some features may be unavailable. This experience is not fully recommended.",
     },
     oobe: {
       configuration: "Configuration",

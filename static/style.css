@@ -650,7 +650,9 @@ input[type="range"] {
   align-items: flex-end;
   width: 100%;
   padding: 0 9rem 8rem 9rem;
-  scroll-snap-type: x mandatory;
+  
+  /* scroll-snap-type: x mandatory; */
+
   /* min-height: 24rem; */
   min-height: 27rem;
 }

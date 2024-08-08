@@ -2,17 +2,41 @@ import icons from "../../libs/icons.js";
 import Html from "/libs/html.js";
 
 let wrapper, Ui, Pid, Sfx, volumeUpdate;
+let uiElements;
 
 const pkg = {
   name: "YouTube",
   type: "app",
   privs: 0,
-  searchRow: new Html("div"),
+  // Root and audio, commonly used so we store it in here
+  // reduces arguments to functions
+  Root: undefined,
+  audio: undefined,
+
+  // ui elements
+  topBar: undefined,
+  actionRow: undefined,
+  searchRow: undefined,
+
   socket: null,
   intervalFunction: null,
+
   volume: { level: 100, muted: false },
 
-  resetRow: async function (row, appendTo) {
+  createRow: async function (appendTo) {
+    return new Html("div")
+      .class("flex-list")
+      .styleJs({
+        overflow: "auto",
+        // "align-items": "flex-end",
+        width: "100%",
+        // "min-height": "300px",
+      })
+      .appendTo(appendTo);
+  },
+
+  resetRow: async function (row) {
+    // stupid solution
     row.innerHTML = "";
   },
 
@@ -37,7 +61,7 @@ const pkg = {
       })
       .appendTo(wrapper);
     wrapper.class("full-ui");
-    let playerFrame = new YT.Player("player", {
+    let playerFrame = new window.YT.Player("player", {
       height: window.innerHeight,
       width: window.innerWidth,
       videoId: id,
@@ -67,6 +91,10 @@ const pkg = {
           });
           this.socket.on("volume", (volume) => {
             playerFrame.setVolume(volume.level);
+            document.dispatchEvent(
+              // distribute the volume change event to show the volume indicator
+              new CustomEvent("CherryTree.Input.VolumeChange")
+            );
             this.volume.level = volume.level;
           });
           this.intervalFunction = setInterval(() => {
@@ -75,7 +103,7 @@ const pkg = {
         },
         onStateChange: (e) => {
           console.log("state change", e);
-          if (e.data == YT.PlayerState.ENDED) {
+          if (e.data == window.YT.PlayerState.ENDED) {
             console.log("The video has finished playing.");
             this.socket.emit("finishedPlaying");
           }
@@ -84,19 +112,19 @@ const pkg = {
     });
   },
 
-  searchAndQuery: async function (Root, audio, topBar) {
+  searchAndQuery: async function () {
     await this.resetRow(this.searchRow);
 
     let options = {
       title: "YouTube Search Query",
       description: "Search YouTube for your query",
       parent: document.body,
-      pid: Root.Pid,
+      pid: this.Root.Pid,
       value: "",
       type: "text",
     };
 
-    let result = (await Root.Libs.Modal.showKeyboard(options)).value;
+    let result = (await this.Root.Libs.Modal.showKeyboard(options)).value;
 
     let ytQuery = await fetch(
       `https://olive.nxw.pw:8080/search?term=${result}`
@@ -133,39 +161,29 @@ const pkg = {
         this.play(i.id);
       });
       thumbnailWrapper.appendTo(this.searchRow);
+      Ui.init(
+        this.Root.Pid,
+        "horizontal",
+        [
+          this.topBar.elm.children,
+          this.actionRow.elm.children,
+          this.searchRow.elm.children,
+        ],
+        function (e) {
+          if (e === "back") {
+            pkg.end();
+          }
+        }
+      );
       Ui.transition("popIn", thumbnailWrapper);
     });
   },
 
-  start: async function (Root) {
-    Pid = Root.Pid;
+  cast: async function () {
+    // get the tvName so we can use it when casting
+    const tvName = this.Root.Security.getSecureVariable("TV_NAME");
 
-    Ui = Root.Processes.getService("UiLib").data;
-
-    wrapper = new Html("div").class("ui", "pad-top", "gap").appendTo("body");
-
-    Ui.transition("popIn", wrapper);
-
-    Ui.becomeTopUi(Pid, wrapper);
-
-    Sfx = Root.Processes.getService("SfxLib").data;
-
-    Sfx.playSfx("deck_ui_into_game_detail.wav");
-
-    const Background = Root.Processes.getService("Background").data;
-
-    console.log(Sfx);
-
-    const audio = Sfx.getAudio();
-    this.volume.level = Sfx.getVolume() * 100;
-
-    const topBar = new Html("div").appendTo(wrapper);
-
-    let Users = Root.Processes.getService("UserSvc").data;
-    let info = await Users.getUserInfo(await Root.Security.getToken());
-    let tvName = `${info.name}'s TV`;
-
-    this.socket = io({
+    this.socket = window.io({
       auth: {
         name: tvName,
         screenName: "YouTube on Cherry Tree",
@@ -176,7 +194,7 @@ const pkg = {
 
     this.socket.on("success", () => {
       console.log("TV is now discoverable");
-      Root.Libs.Notify.show(
+      this.Root.Libs.Notify.show(
         "This TV is now discoverable",
         `This TV is being discovered as "${tvName}"`
       );
@@ -184,7 +202,7 @@ const pkg = {
 
     this.socket.on("clientConnected", (sender) => {
       console.log(sender);
-      Root.Libs.Notify.show(
+      this.Root.Libs.Notify.show(
         `${sender.user.name} connected to this TV.`,
         `${sender.user.name}'s ${sender.name} connected to this TV.`
       );
@@ -192,7 +210,7 @@ const pkg = {
 
     this.socket.on("clientDisconnected", (sender) => {
       console.log(sender);
-      Root.Libs.Notify.show(
+      this.Root.Libs.Notify.show(
         `${sender.user.name} disconnected`,
         `${sender.user.name}'s ${sender.name} has been disconnected.`
       );
@@ -223,50 +241,64 @@ const pkg = {
     this.socket.on("volume", (vol) => {
       console.log("TV received volume data", vol);
     });
+  },
 
-    function loadScript(url) {
-      // script probably already exists
-      if (Html.qs('script[src="' + url + '"]')) {
-        return false;
-      }
-
-      return new Promise((resolve, reject) => {
-        new Html("script")
-          .attr({ src: url })
-          .on("load", () => resolve(true))
-          .appendTo("body");
-      });
-      return true;
+  loadScript: async function (url) {
+    // script probably already exists
+    if (Html.qs('script[src="' + url + '"]')) {
+      return false;
     }
 
-    await loadScript("https://www.youtube.com/iframe_api");
+    return new Promise((resolve, reject) => {
+      new Html("script")
+        .attr({ src: url })
+        .on("load", () => resolve(true))
+        .appendTo("body");
+    });
+    return true;
+  },
 
-    const row = new Html("div")
-      .class("flex-list")
-      .styleJs({
-        overflow: "auto",
-        // "align-items": "flex-end",
-        width: "100%",
-        // "min-height": "300px",
-      })
-      .appendTo(wrapper);
+  start: async function (Root) {
+    // store the root and other root related functions
+    this.Root = Root;
+    Pid = Root.Pid;
 
-    this.searchRow = new Html("div")
-      .class("flex-list")
-      .styleJs({
-        overflow: "auto",
-        // "align-items": "flex-end",
-        width: "100%",
-        // "min-height": "300px",
-      })
-      .appendTo(wrapper);
+    // get the ui library
+    Ui = Root.Processes.getService("UiLib").data;
+
+    // create the topbar and other row elements
+    wrapper = new Html("div")
+      .style({ "max-width": "100%" })
+      .class("ui", "pad-top", "gap")
+      .appendTo("body");
+    this.topBar = new Html("div").appendTo(wrapper);
+
+    // pop in application and play sound effect
+    Ui.transition("popIn", wrapper);
+    Ui.becomeTopUi(Pid, wrapper);
+    Sfx = Root.Processes.getService("SfxLib").data;
+    Sfx.playSfx("deck_ui_into_game_detail.wav");
+    const Background = Root.Processes.getService("Background").data;
+
+    // get the volume level and set it to this.volume.level
+    const audio = Sfx.getAudio();
+    this.audio = audio;
+    this.volume.level = Sfx.getVolume() * 100; //? (not sure what this is supposed to do) -tuck
+
+    this.cast();
+
+    await this.loadScript("https://www.youtube.com/iframe_api");
+
+    this.topBar = await this.createRow(wrapper);
+    this.actionRow = await this.createRow(wrapper);
+    this.searchRow = await this.createRow(wrapper);
 
     let actionList = [
       {
         name: "Search",
         icon: icons.search,
         action: () => {
-          this.searchAndQuery(Root, wrapper, audio, topBar);
+          this.searchAndQuery();
         },
       },
     ];
@@ -283,16 +315,13 @@ const pkg = {
         flexDirection: "column",
         alignItems: "center",
       });
-      let img = new Html("img")
-        .appendTo(actionWrapper)
-        .attr({ src: `data:image/svg+xml,${encodeURIComponent(a.icon)}` })
-        .styleJs({
-          aspectRatio: "16 / 9",
-          minWidth: "20rem",
-          height: "11.25rem",
-          borderRadius: "10px",
-          backgroundColor: "#222",
-        });
+      let img = new Html("div").appendTo(actionWrapper).html(a.icon).styleJs({
+        aspectRatio: "16 / 9",
+        minWidth: "20rem",
+        height: "11.50rem",
+        borderRadius: "10px",
+        backgroundColor: "#222",
+      });
       let actionTitle = new Html("p").text(a.name).styleJs({
         width: "100%",
         textAlign: "left",
@@ -300,17 +329,23 @@ const pkg = {
       });
       actionTitle.appendTo(actionWrapper);
       actionWrapper.on("click", a.action);
-      actionWrapper.appendTo(row);
+      actionWrapper.appendTo(this.actionRow);
     });
 
-    let title = new Html("h1")
-      .text("Early Alpha Youtube Client")
-      .appendTo(topBar);
+    // const ytIconWidth = 168;
+    // let icon = new Html("div")
+    //   .appendTo(this.topBar)
+    //   .html(icons.brandIcons.youtube.replace(`width="512"', 'width="${ytIconWidth}"`)); // stupid ass solution to seth the width
+    let title = new Html("span").text("YouTube").appendTo(this.topBar);
 
     Ui.init(
       Pid,
       "horizontal",
-      [topBar.elm.children, this.searchRow.elm.children],
+      [
+        this.topBar.elm.children,
+        this.actionRow.elm.children,
+        this.searchRow.elm.children,
+      ],
       function (e) {
         if (e === "back") {
           pkg.end();

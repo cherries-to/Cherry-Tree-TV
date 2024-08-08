@@ -43,19 +43,35 @@ export default {
         throw new Error("customType is required");
       }
 
-      let csb;
-      function initCsb() {
-        csb = new controllerStatusBar(
-          { type: "any-dir", label: "Move" },
-          { type: "confirm", label: langManager.getString("actions.confirm") },
-          { type: "back", label: langManager.getString("actions.cancel") }
-        );
+      if (data.csbInfo !== undefined && !data.customType) {
+        throw new Error("customType is required for csbInfo");
       }
 
-      if (data.type === "custom") {
-        initCsb();
-      } else if (data.buttons.length > 0) {
-        initCsb();
+      let csb;
+      try {
+        function initCsb() {
+          let csbInfo = [
+            { type: "any-dir", label: langManager.getString("actions.move") },
+            {
+              type: "confirm",
+              label: langManager.getString("actions.confirm"),
+            },
+            { type: "back", label: langManager.getString("actions.cancel") },
+          ];
+          if (data.csbInfo !== undefined && Array.isArray(data.csbInfo)) {
+            csbInfo = data.csbInfo;
+          }
+          csb = new controllerStatusBar(...csbInfo);
+        }
+        if (data.type === "custom") {
+          initCsb();
+        } else if (data.buttons.length > 0) {
+          initCsb();
+        }
+      } catch (e) {
+        if (csb) {
+          csb.cleanup();
+        }
       }
 
       numb--;
@@ -205,37 +221,6 @@ export default {
       .appendTo(ContainerDiv);
 
     let text = options.value || "";
-    let pcInp = new Html("input")
-      .styleJs({
-        width: 0,
-        height: 0,
-        position: "absolute",
-      })
-      .class("keyboardInput")
-      .on("keyup", (e) => {
-        text = pcInp.elm.value;
-        inputBox.elm.textContent = "";
-        if (options.type === "password") {
-          for (let i = 0; i < text.length; i++) {
-            inputBox.elm.textContent += "•";
-          }
-        } else {
-          for (let i = 0; i < text.length; i++) {
-            if (text.charAt(i) === " ") {
-              inputBox.elm.innerHTML += "&nbsp;";
-            } else {
-              inputBox.elm.textContent += text.charAt(i);
-            }
-          }
-        }
-        if (e.key == "Escape") {
-          pcInp.cleanup();
-        }
-        console.log("type!", e);
-      })
-      .appendTo("body");
-
-    pcInp.elm.focus();
 
     let cb;
 
@@ -269,7 +254,6 @@ export default {
           break;
       }
       console.log("type");
-      pcInp.elm.value = text;
     });
 
     // input list
@@ -280,7 +264,6 @@ export default {
         ...keyboard.keysListHtml,
         new Html("div").class("flex-row-small").appendMany(
           new Html("button").text("Confirm").on("click", (e) => {
-            pcInp.cleanup();
             cb({
               canceled: false,
               text: inputBox.elm.textContent,
@@ -288,7 +271,6 @@ export default {
             });
           }),
           new Html("button").text("Cancel").on("click", (e) => {
-            pcInp.cleanup();
             cb({ canceled: true, text: null, id: -1 });
           })
         )
@@ -305,33 +287,23 @@ export default {
       })
     );
 
-    document.addEventListener("CherryTree.Input.FinishKeyboard", (e) => {
-      if (pcInp.elm.parentNode !== null) {
-        pcInp.cleanup();
-        cb({
-          canceled: false,
-          text: e.detail.text,
-          id: -1,
-        });
-      }
-    });
+    document.addEventListener("CherryTree.Input.FinishKeyboard", (e) => {});
 
     document.addEventListener("CherryTree.Input.TypeInKeyboard", (e) => {
       console.log(e.detail);
-      if (pcInp.elm.parentNode !== null) {
-        text = e.detail.text;
-        inputBox.elm.textContent = "";
-        if (options.type === "password") {
-          for (let i = 0; i < text.length; i++) {
-            inputBox.elm.textContent += "•";
-          }
-        } else {
-          for (let i = 0; i < text.length; i++) {
-            if (text.charAt(i) === " ") {
-              inputBox.elm.innerHTML += "&nbsp;";
-            } else {
-              inputBox.elm.textContent += text.charAt(i);
-            }
+
+      text = e.detail.text;
+      inputBox.elm.textContent = "";
+      if (options.type === "password") {
+        for (let i = 0; i < text.length; i++) {
+          inputBox.elm.textContent += "•";
+        }
+      } else {
+        for (let i = 0; i < text.length; i++) {
+          if (text.charAt(i) === " ") {
+            inputBox.elm.innerHTML += "&nbsp;";
+          } else {
+            inputBox.elm.textContent += text.charAt(i);
           }
         }
       }
@@ -349,6 +321,22 @@ export default {
       },
       customData: ContainerDiv,
       customType: "keyboard",
+      csbInfo: [
+        { type: "any-dir", label: langManager.getString("actions.move") },
+        {
+          type: "confirm",
+          label: langManager.getString("actions.confirm"),
+        },
+        { type: "back", label: langManager.getString("actions.cancel") },
+        {
+          type: "act",
+          label: langManager.getString("actions.delete"),
+        },
+        {
+          type: "alt",
+          label: langManager.getString("actions.space"),
+        },
+      ],
       buttonCallback: function (btn) {
         keyboard.buttonHandler(btn);
       },
@@ -358,10 +346,6 @@ export default {
       },
       // buttons: [{ type: "primary", text: "Label" }],
     });
-
-    if (result.cancelled) {
-      pcInp.cleanup();
-    }
 
     return Object.assign({ value: text }, result);
   },

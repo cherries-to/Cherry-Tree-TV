@@ -106,6 +106,9 @@ const pkg = {
     }
     console.log("volume is ready", volumeIndicator);
 
+    document.addEventListener("CherryTree.Input.VolumeChange", () => {
+      showVolume();
+    });
     document.addEventListener("CherryTree.Input.VolumeDown", () => {
       volume -= 5;
       showVolume();

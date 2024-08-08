@@ -296,6 +296,9 @@ export default {
         case 4:
           sfxPack = "/assets/audio/sfx_ps.zip";
           break;
+        case 5:
+          sfxPack = "/assets/audio/sfx_mp8.zip";
+          break;
       }
 
       await window.localforage.setItem("settings__sfxPack", sfxPack);

@@ -283,12 +283,52 @@ export default {
       down: "down",
       left: "left",
       right: "right",
-      button3: "A",
-      button2: "B",
-      button0: "Y",
-      button1: "X",
-      button8: "Select",
-      button9: "Start",
+      // A
+      button3: `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="19" cy="19" r="17" fill="black" stroke="url(#paint0_linear_672_17)" stroke-width="4"/>
+<path d="M14.3186 23.186C14.3186 22.528 14.4936 21.933 14.8436 21.401C15.1936 20.869 15.7536 20.435 16.5236 20.099C17.2936 19.763 18.3016 19.574 19.5476 19.532L21.0806 19.49V21.002L19.6736 21.107C18.8616 21.163 18.2316 21.289 17.7836 21.485C17.3496 21.667 17.0416 21.884 16.8596 22.136C16.6916 22.388 16.6076 22.661 16.6076 22.955C16.6076 23.361 16.7336 23.683 16.9856 23.921C17.2376 24.145 17.5666 24.257 17.9726 24.257C18.5326 24.257 19.0716 24.117 19.5896 23.837C20.1216 23.543 20.6046 23.151 21.0386 22.661V24.257C20.6466 24.817 20.1356 25.286 19.5056 25.664C18.8756 26.042 18.1756 26.231 17.4056 26.231C16.8596 26.231 16.3486 26.105 15.8726 25.853C15.4106 25.601 15.0326 25.251 14.7386 24.803C14.4586 24.341 14.3186 23.802 14.3186 23.186ZM14.6546 15.941C15.1586 15.647 15.7746 15.402 16.5026 15.206C17.2306 14.996 17.9516 14.891 18.6656 14.891C19.5196 14.891 20.2756 15.052 20.9336 15.374C21.6056 15.682 22.1306 16.158 22.5086 16.802C22.8866 17.432 23.0756 18.223 23.0756 19.175V23.417C23.0756 23.711 23.0826 23.977 23.0966 24.215C23.1246 24.453 23.1666 24.726 23.2226 25.034L23.3906 26H21.1436L20.7236 23.9V19.385C20.7236 18.559 20.5206 17.957 20.1146 17.579C19.7086 17.201 19.1276 17.012 18.3716 17.012C17.8116 17.012 17.2866 17.096 16.7966 17.264C16.3066 17.432 15.8376 17.635 15.3896 17.873L14.6546 15.941Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_672_17" x1="19" y1="0" x2="19" y2="38" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0.45"/>
+</linearGradient>
+</defs>
+</svg>`,
+      // B
+      button2: `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="19" cy="19" r="17" fill="black" stroke="url(#paint0_linear_672_14)" stroke-width="4"/>
+<path d="M14.7254 26L14.8934 25.034C14.9494 24.726 14.9844 24.453 14.9984 24.215C15.0264 23.977 15.0404 23.711 15.0404 23.417V10.985L17.3924 10.565V23.9L16.9724 26H14.7254ZM16.4684 21.338L17.3924 21.17C17.3924 21.884 17.4974 22.472 17.7074 22.934C17.9314 23.396 18.2114 23.739 18.5474 23.963C18.8974 24.187 19.2754 24.299 19.6814 24.299C20.4794 24.299 21.1164 23.963 21.5924 23.291C22.0824 22.619 22.3274 21.723 22.3274 20.603C22.3274 19.819 22.2224 19.168 22.0124 18.65C21.8164 18.118 21.5364 17.719 21.1724 17.453C20.8084 17.187 20.3954 17.054 19.9334 17.054C19.4434 17.054 18.9464 17.187 18.4424 17.453C17.9524 17.705 17.4974 18.062 17.0774 18.524V16.886C17.5254 16.298 18.0574 15.822 18.6734 15.458C19.2894 15.08 19.9474 14.891 20.6474 14.891C21.3894 14.891 22.0684 15.122 22.6844 15.584C23.3004 16.032 23.7904 16.676 24.1544 17.516C24.5324 18.342 24.7214 19.336 24.7214 20.498C24.7214 21.702 24.5254 22.731 24.1334 23.585C23.7554 24.439 23.2234 25.097 22.5374 25.559C21.8654 26.007 21.0814 26.231 20.1854 26.231C19.5414 26.231 18.9324 26.063 18.3584 25.727C17.7984 25.377 17.3434 24.845 16.9934 24.131C16.6434 23.403 16.4684 22.472 16.4684 21.338Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_672_14" x1="19" y1="0" x2="19" y2="38" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0.45"/>
+</linearGradient>
+</defs>
+</svg>`,
+      // Y
+      button0: `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="19" cy="19" r="17" fill="black" stroke="url(#paint0_linear_672_23)" stroke-width="4"/>
+<path d="M14.294 15.101H16.877L19.943 23.963L19.964 26H18.557L14.294 15.101ZM14.63 29.822L14.924 27.911C15.12 27.967 15.288 28.009 15.428 28.037C15.582 28.065 15.75 28.079 15.932 28.079C16.268 28.079 16.576 28.009 16.856 27.869C17.15 27.729 17.43 27.456 17.696 27.05C17.976 26.658 18.263 26.084 18.557 25.328L19.187 23.963L22.232 15.101H24.71L20.3 26.357C19.964 27.225 19.586 27.939 19.166 28.499C18.746 29.059 18.277 29.465 17.759 29.717C17.255 29.983 16.695 30.116 16.079 30.116C15.827 30.116 15.575 30.088 15.323 30.032C15.085 29.976 14.854 29.906 14.63 29.822Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_672_23" x1="19" y1="0" x2="19" y2="38" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0.45"/>
+</linearGradient>
+</defs>
+</svg>`,
+      // X
+      button1: `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="19" cy="19" r="17" fill="black" stroke="url(#paint0_linear_672_20)" stroke-width="4"/>
+<path d="M13.8087 26L17.8827 20.036L18.7437 19.007L21.2427 15.101H23.8467L19.9617 20.771L19.1007 21.779L16.4127 26H13.8087ZM14.0187 15.101H16.7697L19.6257 19.469L19.6677 19.532L24.0567 26H21.3057L18.2817 21.38L18.2397 21.317L14.0187 15.101Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_672_20" x1="19" y1="0" x2="19" y2="38" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0.45"/>
+</linearGradient>
+</defs>
+</svg>`,
+      button8: "-",
+      button9: "+",
     },
     "Switch Pro Controller": {
       // L stick
@@ -327,10 +367,10 @@ export default {
     },
     "GameCube Controller": {
       // L stick
-      up: "L Up",
-      down: "L Down",
-      left: "L Lef",
-      right: "L Right",
+      up: "Up",
+      down: "Down",
+      left: "Left",
+      right: "Right",
       // ABXY
       button1: "A",
       button2: "B",
@@ -343,6 +383,69 @@ export default {
       button13: "D-Pad Right",
       button14: "D-Pad Down",
       button15: "D-Pad Left",
+    },
+    "Stadia Controller": {
+      up: "Up",
+      down: "Down",
+      left: "Left",
+      right: "Right",
+      // A
+      button0: `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="19" cy="19" r="17" fill="black" stroke="url(#paint0_linear_672_5)" stroke-width="4"/>
+<path d="M12.5294 26L18.1154 11.51H19.1444L19.3124 13.4L14.6294 26H12.5294ZM15.2594 21.926V20.12H22.7354V21.926H15.2594ZM18.5984 13.4L18.6824 11.51H19.8794L25.4654 26H23.2814L18.5984 13.4Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_672_5" x1="19" y1="0" x2="19" y2="38" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0.45"/>
+</linearGradient>
+</defs>
+</svg>`,
+      // B
+      button1: `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="19" cy="19" r="17" fill="black" stroke="url(#paint0_linear_672_2)" stroke-width="4"/>
+<path d="M14.3017 26V11.51H16.3177V26H14.3017ZM15.3517 26V24.236H19.6147C20.4127 24.236 21.0847 24.026 21.6307 23.606C22.1767 23.172 22.4497 22.57 22.4497 21.8C22.4497 21.03 22.1767 20.442 21.6307 20.036C21.0987 19.616 20.4267 19.406 19.6147 19.406H15.3517V18.02H19.7197C20.6017 18.02 21.4067 18.167 22.1347 18.461C22.8627 18.755 23.4437 19.196 23.8777 19.784C24.3117 20.358 24.5287 21.065 24.5287 21.905C24.5287 22.787 24.3117 23.536 23.8777 24.152C23.4437 24.754 22.8627 25.216 22.1347 25.538C21.4067 25.846 20.6017 26 19.7197 26H15.3517ZM15.3517 18.965V17.684H19.2367C19.9787 17.684 20.6017 17.495 21.1057 17.117C21.6097 16.739 21.8617 16.2 21.8617 15.5C21.8617 14.8 21.6097 14.254 21.1057 13.862C20.6157 13.47 19.9927 13.274 19.2367 13.274H15.3517V11.51H19.3417C20.1957 11.51 20.9657 11.657 21.6517 11.951C22.3517 12.245 22.9047 12.686 23.3107 13.274C23.7307 13.848 23.9407 14.555 23.9407 15.395C23.9407 16.165 23.7307 16.816 23.3107 17.348C22.9047 17.88 22.3517 18.286 21.6517 18.566C20.9657 18.832 20.1957 18.965 19.3417 18.965H15.3517Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_672_2" x1="19" y1="0" x2="19" y2="38" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0.45"/>
+</linearGradient>
+</defs>
+</svg>`,
+      // X
+      button3: `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="19" cy="19" r="17" fill="black" stroke="url(#paint0_linear_672_8)" stroke-width="4"/>
+<path d="M12.8727 26L18.1647 18.146L18.7737 17.411L22.6167 11.51H24.9267L19.8447 19.049L19.2357 19.784L15.1827 26H12.8727ZM13.0827 11.51H15.5187L19.6557 17.726L25.1367 26H22.7007L18.3747 19.49L13.0827 11.51Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_672_8" x1="19" y1="0" x2="19" y2="38" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0.45"/>
+</linearGradient>
+</defs>
+</svg>`,
+      // Y
+      button4: `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="19" cy="19" r="17" fill="black" stroke="url(#paint0_linear_672_11)" stroke-width="4"/>
+<path d="M13.3448 11.51H15.6548L19.9388 18.839V20.33H18.6578L13.3448 11.51ZM18.4898 26V19.28H20.5058V26H18.4898ZM19.1408 18.839L23.4248 11.51H25.6508L20.3378 20.33H19.1408V18.839Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_672_11" x1="19" y1="0" x2="19" y2="38" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0.45"/>
+</linearGradient>
+</defs>
+</svg>`,
+      // Menu
+      button10: `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="19" cy="19" r="17" fill="black" stroke="url(#paint0_linear_672_26)" stroke-width="4"/>
+<rect x="11" y="12" width="16" height="2" fill="white"/>
+<rect x="11" y="18" width="16" height="2" fill="white"/>
+<rect x="11" y="24" width="16" height="2" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_672_26" x1="19" y1="0" x2="19" y2="38" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0.45"/>
+</linearGradient>
+</defs>
+</svg>`,
     },
   },
   parseControllerId(id) {

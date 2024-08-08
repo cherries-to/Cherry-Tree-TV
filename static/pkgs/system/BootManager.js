@@ -12,7 +12,6 @@ const pkg = {
     const loadingScreen = document.querySelector("#loading");
     if (loadingScreen) loadingScreen.remove();
 
-    // steam deck easter egg if someone finds this
     wrapper = new Html("div")
       .class("flex")
       .styleJs({
@@ -91,6 +90,22 @@ const pkg = {
           true
         );
       }
+
+      let Users = Root.Processes.getService("UserSvc").data;
+      let info = await Users.getUserInfo(await Root.Security.getToken());
+
+      // define the tv's name, used for casting
+      let tvName = "Cherry Tree TV";
+
+      if (info !== false) {
+        if (info.name !== undefined) {
+          console.log(info);
+          tvName = `${info.name}'s TV`;
+          console.log(tvName);
+        }
+      }
+
+      Root.Security.setSecureVariable("TV_NAME", tvName);
 
       let t = await Root.Security.getToken();
       if (t !== "") {
