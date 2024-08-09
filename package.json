@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "electron ."
+    "start": "electron . --ozone-platform-hint=auto"
   },
   "repository": {
     "type": "git",
