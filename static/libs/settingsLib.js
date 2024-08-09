@@ -1,6 +1,7 @@
 import Modal from "./modal.js";
 import Html from "./html.js";
 import langManager from "./l10n/manager.js";
+import Notify from "./notify.js";
 
 export default {
   togglePhoneLink: async (pid, wrapper) => {
@@ -326,18 +327,10 @@ export default {
     let bgmSong = await window.localforage.getItem("settings__bgmSong");
 
     async function promptDone() {
-      await Modal.Show({
-        parent: wrapper,
-        pid: pid,
-        title: "Completed",
-        description: "Your changes have been applied.",
-        buttons: [
-          {
-            type: "primary",
-            text: langManager.getString("actions.ok"),
-          },
-        ],
-      });
+      Notify.show(
+        "Actions Applied",
+        `Your actions have been applied.`
+      );
     }
 
     const menuResult = await Modal.Show({
@@ -359,43 +352,9 @@ export default {
 
     if (menuResult.canceled === true) return;
     if (menuResult.id === 0) {
-      if (playBgm === null) playBgm = true;
+        if (playBgm === null) playBgm = true;
 
-      const result = await Modal.Show({
-        parent: wrapper,
-        pid: pid,
-        title: "Configure background music",
-        description:
-          "Background music is currently " +
-          (playBgm === true ? "enabled" : "disabled") +
-          ".",
-        buttons: [
-          {
-            type: "primary",
-            text: langManager.getString("actions.on"),
-          },
-          {
-            type: "primary",
-            text: langManager.getString("actions.off"),
-          },
-        ],
-      });
-
-      if (result.canceled === true)
-        return await Modal.Show({
-          parent: wrapper,
-          pid: pid,
-          title: "Setting not changed",
-          description: "The modal was closed, so the setting was not modified.",
-          buttons: [
-            {
-              type: "primary",
-              text: langManager.getString("actions.ok"),
-            },
-          ],
-        });
-      else {
-        const value = result.id === 0 ? true : false;
+        const value = playBgm === false ? true : false;
         await window.localforage.setItem("settings__playBgm", value);
 
         const audio = Sfx.getAudio();
@@ -404,7 +363,6 @@ export default {
         } else {
           audio.pause();
         }
-      }
 
       await promptDone();
     } else if (menuResult.id === 1) {

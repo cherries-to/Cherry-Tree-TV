@@ -45,7 +45,8 @@ export function getFriendlyButtonName(playerNumber, button) {
         label = controllerMapping.labels[label];
       }
 
-      console.log(label, map);
+      // stupid console.log that made it impossible to see other logs
+      // console.log(label, map);
 
       for (const key in map) {
         if (map[key] === button) {
@@ -55,7 +56,8 @@ export function getFriendlyButtonName(playerNumber, button) {
         }
       }
 
-      console.log(label, map);
+      // stupid console.log that made it impossible to see other logs
+      // console.log(label, map);
 
       return button;
 
