@@ -20,8 +20,8 @@ const pkg = {
 
   socket: null,
   intervalFunction: null,
-
   volume: { level: 100, muted: false },
+  playerFrame: null,
 
   createRow: async function (appendTo) {
     return new Html("div")
@@ -49,6 +49,15 @@ const pkg = {
       this.intervalFunction = null;
     }
 
+    if (this.playerFrame) {
+      this.playerFrame.destroy();
+      this.playerFrame = null;
+    }
+    this.socket.off("resume");
+    this.socket.off("pause");
+    this.socket.off("seek");
+    this.socket.off("volume");
+
     audio.pause();
 
     Ui.transition("popOut", wrapper);
@@ -61,7 +70,7 @@ const pkg = {
       })
       .appendTo(wrapper);
     wrapper.class("full-ui");
-    let playerFrame = new window.YT.Player("player", {
+    this.playerFrame = new window.YT.Player("player", {
       height: window.innerHeight,
       width: window.innerWidth,
       videoId: id,
@@ -73,32 +82,33 @@ const pkg = {
         onReady: () => {
           console.log("player ready");
           Ui.transition("popIn", wrapper);
-          playerFrame.setVolume(this.volume.level);
+          this.playerFrame.setVolume(this.volume.level);
           volumeUpdate = (e) => {
-            playerFrame.setVolume(e.detail);
+            this.playerFrame.setVolume(e.detail);
             this.volume.level = e.detail;
           };
           document.addEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
-          this.socket.emit("duration", playerFrame.getDuration());
+          this.socket.emit("duration", this.playerFrame.getDuration());
           this.socket.on("resume", () => {
-            playerFrame.playVideo();
+            this.playerFrame.playVideo();
           });
           this.socket.on("pause", () => {
-            playerFrame.pauseVideo();
+            this.playerFrame.pauseVideo();
           });
           this.socket.on("seek", (pos) => {
-            playerFrame.seekTo(pos);
+            this.playerFrame.seekTo(pos);
           });
           this.socket.on("volume", (volume) => {
-            playerFrame.setVolume(volume.level);
-            document.dispatchEvent(
-              // distribute the volume change event to show the volume indicator
-              new CustomEvent("CherryTree.Input.VolumeChange")
-            );
+            this.playerFrame.setVolume(volume.level);
             this.volume.level = volume.level;
+            document.dispatchEvent(
+              new CustomEvent("CherryTree.Input.VolumeChange", {
+                detail: this.volume.level,
+              })
+            );
           });
           this.intervalFunction = setInterval(() => {
-            this.socket.emit("position", playerFrame.getCurrentTime());
+            this.socket.emit("position", this.playerFrame.getCurrentTime());
           }, 500);
         },
         onStateChange: (e) => {
@@ -372,6 +382,7 @@ const pkg = {
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
     // await Ui.transition("popOut", wrapper);
+    this.socket.disconnect();
     document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
     Ui.giveUpUi(Pid);
     wrapper.cleanup();

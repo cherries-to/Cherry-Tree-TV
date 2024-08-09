@@ -88,6 +88,7 @@ class SocketPlayer extends Player {
   doPlay(video, position) {
     return new Promise((resolve, reject) => {
       console.log("play", video);
+      this.position = 0;
       this.socket.emit("play", video);
       resolve(true);
     });
@@ -147,12 +148,15 @@ class SocketPlayer extends Player {
     this.position = position;
   }
   setVolume(volume) {
+    this.volume = volume;
     return new Promise((resolve, reject) => {
       console.log("volume", volume);
-      this.volume = volume;
       this.socket.emit("volume", volume);
       resolve(true);
     });
+  }
+  resetPosition() {
+    this.position = 0;
   }
 }
 
@@ -192,8 +196,18 @@ app.whenReady().then(() => {
       player.setPosition(position);
     });
     socket.on("finishedPlaying", async () => {
+      player.resetPosition();
       await player.pause();
       await player.next();
+    });
+    socket.on("disconnect", async () => {
+      console.log("App disconnected, closing receiver");
+      try {
+        await receiver.stop();
+      } catch (error) {
+        console.log("How the fuck does it have an error here!???");
+        console.log(error);
+      }
     });
   });
   server.get("/local_ip", (req, res) => {
