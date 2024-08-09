@@ -6,6 +6,8 @@ const UiInfo = {};
 let Sfx = { playSfx() {} };
 let uis = [];
 
+window.snapScroll = false;
+
 let controls = [
   "left",
   "right",
@@ -152,11 +154,15 @@ const pkg = {
       },
     },
     customScrollIntoView(element, container, extraSpace = 50) {
-      element.scrollIntoView({
-        behavior: "smooth",
-        // block: "center",
-        // inline: "start",
-      });
+      if (window.snapScroll !== undefined && window.snapScroll !== false) {
+        element.scrollIntoView();
+      } else {
+        element.scrollIntoView({
+          behavior: "smooth",
+          // block: "center",
+          // inline: "start",
+        });
+      }
     },
     async getTopUi() {
       return r.Input.focusedApp;
@@ -582,6 +588,9 @@ const pkg = {
             return true;
           });
         });
+      if (UiInfo[pid] === undefined) {
+        return false;
+      }
       UiInfo[pid].lists = elmLists;
       pkg.data.focus.setupElmLists(pid, elmLists);
     },
@@ -589,6 +598,10 @@ const pkg = {
       UiInfo[pid].cursor = cursor;
       pkg.data.focus.unfocusAll(pid);
       pkg.data.focus.focusCurrent(pid);
+    },
+    updateParentCallback(pid, newCallback) {
+      if (UiInfo[pid] === undefined) return;
+      UiInfo[pid].parentCallback = newCallback;
     },
     get(pid) {
       return UiInfo[pid];

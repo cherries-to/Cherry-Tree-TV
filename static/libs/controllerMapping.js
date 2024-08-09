@@ -17,10 +17,14 @@ export default {
     "18d1-9400-Unknown Gamepad": "Stadia Controller",
     "18d1-9400-Stadia Controller rev. A": "Stadia Controller",
     // evdev
-    "Microsoft X-Box 360 pad 0 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)": "Xbox Controller",
-    "Microsoft X-Box 360 pad 1 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)": "Xbox Controller",
-    "Microsoft X-Box 360 pad 2 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)": "Xbox Controller",
-    "Microsoft X-Box 360 pad 3 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)": "Xbox Controller",
+    "Microsoft X-Box 360 pad 0 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)":
+      "Xbox Controller",
+    "Microsoft X-Box 360 pad 1 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)":
+      "Xbox Controller",
+    "Microsoft X-Box 360 pad 2 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)":
+      "Xbox Controller",
+    "Microsoft X-Box 360 pad 3 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)":
+      "Xbox Controller",
   },
   mappings: {
     default: {
@@ -548,14 +552,18 @@ export default {
 
     function beginHoldingTimeout(key) {
       holdingTimeouts[key] = setTimeout(() => {
-        console.log(`${key} is still Held!`);
-        if (holdingIntervals[key]) clearInterval(holdingIntervals[key]);
+        window.snapScroll = true;
+
+        if (holdingIntervals[key]) {
+          clearInterval(holdingIntervals[key]);
+        }
         holdingIntervals[key] = setInterval(() => {
           popInput(mapping[key]);
         }, 100);
       }, 330);
     }
     function clearHoldingTimeout(key) {
+      window.snapScroll = false;
       clearTimeout(holdingTimeouts[key]);
       clearInterval(holdingIntervals[key]);
     }
