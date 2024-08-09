@@ -18,7 +18,7 @@ const pkg = {
     const statusBar = new Html("div")
       .style({
         position: "fixed",
-        top: "4.5rem",
+        top: "2.5rem",
         right: "4rem",
         "z-index": 1000000,
       })
@@ -39,8 +39,8 @@ const pkg = {
     updateTime();
     setInterval(updateTime, 1000);
 
-    if ((await localforage.getItem("settings__phoneLink")) === null) {
-      await localforage.setItem("settings__phoneLink", true);
+    if ((await window.localforage.getItem("settings__phoneLink")) === null) {
+      await window.localforage.setItem("settings__phoneLink", true);
     }
 
     const controllerTypes = [
@@ -191,15 +191,15 @@ const pkg = {
     }
 
     async function enablePhoneLink() {
-      localforage.setItem("settings__phoneLink", true);
+      window.localforage.setItem("settings__phoneLink", true);
       await connectPeerJs();
     }
     function disablePhoneLink() {
-      localforage.setItem("settings__phoneLink", false);
+      window.localforage.setItem("settings__phoneLink", false);
       disconnectPeerJs();
     }
 
-    if ((await localforage.getItem("settings__phoneLink")) === true) {
+    if ((await window.localforage.getItem("settings__phoneLink")) === true) {
       enablePhoneLink();
     }
 
