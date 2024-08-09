@@ -315,13 +315,27 @@ const pkg = {
         flexDirection: "column",
         alignItems: "center",
       });
-      let img = new Html("div").appendTo(actionWrapper).html(a.icon).styleJs({
-        aspectRatio: "16 / 9",
-        minWidth: "20rem",
-        height: "11.50rem",
-        borderRadius: "10px",
-        backgroundColor: "#222",
-      });
+      let img = new Html("div")
+        .appendTo(actionWrapper)
+        .append(
+          new Html("span")
+            .style({
+              display: "inline-block",
+              width: "3.5rem",
+              height: "3.5rem",
+            })
+            .html(a.icon)
+        )
+        .styleJs({
+          aspectRatio: "16 / 9",
+          minWidth: "20rem",
+          height: "11.50rem",
+          borderRadius: "10px",
+          backgroundColor: "#222",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        });
       let actionTitle = new Html("p").text(a.name).styleJs({
         width: "100%",
         textAlign: "left",

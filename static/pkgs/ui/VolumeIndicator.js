@@ -36,7 +36,7 @@ const pkg = {
         background: "var(--current-player)",
         height: "8px",
         borderRadius: "99px",
-        transition: "all 0.1s cubic-bezier(0.87, 0, 0.13, 1)",
+        transition: "all 0.25s cubic-bezier(0.87, 0, 0.13, 1)",
       }),
       volumeBar = new Html("span")
         .styleJs({

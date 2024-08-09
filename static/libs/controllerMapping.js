@@ -16,6 +16,11 @@ export default {
     "Backbone Labs, Inc. ": "Backbone Controller",
     "18d1-9400-Unknown Gamepad": "Stadia Controller",
     "18d1-9400-Stadia Controller rev. A": "Stadia Controller",
+    // evdev
+    "Microsoft X-Box 360 pad 0 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)": "Xbox Controller",
+    "Microsoft X-Box 360 pad 1 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)": "Xbox Controller",
+    "Microsoft X-Box 360 pad 2 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)": "Xbox Controller",
+    "Microsoft X-Box 360 pad 3 (STANDARD GAMEPAD Vendor: 28de Product: 11ff)": "Xbox Controller",
   },
   mappings: {
     default: {
