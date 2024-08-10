@@ -46,6 +46,9 @@ const pkg = {
         pkg.end();
       }
     });
+    Ui.updateParentCallback(Pid, function parentCallback(event) {
+      console.log("parent called back!!!", event);
+    });
   },
   end: async function () {
     // Exit this UI when the process is exited
