@@ -771,7 +771,7 @@ const pkg = {
     function openWatchPartyMenu(e, displayName, noExt) {
       let overlay = new Html("div")
         .styleJs({
-          width: "33.25rem",
+          width: "25rem",
           height: "600px",
           background: "rgba(0,0,0,0.5)",
           position: "absolute",
@@ -856,7 +856,7 @@ const pkg = {
     function openPictureAdjustMenu(e) {
       let overlay = new Html("div")
         .styleJs({
-          width: "33.25rem",
+          width: "25rem",
           height: "600px",
           background: "rgba(0,0,0,0.5)",
           position: "absolute",
@@ -1050,7 +1050,7 @@ const pkg = {
     function openCaptionsMenu(e, captions, displayName, path) {
       let overlay = new Html("div")
         .styleJs({
-          width: "33.25rem",
+          width: "25rem",
           height: "600px",
           background: "rgba(0,0,0,0.5)",
           position: "absolute",
