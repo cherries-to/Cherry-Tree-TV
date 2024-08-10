@@ -1,6 +1,9 @@
 import Html from "/libs/html.js";
 import Ws from "/libs/windowSystem.js";
 import Keyboard from "/libs/keyboard.js";
+import appLib from "../../libs/appLib";
+import controllerMapping from "../../libs/controllerMapping";
+import langManager from "../../libs/l10n/manager";
 
 let wrapper, Ui, Pid, Sfx;
 
@@ -249,7 +252,42 @@ const pkg = {
             },
           ],
         });
-      })
+      }),
+      new Html("button")
+        .text("Spoof controller info")
+        .on("click", async (e) => {
+          const result = await Root.Libs.Modal.Show({
+            parent: wrapper,
+            pid: Root.Pid,
+            title: "Spoof Controller ID",
+            description:
+              "This will only affect player 1 on controller.\nUseful for debugging button prompts.",
+            type: "custom",
+            buttons: [{ type: "primary", text: "Xbox Controller" }],
+          });
+          if (window.gps[0] === undefined) {
+            return await Root.Libs.Modal.Show({
+              parent: wrapper,
+              pid: Root.Pid,
+              title: "Error",
+              description: "Controller 1 not detected.",
+              type: "custom",
+              buttons: [
+                { type: "primary", text: langManager.getString("actions.ok") },
+              ],
+            });
+          }
+          function changeGamepadName(newName) {
+            let gp = window.gps[0];
+            gp.name = newName;
+            controllerMapping.setup(window.gps[0], true);
+          }
+          switch (result.id) {
+            case 0:
+              changeGamepadName("Xbox Controller");
+              break;
+          }
+        })
     );
 
     new Html("h2").text("Debug").appendTo(wrapper);
@@ -273,6 +311,30 @@ const pkg = {
           ],
         });
       }),
+      new Html("button")
+        .text("Refresh main menu listing")
+        .on("click", async (e) => {
+          await appLib.resetAppList();
+          let result = await Root.Libs.Modal.Show({
+            parent: wrapper,
+            pid: Root.Pid,
+            title: "Main Menu Reset Complete",
+            description: "Would you like to refresh?",
+            buttons: [
+              {
+                type: "primary",
+                text: "No",
+              },
+              {
+                type: "primary",
+                text: "Yes",
+              },
+            ],
+          });
+          if (result.id === 1) {
+            location.reload();
+          }
+        }),
       new Html("button").text("Exit this app").on("click", async (e) => {
         await Root.end();
       })

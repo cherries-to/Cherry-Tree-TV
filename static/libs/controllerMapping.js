@@ -501,10 +501,14 @@ export default {
   init(n) {
     notify = n;
   },
-  setup(gamepad) {
+  setup(gamepad, forceGamepadName = false) {
     let formalGamepadName;
 
-    formalGamepadName = this.getGamepadName(gamepad.name);
+    if (forceGamepadName) {
+      formalGamepadName = gamepad.name;
+    } else {
+      formalGamepadName = this.getGamepadName(gamepad.name);
+    }
 
     console.log("Gp controller name", formalGamepadName);
 
