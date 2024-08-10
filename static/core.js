@@ -3,14 +3,14 @@
 //  By kat21 and lap  //
 ////////////////////////
 
-import Html from "/libs/html.js";
-import Ws from "/libs/windowSystem.js";
-import Modal from "/libs/modal.js";
-import Keyboard from "/libs/keyboard.js";
-import vfs from "/libs/vfs.js";
-import notify from "/libs/notify.js";
-import controllerMapping from "/libs/controllerMapping.js";
-import "/libs/gamecontroller.js";
+import Html from "./libs/html.js";
+import Ws from "./libs/windowSystem.js";
+import Modal from "./libs/modal.js";
+import Keyboard from "./libs/keyboard.js";
+import vfs from "./libs/vfs.js";
+import notify from "./libs/notify.js";
+import controllerMapping from "./libs/controllerMapping.js";
+import "./libs/gamecontroller.js";
 
 (async () => {
   if (typeof window["gameControl"] !== "undefined") {
