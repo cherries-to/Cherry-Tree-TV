@@ -98,7 +98,12 @@ const pkg = {
       },
     };
 
+    let first;
+
     Object.keys(tabs).forEach((tab) => {
+      if (!first) {
+        first = tab;
+      }
       let tabDiv = new Html("div").appendTo(tabsList).styleJs({
         width: "100%",
         height: "10%",
@@ -149,6 +154,10 @@ const pkg = {
       }
       prevValue = e.x;
     }
+
+    tabContents.clear();
+    tabContentButtons = [];
+    tabs[first](tabContents, uiFuncs);
 
     Ui.init(Pid, "horizontal", tabButtons, handleTabFocus);
   },
