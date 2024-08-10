@@ -164,7 +164,7 @@ const pkg = {
         });
       }
     },
-    async getTopUi() {
+    getTopUi() {
       return r.Input.focusedApp;
     },
     // Had to remake this part due to stupid vscode not saving my files...
