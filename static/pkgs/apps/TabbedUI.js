@@ -121,10 +121,14 @@ const pkg = {
     console.log(Sfx);
     let focusedOnTab = false;
     let prevValue = 0;
+    let hoverValue = 0;
 
     function handleTabFocus(e) {
       console.log(e);
       console.log(prevValue);
+      if (!focusedOnTab) {
+        hoverValue = e.y;
+      }
       if (
         focusedOnTab == false &&
         e.x === 0 &&
@@ -140,6 +144,7 @@ const pkg = {
         e.button == "left"
       ) {
         Ui.init(Pid, "horizontal", tabButtons, handleTabFocus);
+        Ui.updatePos(Pid, { x: 0, y: hoverValue });
         focusedOnTab = false;
       }
       prevValue = e.x;
