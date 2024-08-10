@@ -339,7 +339,7 @@ const pkg = {
             });
           });
         UiInfo[pid] = {
-          cursor: { x: 0, y: 0 },
+          cursor: { x: 0, y: 0, button: "" },
           type: "horizontal",
           lists: elmLists,
           parentCallback,
@@ -364,6 +364,7 @@ const pkg = {
                   UiInfo[pid].cursor.x = 0;
                   Sfx.playSfx("deck_ui_bumper_end_02.wav");
                 } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                UiInfo[pid].cursor.button = "left";
                 UiInfo[pid].parentCallback(UiInfo[pid].cursor);
                 pkg.data.focus.focusCurrent(pid);
                 break;
@@ -381,6 +382,7 @@ const pkg = {
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
                   Sfx.playSfx("deck_ui_bumper_end_02.wav");
                 } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                UiInfo[pid].cursor.button = "right";
                 UiInfo[pid].parentCallback(UiInfo[pid].cursor);
                 pkg.data.focus.focusCurrent(pid);
                 break;
@@ -402,6 +404,7 @@ const pkg = {
                   UiInfo[pid].cursor.x =
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
                 }
+                UiInfo[pid].cursor.button = "up";
                 UiInfo[pid].parentCallback(UiInfo[pid].cursor);
                 pkg.data.focus.focusCurrent(pid);
                 break;
@@ -424,6 +427,7 @@ const pkg = {
                   UiInfo[pid].cursor.x =
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
                 }
+                UiInfo[pid].cursor.button = "down";
                 UiInfo[pid].parentCallback(UiInfo[pid].cursor);
                 pkg.data.focus.focusCurrent(pid);
                 break;
@@ -457,7 +461,7 @@ const pkg = {
       } else if (type === "vertical") {
         let elmLists = elementLists.map((l) => Array.from(l));
         UiInfo[pid] = {
-          cursor: { x: 0, y: 0 },
+          cursor: { x: 0, y: 0, button: "" },
           type: "vertical",
           lists: elmLists,
         };
@@ -494,6 +498,7 @@ const pkg = {
                   UiInfo[pid].cursor.x = 0;
                   Sfx.playSfx("deck_ui_bumper_end_02.wav");
                 } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                UiInfo[pid].cursor.button = "left";
                 pkg.data.focus.focusCurrent(pid);
                 break;
               case "right":
@@ -510,6 +515,7 @@ const pkg = {
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
                   Sfx.playSfx("deck_ui_bumper_end_02.wav");
                 } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                UiInfo[pid].cursor.button = "right";
                 pkg.data.focus.focusCurrent(pid);
                 break;
               case "up":
@@ -530,6 +536,7 @@ const pkg = {
                   UiInfo[pid].cursor.x =
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
                 }
+                UiInfo[pid].cursor.button = "up";
                 pkg.data.focus.focusCurrent(pid);
                 break;
               case "down":
@@ -551,6 +558,7 @@ const pkg = {
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
                 }
                 pkg.data.focus.focusCurrent(pid);
+                UiInfo[pid].cursor.button = "down";
                 break;
               case "confirm":
                 pkg.data.focus.pressCurrent(pid);
