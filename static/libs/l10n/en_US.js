@@ -13,6 +13,7 @@ export default {
     },
   },
   status: {
+    alert: "Alert",
     loading: "Loading...",
     checking: "Checking...",
     downloadingContent: "Downloading content...",

@@ -8,9 +8,38 @@ let Sfx = { playSfx() {} };
 
 let numb = -1;
 
-export default {
+const Modal = {
   init(p) {
     Processes = p;
+
+    // stall for a bit for UiLib to become available (hacky)
+
+    let x = setInterval(() => {
+      if (Processes.getService("UiLib") !== undefined) {
+        Ui = Processes.getService("UiLib").data;
+        clearInterval(x);
+
+        // Modal.js will overwrite alert() for you
+        (function () {
+          window.alert = function () {
+            Modal.Show({
+              title: langManager.getString("status.alert"),
+              description: arguments[0],
+              parent: document.body,
+              pid: Ui.getTopUi(),
+              buttons: [
+                {
+                  type: "primary",
+                  text: langManager.getString("actions.ok"),
+                },
+              ],
+            });
+            return;
+            // return proxied.apply(this, arguments);
+          };
+        })(window.alert);
+      }
+    }, 1000);
   },
   Show(data) {
     return new Promise((resolve, reject) => {
@@ -350,3 +379,5 @@ export default {
     return Object.assign({ value: text }, result);
   },
 };
+
+export default Modal;
