@@ -11,7 +11,13 @@ const pkg = {
 
     Ui = Root.Processes.getService("UiLib").data;
 
-    wrapper = new Html("div").class("ui", "pad-top", "gap").appendTo("body");
+    wrapper = new Html("div").class("full-ui").appendTo("body").styleJs({
+      display: "flex",
+      gap: "25px",
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+    });
 
     Ui.transition("popIn", wrapper);
 
@@ -23,31 +29,65 @@ const pkg = {
 
     const Background = Root.Processes.getService("Background").data;
 
+    let tabs = {
+      "Tab 1": (wrapper) => {
+        new Html("h1").text("Hi, I'm Tab 1!").appendTo(wrapper);
+      },
+      "Tab 2": (wrapper) => {
+        new Html("h1").text("Hi, I'm Tab 2!").appendTo(wrapper);
+      },
+    };
+
+    let tabsList = new Html("div")
+      .styleJs({
+        height: "75%",
+        width: "15%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "var(--background-light)",
+        borderRadius: "5px",
+      })
+      .appendTo(wrapper);
+
+    let tabContents = new Html("div")
+      .styleJs({
+        height: "75%",
+        width: "75%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "var(--background-light)",
+        borderRadius: "5px",
+      })
+      .appendTo(wrapper);
+
+    let tabButtons = [];
+
+    Object.keys(tabs).forEach((tab) => {
+      let tabDiv = new Html("div").appendTo(tabsList).styleJs({
+        width: "100%",
+        height: "10%",
+      });
+      let tabElement = new Html("button").styleJs({
+        width: "100%",
+        height: "100%",
+        textAlign: "left",
+      });
+      tabElement.on("click", () => {
+        tabContents.clear();
+        tabs[tab](tabContents);
+      });
+      tabElement.text(tab);
+      tabElement.appendTo(tabDiv);
+      tabButtons.push(tabDiv.elm.children);
+    });
+
     console.log(Sfx);
 
-    new Html("h1").text("Controller Remapping").appendTo(wrapper);
-    new Html("p")
-      .text(
-        "Select a controller to remap.\nNote: Controller inputs are ignored, use keyboard, mouse, or touch to control this menu."
-      )
-      .appendTo(wrapper);
-    const row = new Html("div")
-      .class("flex-list")
-      .appendMany(
-        new Html("button").on("click", (e) => {
-          Root.end();
-        })
-      )
-      .appendTo(wrapper);
-
-    Ui.init(Pid, "horizontal", [row.elm.children], function (e) {
+    Ui.init(Pid, "horizontal", tabButtons, function (e) {
       console.log(e);
       if (e === "back") {
         pkg.end();
       }
-    });
-    Ui.updateParentCallback(Pid, function parentCallback(event) {
-      console.log("parent called back!!!", event);
     });
   },
   end: async function () {
