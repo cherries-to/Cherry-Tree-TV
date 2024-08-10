@@ -1,9 +1,9 @@
 import Html from "/libs/html.js";
 import Ws from "/libs/windowSystem.js";
 import Keyboard from "/libs/keyboard.js";
-import appLib from "../../libs/appLib";
-import controllerMapping from "../../libs/controllerMapping";
-import langManager from "../../libs/l10n/manager";
+import appLib from "../../libs/appLib.js";
+import controllerMapping from "../../libs/controllerMapping.js";
+import langManager from "../../libs/l10n/manager.js";
 
 let wrapper, Ui, Pid, Sfx;
 
@@ -256,14 +256,23 @@ const pkg = {
       new Html("button")
         .text("Spoof controller info")
         .on("click", async (e) => {
+          const controllerList = [
+            "DualShock 4",
+            "GameCube Controller",
+            "Generic Controller",
+            "Stadia Controller",
+            "Wii Classic Controller",
+            "Xbox Controller",
+          ];
           const result = await Root.Libs.Modal.Show({
             parent: wrapper,
             pid: Root.Pid,
-            title: "Spoof Controller ID",
+            title: "Spoof Controller Type",
             description:
               "This will only affect player 1 on controller.\nUseful for debugging button prompts.",
-            type: "custom",
-            buttons: [{ type: "primary", text: "Xbox Controller" }],
+            buttons: controllerList.map((controller) => {
+              return { type: "primary", text: controller };
+            }),
           });
           if (window.gps[0] === undefined) {
             return await Root.Libs.Modal.Show({
@@ -280,13 +289,11 @@ const pkg = {
           function changeGamepadName(newName) {
             let gp = window.gps[0];
             gp.name = newName;
-            controllerMapping.setup(window.gps[0], true);
+            window.gps.splice(0, 1);
+            controllerMapping.setup(gp, true);
           }
-          switch (result.id) {
-            case 0:
-              changeGamepadName("Xbox Controller");
-              break;
-          }
+          if (result.canceled === true) return;
+          changeGamepadName(controllerList[result.id]);
         })
     );
 
