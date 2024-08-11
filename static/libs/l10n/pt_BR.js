@@ -60,15 +60,14 @@ export default {
     },
     offlineMenu: {
       title: "Você está no modo offline",
-      description: "Você não consegui addicionar ou ver a lista do seus amigos.", // 
+      description: "Você não consegui addicionar ou ver a lista do seus amigos.",
     },
     noLocalServer: {
       title: "Cherry Tree não consegui acessar or servidor local",
       description:
-        "O seu cliente Cherry Tree nao consegui accesar or servido local, entao algumas funções não será acessível. Esta experiência nao e recomendado.", // 
+        "O seu cliente Cherry Tree nao consegui accesar or servido local, entao algumas funções não será acessível. Esta experiência nao e recomendado.", 
     },
     oobe: {
-      // The welcome section is google translated so probably not accurate
       welcome: {
         intro: "Bem-vindo ao seu",
         bingeing: "Compulsão",
@@ -86,14 +85,14 @@ export default {
       phoneLink: {
         title: "Setup do Phone Link",
         description:
-          "Want to use your phone as a TV remote?\nScan the QR code shown on screen.", // Quer use o telefone como um remoto de televisão? Escaneia o codigo QR na tela.
+          "Quer use o telefone como um remoto de televisão?\nEscaneia o codigo QR na tela.", 
         helpText: "Ajuda do Phone Link",
         helpInfo: `No seu telefone, vai para esse URL: %url%\n\nQuando voce connecta, você vai ver um prompt pedindo para você inserta o código. Use o código no canto superior direito da tela ou encontre o codico no Aplicativo de Configurações.`,
       },
       account: {
         title: "Cria uma conta con cherries.to",
         description:
-          "Uma conta online consegui ser usado para adicionar amigos e vazer downloade dos aplicativos.", // 
+          "Uma conta online consegui ser usado para adicionar amigos e vazer downloade dos aplicativos.",
       },
       modal: {
         username: {
@@ -111,7 +110,7 @@ export default {
         skip: {
           title: "Tem certeza que quer pular?",
           description:
-            "Você não vai estar logado e vai perder algumas funções.", // voce nao vai 
+            "Você não vai estar logado e vai perder algumas funções.",
         },
       },
       login: {
@@ -127,7 +126,7 @@ export default {
       thanks: {
         title: "Obrigado",
         description:
-          "Esperamos que você aproveite sua entretenimento e experiência. O seu supporto significa o mundo.", // Ajente 
+          "Esperamos que você aproveite sua entretenimento e experiência. O seu supporto significa o mundo.",
       },
     },
   },
