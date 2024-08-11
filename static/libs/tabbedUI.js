@@ -7,6 +7,15 @@ class TabbedUI {
     let Ui = obj.ui;
     let callback = obj.callback;
     let Pid = obj.pid;
+
+    wrapper.styleJs({
+      display: "flex",
+      gap: "25px",
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+    });
+
     let tabsList = new Html("div")
       .styleJs({
         height: "75%",
