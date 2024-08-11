@@ -37,6 +37,10 @@ class TabbedUI {
         tabContentButtons.push(elm);
         console.log("Added to list", tabContentButtons);
       },
+      update: (elms) => {
+        tabContentButtons = elms;
+        console.log("Updated element list", tabContentButtons);
+      },
     };
 
     let first;
