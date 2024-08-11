@@ -1,7 +1,8 @@
 import icons from "../../libs/icons.js";
 import Html from "/libs/html.js";
+import ColorThief from "../../libs/color-thief.mjs";
 
-let wrapper, Ui, Pid, Sfx;
+let wrapper, Ui, Pid, Sfx, colorThief;
 
 const pkg = {
   name: "Audio Player",
@@ -21,7 +22,7 @@ const pkg = {
     Sfx = Root.Processes.getService("SfxLib").data;
 
     const Background = Root.Processes.getService("Background").data;
-    const colorThief = new window.ColorThief();
+    colorThief = new ColorThief();
 
     console.log(Sfx);
 
@@ -64,20 +65,6 @@ const pkg = {
       })
       .appendTo(songDisplay);
 
-    if (albumCover.elm.complete) {
-      colorThief.getColor(albumCover.elm);
-    } else {
-      albumCover.elm.addEventListener("load", function () {
-        let color = colorThief.getColor(albumCover.elm);
-        console.log(color);
-        container.styleJs({
-          backgroundColor: `rgb(${color[0] - 10},${color[1] - 10}, ${
-            color[2] - 10
-          })`,
-        });
-      });
-    }
-
     let songInfo = new Html("div")
       .styleJs({ display: "flex", flexDirection: "column", gap: "10px" })
       .appendTo(songDisplay);
@@ -119,6 +106,22 @@ const pkg = {
     }).appendTo(playerControls);
 
     // wip
+
+    function setAccentedBackground() {
+      let color = colorThief.getColor(albumCover.elm);
+      console.log("colors", color);
+      container.styleJs({
+        backgroundColor: `rgb(${color[0] - 10},${color[1] - 10}, ${
+          color[2] - 10
+        })`,
+      });
+    }
+
+    if (albumCover.elm.complete) {
+      setAccentedBackground();
+    } else {
+      albumCover.elm.addEventListener("load", setAccentedBackground);
+    }
 
     Ui.init(Pid, "horizontal", [playerControls.elm.children], function (e) {
       if (e === "back") {
