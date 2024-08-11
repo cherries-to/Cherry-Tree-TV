@@ -169,5 +169,6 @@ export default {
       },
     },
     quit: "Quit Settings",
+    quit: "Quit Settings",
   },
 };
