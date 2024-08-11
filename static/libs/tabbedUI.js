@@ -5,6 +5,7 @@ class TabbedUI {
     let tabs = obj.tabs;
     let wrapper = obj.wrapper;
     let Ui = obj.ui;
+    let Sfx = obj.sfx;
     let callback = obj.callback;
     let Pid = obj.pid;
 
@@ -19,7 +20,7 @@ class TabbedUI {
     let tabsList = new Html("div")
       .styleJs({
         height: "75%",
-        width: "15%",
+        width: "max-content",
         display: "flex",
         flexDirection: "column",
         backgroundColor: "var(--background-light)",
@@ -60,7 +61,7 @@ class TabbedUI {
       }
       let tabDiv = new Html("div").appendTo(tabsList).styleJs({
         width: "100%",
-        height: "10%",
+        height: "4rem",
       });
       let tabElement = new Html("button").styleJs({
         width: "100%",
@@ -93,7 +94,8 @@ class TabbedUI {
         prevValue == 0 &&
         e.button == "right"
       ) {
-        Ui.init(Pid, "horizontal", tabContentButtons, handleTabFocus);
+        Ui.update(Pid, tabContentButtons);
+        Ui.updateParentCallback(handleTabFocus);
         focusedOnTab = true;
       } else if (
         focusedOnTab == true &&
@@ -101,12 +103,16 @@ class TabbedUI {
         prevValue == 0 &&
         e.button == "left"
       ) {
-        Ui.init(Pid, "horizontal", tabButtons, handleTabFocus);
+        Ui.update(Pid, tabButtons);
+        Ui.updateParentCallback(handleTabFocus);
         Ui.updatePos(Pid, { x: 0, y: hoverValue });
         focusedOnTab = false;
+      } else {
+        Sfx.playSfx(window.uiInfo[Pid].customSfx.hover);
       }
       prevValue = e.x;
       callback(e);
+      return false;
     }
 
     tabContents.clear();

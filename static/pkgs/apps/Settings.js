@@ -334,6 +334,7 @@ const pkg = {
       tabs: tabs,
       wrapper: wrapper,
       ui: Ui,
+      sfx: Sfx,
       callback: (e) => {
         if (e == "back") {
           pkg.end();

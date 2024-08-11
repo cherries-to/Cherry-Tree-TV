@@ -71,6 +71,7 @@ const pkg = {
       pid: Pid,
       tabs: tabs,
       wrapper: wrapper,
+      sfx: Sfx,
       ui: Ui,
       callback: (e) => {
         if (e == "back") {
