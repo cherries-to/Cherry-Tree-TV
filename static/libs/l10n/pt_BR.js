@@ -68,6 +68,19 @@ export default {
         "O seu cliente Cherry Tree nao consegui accesar or servido local, entao algumas funções não será acessível. Esta experiência nao e recomendado.", // 
     },
     oobe: {
+      // The welcome section is google translated so probably not accurate
+      welcome: {
+        intro: "Bem-vindo ao seu",
+        bingeing: "Compulsão",
+        socialNetwork: "Rede Social",
+        library: "Biblioteca",
+        tv: "TV",
+        home: "Casa",
+        games: "Jogos",
+        computer: "Computador",
+        entertainment: "Entretenimento",
+        enjoyment: "Prazer",
+      },
       configuration: "Configuração",
       getStarted: "Começar",
       phoneLink: {

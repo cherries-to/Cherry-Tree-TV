@@ -124,24 +124,24 @@ const pkg = {
       textData[resultName] = result;
     }
 
+    let introWelcomeDiv = new Html("div")
+      .style({
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%,-50%)",
+      })
+      .html(svg);
+
+    let toBeLocalized = introWelcomeDiv.elm.querySelectorAll("[data-localize]");
+    for (const elm of toBeLocalized) {
+      elm.textContent = langManager.getString(elm.dataset.localize);
+    }
+
     pages = {
       welcome: {
         // Main parent element on top
-        elm: new Html("div").class("flex-row").appendMany(
-          new Html("div")
-            .style({
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%,-50%)",
-            })
-            .html(svg)
-          // Still needs a button on the page...
-          // new Html("div")
-          //   .class("button-row")
-          //   .style({ display: "none" })
-          //   .appendMany(new Html("button").text("..."))
-        ),
+        elm: new Html("div").class("flex-row").appendMany(introWelcomeDiv),
         // bottom bar buttons
         barButtons: {
           // Buttons call a page

@@ -68,6 +68,18 @@ export default {
         "Your Cherry Tree client was unable to reach the local server, so some features may be unavailable. This experience is not fully recommended.",
     },
     oobe: {
+      welcome: {
+        intro: "Welcome to your",
+        bingeing: "Bingeing",
+        socialNetwork: "Social Network",
+        library: "Library",
+        tv: "TV",
+        home: "Home",
+        games: "Games",
+        computer: "Computer",
+        entertainment: "Entertainment",
+        enjoyment: "Enjoyment",
+      },
       configuration: "Configuration",
       getStarted: "Get started",
       phoneLink: {
@@ -133,7 +145,8 @@ export default {
           logoutDescription: "You will have to log in again.",
           delete: "Delete All Data",
           deleteTitle: "Are you sure you want to do this?",
-          deleteDescription: "This will delete EVERYTHING. Your saved user account data and settings will be deleted permanently."
+          deleteDescription:
+            "This will delete EVERYTHING. Your saved user account data and settings will be deleted permanently.",
         },
       },
       input: {
@@ -161,11 +174,11 @@ export default {
           bgm: "Background music settings",
         },
       },
-      pictureCalibration:{
-        title:"Picture calibration",
+      pictureCalibration: {
+        title: "Picture calibration",
         testPattern: "Open test pattern",
-        testPatternName: "SMPTE test pattern"
-      }
+        testPatternName: "SMPTE test pattern",
+      },
     },
     quit: "Quit Settings",
   },
