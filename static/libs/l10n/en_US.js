@@ -131,6 +131,17 @@ export default {
           logout: "Log out of your account",
           logoutTitle: "Are you sure you want to log out?",
           logoutDescription: "You will have to log in again.",
+          delete: "Delete All Data",
+          deleteTitle: "Are you sure you want to do this?",
+          deleteDescription: "This will delete EVERYTHING. Your saved user account data and settings will be deleted permanently."
+        },
+      },
+      input: {
+        title: "Input",
+        description: "Configure input methods.",
+        items: {
+          phoneLinkCode: `Phone Link code:`,
+          phoneLinkToggle: "Enable/Disable Phone Link",
         },
       },
       display: {
@@ -150,6 +161,12 @@ export default {
           bgm: "Background music settings",
         },
       },
+      pictureCalibration:{
+        title:"Picture calibration",
+        testPattern: "Open test pattern",
+        testPatternName: "SMPTE test pattern"
+      }
     },
+    quit: "Quit Settings",
   },
 };
