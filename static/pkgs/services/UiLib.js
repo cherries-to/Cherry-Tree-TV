@@ -350,10 +350,11 @@ const pkg = {
         // Focus the current item
         pkg.data.focus.focusCurrent(pid);
 
-        this.listenAll(pid, function callback(e, plr) {
+        this.listenAll(pid, async function callback(e, plr) {
           try {
             // Handle player
             updatePlayer(plr);
+            let returnCallbackValue;
 
             // Handle navigation
             switch (e) {
@@ -362,10 +363,21 @@ const pkg = {
                 UiInfo[pid].cursor.x--;
                 if (UiInfo[pid].cursor.x < 0) {
                   UiInfo[pid].cursor.x = 0;
-                  Sfx.playSfx("deck_ui_bumper_end_02.wav");
-                } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx("deck_ui_bumper_end_02.wav");
+                  }
+                } else {
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  }
+                }
                 UiInfo[pid].cursor.button = "left";
-                UiInfo[pid].parentCallback(UiInfo[pid].cursor);
                 pkg.data.focus.focusCurrent(pid);
                 break;
               case "right":
@@ -380,8 +392,20 @@ const pkg = {
                 ) {
                   UiInfo[pid].cursor.x =
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
-                  Sfx.playSfx("deck_ui_bumper_end_02.wav");
-                } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx("deck_ui_bumper_end_02.wav");
+                  }
+                } else {
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  }
+                }
                 UiInfo[pid].cursor.button = "right";
                 UiInfo[pid].parentCallback(UiInfo[pid].cursor);
                 pkg.data.focus.focusCurrent(pid);
@@ -393,8 +417,20 @@ const pkg = {
                 // Set cursor Y to the lowest available
                 if (UiInfo[pid].cursor.y < 0) {
                   UiInfo[pid].cursor.y = 0;
-                  Sfx.playSfx("deck_ui_bumper_end_02.wav");
-                } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx("deck_ui_bumper_end_02.wav");
+                  }
+                } else {
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  }
+                }
 
                 // Set cursor X to the highest available
                 if (
@@ -416,8 +452,20 @@ const pkg = {
                 if (UiInfo[pid].cursor.y >= UiInfo[pid].lists.length) {
                   // UiInfo[pid].cursor.y = 0;
                   UiInfo[pid].cursor.y = UiInfo[pid].lists.length - 1;
-                  Sfx.playSfx("deck_ui_bumper_end_02.wav");
-                } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx("deck_ui_bumper_end_02.wav");
+                  }
+                } else {
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  }
+                }
 
                 // Set cursor X to the highest available
                 if (
@@ -487,7 +535,9 @@ const pkg = {
         // Focus the current item
         pkg.data.focus.focusCurrent(pid);
 
-        this.listenAll(pid, function callback(e) {
+        let returnCallbackValue;
+
+        this.listenAll(pid, async function callback(e) {
           try {
             // Handle navigation
             switch (e) {
@@ -496,8 +546,20 @@ const pkg = {
                 UiInfo[pid].cursor.x--;
                 if (UiInfo[pid].cursor.x < 0) {
                   UiInfo[pid].cursor.x = 0;
-                  Sfx.playSfx("deck_ui_bumper_end_02.wav");
-                } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx("deck_ui_bumper_end_02.wav");
+                  }
+                } else {
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  }
+                }
                 UiInfo[pid].cursor.button = "left";
                 pkg.data.focus.focusCurrent(pid);
                 break;
@@ -513,8 +575,20 @@ const pkg = {
                 ) {
                   UiInfo[pid].cursor.x =
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
-                  Sfx.playSfx("deck_ui_bumper_end_02.wav");
-                } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx("deck_ui_bumper_end_02.wav");
+                  }
+                } else {
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  }
+                }
                 UiInfo[pid].cursor.button = "right";
                 pkg.data.focus.focusCurrent(pid);
                 break;
@@ -525,8 +599,20 @@ const pkg = {
                 // Set cursor Y to the highest available
                 if (UiInfo[pid].cursor.y < 0) {
                   UiInfo[pid].cursor.y = UiInfo[pid].lists.length - 1;
-                  Sfx.playSfx("deck_ui_bumper_end_02.wav");
-                } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx("deck_ui_bumper_end_02.wav");
+                  }
+                } else {
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  }
+                }
 
                 // Set cursor X to the highest available
                 if (
@@ -546,8 +632,20 @@ const pkg = {
                 // Set cursor Y to the lowest available
                 if (UiInfo[pid].cursor.y >= UiInfo[pid].lists.length) {
                   UiInfo[pid].cursor.y = 0;
-                  Sfx.playSfx("deck_ui_bumper_end_02.wav");
-                } else Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx("deck_ui_bumper_end_02.wav");
+                  }
+                } else {
+                  returnCallbackValue = await UiInfo[pid].parentCallback(
+                    UiInfo[pid].cursor
+                  );
+                  if (returnCallbackValue !== false) {
+                    Sfx.playSfx(UiInfo[pid].customSfx.hover);
+                  }
+                }
 
                 // Set cursor X to the highest available
                 if (

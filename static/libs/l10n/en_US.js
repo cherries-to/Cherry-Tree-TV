@@ -153,7 +153,7 @@ export default {
         title: "Input",
         description: "Configure input methods.",
         items: {
-          phoneLinkCode: `Phone Link code:`,
+          phoneLinkCode: `Phone Link code:&nbsp;`,
           phoneLinkToggle: "Enable/Disable Phone Link",
         },
       },
@@ -180,6 +180,7 @@ export default {
         testPatternName: "SMPTE test pattern",
       },
     },
+    quit: "Quit Settings",
     quit: "Quit Settings",
   },
 };
