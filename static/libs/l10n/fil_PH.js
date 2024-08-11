@@ -70,6 +70,18 @@ export default {
         "Ang client mo ay hindi naka-connect sa local server, at hindi mo magagamit ang mga feature na kailangan nito. Hindi namin nirerekomenda ito.",
     },
     oobe: {
+      welcome: {
+        intro: "Maligayang pagdating sa iyong",
+        bingeing: "Bingeing",
+        socialNetwork: "Social Network",
+        library: "Library",
+        tv: "Telebisyon",
+        home: "Home",
+        games: "Games",
+        computer: "Computer",
+        entertainment: "Entertainment",
+        enjoyment: "Enjoyment",
+      },
       configuration: "Configuration",
       getStarted: "Magsimula",
       phoneLink: {
