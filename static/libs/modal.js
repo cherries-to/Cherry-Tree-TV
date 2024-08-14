@@ -141,10 +141,10 @@ const Modal = {
       const modalContainer = new Html("div").class("modal-container");
 
       // Mouse click-off support
-      modalContainer.on('click', (e) => {
+      modalContainer.on("click", (e) => {
         if (e.target.closest(".modal-content")) return;
-        killModal();
-      })
+        return killModal({ canceled: true, text: null, id: -1 });
+      });
 
       if (data.customType) {
         modalContainer.classOn(data.customType);
