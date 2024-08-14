@@ -45,6 +45,14 @@ function updatePlayer(plr) {
   }
 }
 
+// Mouse/kb player swap handler
+document.addEventListener('mousemove', () => {
+  updatePlayer(4);
+});
+document.addEventListener('keydown', () => {
+  updatePlayer(4);
+});
+
 const pkg = {
   name: "UI Lib",
   svcName: "UiLib",
@@ -122,21 +130,21 @@ const pkg = {
               return;
             e.classList.add("hv");
             e.setAttribute("tabindex", "-1");
-            // e.onmouseenter = (ev) => {
-            //   if (UiInfo[pid] === undefined) return;
-            //   ev.clientY > 0 && updatePlayer(4);
-            //   pkg.data.focus.unfocusCurrent(pid);
-            //   UiInfo[pid].cursor.x = x;
-            //   UiInfo[pid].cursor.y = y;
-            //   if (e.classList.contains("over") === false)
-            //     Sfx.playSfx(
-            //       UiInfo[pid] !== undefined
-            //         ? UiInfo[pid].customSfx.hover
-            //         : "deck_ui_misc_10.wav"
-            //     );
-            //   pkg.data.focus.focusCurrent(pid);
-            //   UiInfo[pid].parentCallback(UiInfo[pid].cursor);
-            // };
+            e.onmouseenter = (ev) => {
+              if (UiInfo[pid] === undefined) return;
+              ev.clientY > 0 && updatePlayer(4);
+              pkg.data.focus.unfocusCurrent(pid);
+              UiInfo[pid].cursor.x = x;
+              UiInfo[pid].cursor.y = y;
+              if (e.classList.contains("over") === false)
+                Sfx.playSfx(
+                  UiInfo[pid] !== undefined
+                    ? UiInfo[pid].customSfx.hover
+                    : "deck_ui_misc_10.wav"
+                );
+              pkg.data.focus.focusCurrent(pid);
+              UiInfo[pid].parentCallback(UiInfo[pid].cursor);
+            };
             e.onclick = (e) => {
               // Weird hacky way to prevent accidental space/enter clicks
               e.preventDefault();
@@ -516,14 +524,14 @@ const pkg = {
         elmLists.forEach((elmList, y) => {
           elmList.forEach((e, x) => {
             e.classList.add("hv");
-            // e.addEventListener("mouseenter", (_) => {
-            //   updatePlayer(4);
-            //   pkg.data.focus.unfocusCurrent(pid);
-            //   UiInfo[pid].cursor.x = 0; // always set x to 0 for vertical layout
-            //   UiInfo[pid].cursor.y = x; // map x to y for vertical layout
-            //   Sfx.playSfx(UiInfo[pid].customSfx.hover);
-            //   pkg.data.focus.focusCurrent(pid);
-            // });
+            e.addEventListener("mouseenter", (_) => {
+              updatePlayer(4);
+              pkg.data.focus.unfocusCurrent(pid);
+              UiInfo[pid].cursor.x = 0; // always set x to 0 for vertical layout
+              UiInfo[pid].cursor.y = x; // map x to y for vertical layout
+              Sfx.playSfx(UiInfo[pid].customSfx.hover);
+              pkg.data.focus.focusCurrent(pid);
+            });
             e.addEventListener("click", (e) => {
               // Sfx.playSfx("deck_ui_default_activation.wav");
               // console.log(e);
