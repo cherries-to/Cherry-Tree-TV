@@ -282,6 +282,8 @@ const pkg = {
                       },
                     ],
                   });
+                  
+                  if (result.canceled === true) return;
 
                   switch (result.id) {
                     case 0:
@@ -325,6 +327,8 @@ const pkg = {
                       },
                     ],
                   });
+
+                  if (result.canceled === true) return;
 
                   switch (result.id) {
                     case 0:
@@ -420,6 +424,8 @@ const pkg = {
                     },
                   ],
                 });
+
+                if (result.canceled === true) return;
 
                 if (result.id === 1) {
                   // set offline mode since no login
@@ -751,7 +757,7 @@ const pkg = {
             Array.from(barRight.elm.children)
           ),
         ]);
-        Ui.focus.focusCurrent(Root.Pid);
+        if (window.p !== 4) Ui.focus.focusCurrent(Root.Pid);
       }
       Sfx.playSfx("deck_ui_tab_transition_01.wav");
     }

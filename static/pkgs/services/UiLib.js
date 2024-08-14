@@ -46,10 +46,10 @@ function updatePlayer(plr) {
 }
 
 // Mouse/kb player swap handler
-document.addEventListener('mousemove', () => {
+document.addEventListener("mousemove", () => {
   updatePlayer(4);
 });
-document.addEventListener('keydown', () => {
+document.addEventListener("keydown", () => {
   updatePlayer(4);
 });
 
@@ -144,6 +144,9 @@ const pkg = {
                 );
               pkg.data.focus.focusCurrent(pid);
               UiInfo[pid].parentCallback(UiInfo[pid].cursor);
+            };
+            e.onmouseleave = () => {
+              pkg.data.focus.unfocusCurrent(pid);
             };
             e.onclick = (e) => {
               // Weird hacky way to prevent accidental space/enter clicks
@@ -355,8 +358,14 @@ const pkg = {
         };
         pkg.data.focus.setupElmLists(pid, elmLists);
 
-        // Focus the current item
-        pkg.data.focus.focusCurrent(pid);
+        // On mouse/kb, we don't want to auto-highlight a selection
+        if (window.p !== 4) {
+          // Focus the current item
+          pkg.data.focus.focusCurrent(pid);
+        } else {
+          // Don't highlight the current
+          pkg.data.focus.unfocusCurrent(pid);
+        }
 
         this.listenAll(pid, async function callback(e, plr) {
           try {
@@ -531,6 +540,9 @@ const pkg = {
               UiInfo[pid].cursor.y = x; // map x to y for vertical layout
               Sfx.playSfx(UiInfo[pid].customSfx.hover);
               pkg.data.focus.focusCurrent(pid);
+            });
+            e.addEventListener("mouseleave", (_) => {
+              pkg.data.focus.unfocusCurrent(pid);
             });
             e.addEventListener("click", (e) => {
               // Sfx.playSfx("deck_ui_default_activation.wav");
