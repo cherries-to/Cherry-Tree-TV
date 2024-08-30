@@ -1,5 +1,6 @@
 const YouTubeCastReceiver = require("yt-cast-receiver");
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
+const { Client } = require("@xhayper/discord-rpc");
 const nodeDiskInfo = require("node-disk-info");
 const { Player } = require("yt-cast-receiver");
 const { Worker } = require("worker_threads");
@@ -41,6 +42,9 @@ const createWindow = () => {
     height: 720,
     icon: "icon.png",
     autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js")
+    }
   });
 
   win.loadURL(`http://127.0.0.1:${port}/index.html`);
@@ -160,7 +164,21 @@ class SocketPlayer extends Player {
   }
 }
 
+const client = new Client({
+  clientId: "1278852361053405336"
+});
+
+client.on("ready", () => {
+  console.log("[DISCORD] Cherry Tree TV is ready!");
+  client.user?.setActivity({
+    details: "Chillin' in the main menu",
+    largeImageKey: "cherrylogo",
+    largeImageText: "Cherry Tree TV"
+  });
+});
+
 app.whenReady().then(() => {
+  client.login();
   io.on("connection", async (socket) => {
     console.log("connection attempt");
     const details = socket.handshake.auth;
@@ -170,8 +188,8 @@ app.whenReady().then(() => {
         name: details.name,
         screenName: details.screenName,
         brand: details.brand,
-        model: details.model,
-      },
+        model: details.model
+      }
     });
     receiver.on("senderConnect", (sender) => {
       socket.emit("clientConnected", sender);
@@ -223,7 +241,7 @@ app.whenReady().then(() => {
   server.get("/thumbnail", (req, res) => {
     const fPath = req.query.path;
     const worker = new Worker("./thumbnailer.js", {
-      workerData: { vidPath: fPath },
+      workerData: { vidPath: fPath }
     });
     worker.on("message", (data) => {
       console.log(data);
@@ -291,7 +309,7 @@ app.whenReady().then(() => {
               name: file,
               type: fileStats.isFile() ? "file" : "folder",
               created: new Date(fileStats.ctime).getTime(),
-              modified: new Date(fileStats.mtime).getTime(),
+              modified: new Date(fileStats.mtime).getTime()
             });
           } catch (error) {
             console.error(`Error reading file ${file}: ${error.message}`);
@@ -339,5 +357,23 @@ app.whenReady().then(() => {
   serverHttp.listen(port, () => {
     console.log(`[SERVER] Cherry Tree server listening on port ${port}`);
     createWindow();
+  });
+
+  // Electron IPC
+
+  ipcMain.on("setRPC", (event, arg) => {
+    client.user?.setActivity({
+      state: arg.state,
+      details: arg.details,
+      endTimestamp: arg.endTimestamp,
+      largeImageKey: "cherrylogo",
+      largeImageText: "Cherry Tree TV",
+      buttons: arg.button1 && [
+        {
+          label: arg.button1.label,
+          url: arg.button1.url
+        }
+      ]
+    });
   });
 });
