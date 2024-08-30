@@ -14,6 +14,10 @@ const pkg = {
 
       wrapper = new Html("div").class("ui", "pad-top", "gap").appendTo("body");
 
+      cherrywoo.ipc.send("setRPC", {
+        details: "Managing files"
+      });
+
       Ui.transition("popIn", wrapper);
 
       Ui.becomeTopUi(Pid, wrapper);
@@ -32,19 +36,19 @@ const pkg = {
           type: "text",
           label: "Text document",
           opensWith: "apps:Notepad",
-          icon: "file",
+          icon: "file"
         },
         panic: {
           type: "text",
           label: "Panic Log",
           opensWith: "apps:Notepad",
-          icon: "filePanic",
+          icon: "filePanic"
         },
         md: {
           type: "text",
           label: "Markdown document",
           opensWith: "apps:Notepad",
-          icon: "fileMd",
+          icon: "fileMd"
         },
         app: {
           type: "executable",
@@ -52,9 +56,9 @@ const pkg = {
           opensWith: "evaluate",
           ctxMenuApp: {
             launch: "apps:DevEnv",
-            name: "systemApp_DevEnv",
+            name: "systemApp_DevEnv"
           },
-          icon: "box",
+          icon: "box"
         },
         pml: {
           type: "executable",
@@ -62,105 +66,105 @@ const pkg = {
           opensWith: "apps:PML",
           ctxMenuApp: {
             launch: "apps:DevEnv",
-            name: "systemApp_DevEnv",
+            name: "systemApp_DevEnv"
           },
-          icon: "box",
+          icon: "box"
         },
         json: {
           type: "code",
           label: "JSON file",
           opensWith: "apps:DevEnv",
-          icon: "fileJson",
+          icon: "fileJson"
         },
         js: {
           type: "code",
           label: "JavaScript file",
           opensWith: "apps:DevEnv",
-          icon: "fileJson",
+          icon: "fileJson"
         },
         png: {
           type: "image",
           label: "PNG image",
           opensWith: "apps:ImageViewer",
-          icon: "fileImage",
+          icon: "fileImage"
         },
         jpg: {
           type: "image",
           label: "JPG image",
           opensWith: "apps:ImageViewer",
-          icon: "fileImage",
+          icon: "fileImage"
         },
         jpeg: {
           type: "image",
           label: "JPG image",
           opensWith: "apps:ImageViewer",
-          icon: "fileImage",
+          icon: "fileImage"
         },
         gif: {
           type: "image",
           label: "GIF image",
           opensWith: "apps:ImageViewer",
-          icon: "fileImage",
+          icon: "fileImage"
         },
         mp4: {
           type: "video",
           label: "MP4 video",
           opensWith: "apps:VideoPlayer",
-          icon: "fileVideo",
+          icon: "fileVideo"
         },
         mov: {
           type: "video",
           label: "MOV video",
           opensWith: "apps:VideoPlayer",
-          icon: "fileVideo",
+          icon: "fileVideo"
         },
         mkv: {
           type: "video",
           label: "MKV video",
           opensWith: "apps:VideoPlayer",
-          icon: "fileVideo",
+          icon: "fileVideo"
         },
         avi: {
           type: "video",
           label: "AVI video",
           opensWith: "apps:VideoPlayer",
-          icon: "fileVideo",
+          icon: "fileVideo"
         },
         webm: {
           type: "video",
           label: "WebM video",
           opensWith: "apps:VideoPlayer",
-          icon: "fileVideo",
+          icon: "fileVideo"
         },
         wav: {
           type: "audio",
           label: "WAV audio",
           opensWith: "apps:AudioPlayer",
-          icon: "fileAudio",
+          icon: "fileAudio"
         },
         m4a: {
           type: "audio",
           label: "MPEG audio",
           opensWith: "apps:AudioPlayer",
-          icon: "fileAudio",
+          icon: "fileAudio"
         },
         mp3: {
           type: "audio",
           label: "MP3 audio",
           opensWith: "apps:AudioPlayer",
-          icon: "fileAudio",
+          icon: "fileAudio"
         },
         shrt: {
           type: "text",
           label: "Desktop shortcut",
-          opensWith: "apps:Notepad",
+          opensWith: "apps:Notepad"
         },
         theme: {
           type: "text",
           label: "Theme",
           opensWith: "apps:Notepad",
-          icon: "brush",
-        },
+          icon: "brush"
+        }
       };
 
       async function GetDrives() {
@@ -168,8 +172,8 @@ const pkg = {
         const options = {
           method: "GET",
           headers: {
-            accept: "application/json",
-          },
+            accept: "application/json"
+          }
         };
         return new Promise((resolve, reject) => {
           fetch(url, options)
@@ -184,9 +188,9 @@ const pkg = {
         const options = {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify({ dir: path }),
+          body: JSON.stringify({ dir: path })
         };
         return new Promise((resolve, reject) => {
           fetch(url, options)
@@ -215,7 +219,7 @@ const pkg = {
         if (!pathOpen) {
           let respItem = {
             cancelled: true,
-            selected: null,
+            selected: null
           };
           if (launchArgs.callback) {
             launchArgs.callback(respItem);
@@ -301,7 +305,7 @@ const pkg = {
               .on("click", () => {
                 let respItem = {
                   cancelled: false,
-                  selected: path + item.name + "/",
+                  selected: path + item.name + "/"
                 };
                 if (launchArgs.callback) {
                   launchArgs.callback(respItem);
@@ -328,7 +332,7 @@ const pkg = {
                 .on("click", () => {
                   let respItem = {
                     cancelled: false,
-                    selected: path + item.name,
+                    selected: path + item.name
                   };
                   if (launchArgs.callback) {
                     launchArgs.callback(respItem);
@@ -354,12 +358,21 @@ const pkg = {
         UiElems = [];
         pathOpen = false;
         new Html("h1").text(title).appendTo(wrapper);
+        let row = new Html("div")
+          .class("flex-list")
+          .appendTo(wrapper)
+          .styleJs({ width: "100%" });
+
+        let tempLabel = new Html("p")
+          .text(
+            "Your drives are loading, if you have a lot of drives this may take a moment."
+          )
+          .styleJs({ width: "100%" })
+          .appendTo(row);
+
         let drives = await GetDrives();
+
         drives.forEach((drive) => {
-          let row = new Html("div")
-            .class("flex-list")
-            .appendTo(wrapper)
-            .styleJs({ width: "100%" });
           new Html("button")
             .text(drive)
             .styleJs({ width: "100%" })
@@ -370,6 +383,7 @@ const pkg = {
               renderList(drive + "/");
             });
           UiElems.push(row.elm.children);
+          tempLabel.cleanup();
         });
         Ui.transition("popIn", wrapper);
         Ui.init(Pid, "horizontal", UiElems, function (e) {
@@ -392,7 +406,7 @@ const pkg = {
     // await Ui.transition("popOut", wrapper);
     Ui.giveUpUi(Pid);
     wrapper.cleanup();
-  },
+  }
 };
 
 export default pkg;
