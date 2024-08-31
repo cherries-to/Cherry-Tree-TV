@@ -3,7 +3,7 @@ import Html from "/libs/html.js";
 import {
   CaptionsRenderer,
   parseResponse,
-  parseText,
+  parseText
 } from "/libs/media-captions/dist/prod.js";
 import { Peer } from "https://esm.sh/peerjs@1.5.4?bundle-deps";
 
@@ -61,9 +61,9 @@ const pkg = {
       const options = {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({ dir: path }),
+        body: JSON.stringify({ dir: path })
       };
       return new Promise((resolve, reject) => {
         fetch(url, options)
@@ -149,7 +149,7 @@ const pkg = {
             conn.send({
               type: "timeupdate",
               currentTime: videoElm.currentTime,
-              duration: videoElm.duration,
+              duration: videoElm.duration
             });
           });
           videoElm.addEventListener("pause", () => {
@@ -164,7 +164,7 @@ const pkg = {
               if (!data.username) {
                 conn.send({
                   type: "error",
-                  message: "Please identify yourself",
+                  message: "Please identify yourself"
                 });
                 conn.close();
               } else {
@@ -202,7 +202,7 @@ const pkg = {
               conn.send({
                 type: "captionData",
                 captionName: lang,
-                captionData: captionData,
+                captionData: captionData
               });
             }
           });
@@ -222,7 +222,7 @@ const pkg = {
 
       return {
         minutes: result.slice(3, 5),
-        seconds: result.slice(6, 8),
+        seconds: result.slice(6, 8)
       };
     }
 
@@ -244,7 +244,7 @@ const pkg = {
           width: "100%",
           height: "100%",
           position: "absolute",
-          filter: filterStr,
+          filter: filterStr
         })
         .attr(attr);
 
@@ -258,13 +258,13 @@ const pkg = {
         width: "100%",
         position: "absolute",
         top: 0,
-        zIndex: "100",
+        zIndex: "100"
       });
       invButton = new Html("button")
         .text("You should not see this!")
         .appendTo(top)
         .styleJs({
-          opacity: 0,
+          opacity: 0
         });
       return top;
     }
@@ -281,7 +281,7 @@ const pkg = {
         transition: "0.1s linear",
         padding: "1rem",
         borderRadius: "8px",
-        opacity: "0",
+        opacity: "0"
       });
       return bottom;
     }
@@ -290,7 +290,7 @@ const pkg = {
       captionOverlay = new Html("div")
         .styleJs({
           bottom: "48px",
-          transition: "all 0.1s cubic-bezier(0.87, 0, 0.13, 1)",
+          transition: "all 0.1s cubic-bezier(0.87, 0, 0.13, 1)"
         })
         .appendTo(wrapper);
       renderer = new CaptionsRenderer(captionOverlay.elm);
@@ -306,7 +306,7 @@ const pkg = {
         height: "100%",
         width: "100%",
         background: "linear-gradient(to top, #0000, #000f)",
-        transition: "all 0.1s linear",
+        transition: "all 0.1s linear"
       });
       let noExt = "undefined";
       if (path) {
@@ -317,8 +317,18 @@ const pkg = {
         .text(displayName ? displayName : noExt)
         .appendTo(vidInfo)
         .styleJs({
-          padding: "3.25rem",
+          padding: "3.25rem"
         });
+
+      cherrywoo.ipc.send("setRPC", {
+        details: "Now watching",
+        state: displayName ? displayName : noExt,
+        button1: {
+          label: "Watch along",
+          url: "https://localhost:9864"
+        }
+      });
+
       return vidInfo;
     }
 
@@ -344,7 +354,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         });
 
       playPause = new Html("button")
@@ -367,7 +377,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         });
 
       new Html("button")
@@ -391,7 +401,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         });
       return playPause;
     }
@@ -401,7 +411,7 @@ const pkg = {
         flexShrink: "0",
         display: "flex",
         "align-items": "center",
-        gap: "8px",
+        gap: "8px"
       });
       timeElapsedFront = new Html("span").styleJs({ fontSize: "1.3rem" });
       timeElapsedMiddle = new Html("span")
@@ -420,7 +430,7 @@ const pkg = {
       progress = new Html("div")
         .class("vp-progress-bar")
         .style({
-          "flex-grow": "1",
+          "flex-grow": "1"
         })
         .appendTo(bottom);
       progressBarValue = new Html("div")
@@ -444,7 +454,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         });
 
       if (captions != null) {
@@ -476,7 +486,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         });
       captionToggle.on("click", (e) => {
         callback();
@@ -495,7 +505,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         })
         .on("click", async (e) => {
           if (ws) {
@@ -517,7 +527,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         })
         .on("click", (e) => {
           openPictureAdjustMenu(e);
@@ -757,7 +767,7 @@ const pkg = {
         bottom.styleJs({ opacity: "1" });
         vidInfo.styleJs({ opacity: "1" });
         captionOverlay.styleJs({
-          bottom: "calc(48px + 3rem)",
+          bottom: "calc(48px + 3rem)"
         });
         Ui.init(
           Pid,
@@ -784,7 +794,7 @@ const pkg = {
           flexDirection: "column",
           padding: "25px",
           overflow: "scroll",
-          gap: "10px",
+          gap: "10px"
         })
         .appendTo(wrapper);
       new Html("h1").text("Invite a friend").appendTo(overlay);
@@ -823,8 +833,8 @@ const pkg = {
                 userId: friendId,
                 message: JSON.stringify({
                   name: displayName ? displayName : noExt,
-                  partyId: hostCode,
-                }),
+                  partyId: hostCode
+                })
               });
               console.log(result);
               if (result.type == "success") {
@@ -869,7 +879,7 @@ const pkg = {
           flexDirection: "column",
           padding: "25px",
           overflow: "scroll",
-          gap: "10px",
+          gap: "10px"
         })
         .appendTo(wrapper);
       new Html("h1").text("Picture Adjustment").appendTo(overlay);
@@ -933,7 +943,7 @@ const pkg = {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyItems: "center",
+          justifyItems: "center"
         })
         .on("click", () => {
           changeBrightness(false, brightnessInd);
@@ -943,7 +953,7 @@ const pkg = {
         .appendTo(row)
         .styleJs({
           width: "calc(100% - 100px)",
-          textAlign: "center",
+          textAlign: "center"
         });
       new Html("button")
         .html(icons["plus"])
@@ -954,7 +964,7 @@ const pkg = {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyItems: "center",
+          justifyItems: "center"
         })
         .on("click", () => {
           changeBrightness(true, brightnessInd);
@@ -975,14 +985,14 @@ const pkg = {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyItems: "center",
+          justifyItems: "center"
         })
         .on("click", () => {
           changeContrast(false, contrastInd);
         });
       contrastInd = new Html("p").text(`${contrast}%`).appendTo(row2).styleJs({
         width: "calc(100% - 100px)",
-        textAlign: "center",
+        textAlign: "center"
       });
       new Html("button")
         .html(icons["plus"])
@@ -993,7 +1003,7 @@ const pkg = {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyItems: "center",
+          justifyItems: "center"
         })
         .on("click", () => {
           changeContrast(true, contrastInd);
@@ -1014,7 +1024,7 @@ const pkg = {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyItems: "center",
+          justifyItems: "center"
         })
         .on("click", () => {
           changeSaturation(false, saturationInd);
@@ -1024,7 +1034,7 @@ const pkg = {
         .appendTo(row3)
         .styleJs({
           width: "calc(100% - 100px)",
-          textAlign: "center",
+          textAlign: "center"
         });
       new Html("button")
         .html(icons["plus"])
@@ -1035,7 +1045,7 @@ const pkg = {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyItems: "center",
+          justifyItems: "center"
         })
         .on("click", () => {
           changeSaturation(true, saturationInd);
@@ -1063,7 +1073,7 @@ const pkg = {
           flexDirection: "column",
           padding: "25px",
           overflow: "scroll",
-          gap: "10px",
+          gap: "10px"
         })
         .appendTo(wrapper);
       new Html("h1").text("Captions").appendTo(overlay);
@@ -1126,7 +1136,7 @@ const pkg = {
           flexDirection: "column",
           padding: "25px",
           overflow: "scroll",
-          gap: "10px",
+          gap: "10px"
         })
         .appendTo(wrapper);
       new Html("h1").text("Captions").appendTo(overlay);
@@ -1202,6 +1212,7 @@ const pkg = {
         playVideo(path, captions, displayName, !launchArgs.isOnline, autoplay);
       }
     }
+    console.log(vidInfo);
   },
 
   end: async function () {
@@ -1213,11 +1224,11 @@ const pkg = {
     document.dispatchEvent(
       new CustomEvent("CherryTree.VideoPlayer.Close", {
         detail: {
-          destroyPeer: true,
-        },
+          destroyPeer: true
+        }
       })
     );
-  },
+  }
 };
 
 export default pkg;

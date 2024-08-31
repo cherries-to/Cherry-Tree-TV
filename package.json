@@ -26,6 +26,7 @@
   },
   "homepage": "./",
   "dependencies": {
+    "@xhayper/discord-rpc": "^1.2.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "fluent-ffmpeg": "^2.1.3",

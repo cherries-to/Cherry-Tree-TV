@@ -49,7 +49,7 @@ const pkg = {
       .styleJs({
         overflow: "auto",
         // "align-items": "flex-end",
-        width: "100%",
+        width: "100%"
         // "min-height": "300px",
       })
       .appendTo(appendTo);
@@ -60,7 +60,7 @@ const pkg = {
       .styleJs({
         overflow: "auto",
         // "align-items": "flex-end",
-        width: "100%",
+        width: "100%"
         // "min-height": "300px",
       })
       .appendTo(appendTo);
@@ -93,7 +93,7 @@ const pkg = {
           transition: "0.1s linear",
           padding: "1rem",
           borderRadius: "8px",
-          opacity: "0",
+          opacity: "0"
         });
       return bottom;
     };
@@ -120,7 +120,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         });
 
       playPause = new Html("button")
@@ -143,7 +143,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         });
 
       new Html("button")
@@ -167,7 +167,7 @@ const pkg = {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.8rem",
+          padding: "0.8rem"
         });
       return playPause;
     }
@@ -177,7 +177,7 @@ const pkg = {
         flexShrink: "0",
         display: "flex",
         "align-items": "center",
-        gap: "8px",
+        gap: "8px"
       });
       timeElapsedFront = new Html("span").styleJs({ fontSize: "1.3rem" });
       timeElapsedMiddle = new Html("span")
@@ -196,7 +196,7 @@ const pkg = {
       progress = new Html("div")
         .class("vp-progress-bar")
         .style({
-          "flex-grow": "1",
+          "flex-grow": "1"
         })
         .appendTo(bottom);
       progressBarValue = new Html("div")
@@ -235,7 +235,7 @@ const pkg = {
       .id("player")
       .style({
         height: "100%",
-        width: "100%",
+        width: "100%"
       })
       .appendTo(this.wrapper);
     this.wrapper.class("full-ui");
@@ -245,7 +245,7 @@ const pkg = {
       videoId: id,
       playerVars: {
         autoplay: 1,
-        controls: 0,
+        controls: 0
       },
       events: {
         onReady: () => {
@@ -272,7 +272,7 @@ const pkg = {
             this.volume.level = volume.level;
             document.dispatchEvent(
               new CustomEvent("CherryTree.Input.VolumeChange", {
-                detail: this.volume.level,
+                detail: this.volume.level
               })
             );
           });
@@ -286,8 +286,8 @@ const pkg = {
             console.log("The video has finished playing.");
             this.socket.emit("finishedPlaying");
           }
-        },
-      },
+        }
+      }
     });
   },
 
@@ -298,8 +298,8 @@ const pkg = {
         icon: icons.search,
         action: () => {
           this.searchAndQuery();
-        },
-      },
+        }
+      }
     ];
 
     actionList.forEach((a) => {
@@ -312,7 +312,7 @@ const pkg = {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "center"
       });
       let img = new Html("div")
         .appendTo(actionWrapper)
@@ -321,7 +321,7 @@ const pkg = {
             .style({
               display: "inline-block",
               width: "4rem",
-              height: "4rem",
+              height: "4rem"
             })
             .html(a.icon)
         )
@@ -333,12 +333,12 @@ const pkg = {
           backgroundColor: "#222",
           display: "flex",
           justifyContent: "center",
-          alignItems: "center",
+          alignItems: "center"
         });
       let actionTitle = new Html("p").text(a.name).styleJs({
         width: "100%",
         textAlign: "left",
-        padding: "10px",
+        padding: "10px"
       });
       actionTitle.appendTo(actionWrapper);
       actionWrapper.on("click", a.action);
@@ -355,14 +355,17 @@ const pkg = {
       parent: document.body,
       pid: this.Root.Pid,
       value: "",
-      type: "text",
+      type: "text"
     };
 
     let result = (await this.Root.Libs.Modal.showKeyboard(options)).value;
 
     let ytQuery = await fetch(
       `https://olive.nxw.pw:8080/search?term=${result}`
-    ).then((t) => t.json());
+    ).then((t) => {
+      Ui.transition("popIn", thumbnailWrapper);
+      t.json();
+    });
     ytQuery.items.forEach((i) => {
       console.log(i);
       let thumbnailWrapper = new Html("button");
@@ -374,7 +377,7 @@ const pkg = {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "center"
       });
       let img = new Html("img")
         .appendTo(thumbnailWrapper)
@@ -383,12 +386,12 @@ const pkg = {
           aspectRatio: "16 / 9",
           minWidth: "20rem",
           height: "11.25rem",
-          borderRadius: "10px",
+          borderRadius: "10px"
         });
       let title = new Html("p").text(i.title).styleJs({
         width: "100%",
         textAlign: "left",
-        padding: "10px",
+        padding: "10px"
       });
       title.appendTo(thumbnailWrapper);
       thumbnailWrapper.on("click", async () => {
@@ -403,7 +406,6 @@ const pkg = {
           }
         }
       );
-      Ui.transition("popIn", thumbnailWrapper);
     });
   },
 
@@ -416,8 +418,8 @@ const pkg = {
         name: tvName,
         screenName: "YouTube on Cherry Tree",
         brand: "Cherries.to",
-        model: "Cherry Tree",
-      },
+        model: "Cherry Tree"
+      }
     });
 
     this.socket.on("success", () => {
@@ -558,14 +560,14 @@ const pkg = {
         text: "Home",
         action: async () => {
           this.home();
-        },
+        }
       },
       {
         text: "Settings",
         action: async () => {
           this.settings();
-        },
-      },
+        }
+      }
     ];
 
     topButtons.forEach((b) => {
@@ -586,7 +588,7 @@ const pkg = {
     document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
     Ui.giveUpUi(Pid);
     this.outerWrapper.cleanup();
-  },
+  }
 };
 
 export default pkg;

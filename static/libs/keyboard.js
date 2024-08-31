@@ -129,7 +129,7 @@ export default {
           callback({ type: "key", data: " " });
           Sfx.playSfx("deck_ui_slider_up.wav");
         }
-      },
+      }
     };
-  },
+  }
 };

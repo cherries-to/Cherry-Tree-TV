@@ -15,6 +15,11 @@ const pkg = {
   start: async function (Root) {
     // Get the window body
     wrapper = new Html("div").class("ui", "main-menu").appendTo("body");
+
+    cherrywoo.ipc.send("setRPC", {
+      details: "Chillin' in the main menu"
+    });
+
     const Sfx = Root.Processes.getService("SfxLib").data;
     const User = Root.Processes.getService("UserSvc").data;
     const Ui = Root.Processes.getService("UiLib").data;
@@ -39,7 +44,7 @@ const pkg = {
     let info = {
       id: -1,
       name: "Not logged in",
-      extra: null,
+      extra: null
     };
     if (ws) {
       logStep("There is a WebSocket detected");
@@ -68,8 +73,8 @@ const pkg = {
               pid: await Ui.getTopUi(),
               buttons: [
                 { type: "default", text: "Accept" },
-                { type: "default", text: "Ignore" },
-              ],
+                { type: "default", text: "Ignore" }
+              ]
             });
             console.log(userResult);
             if (!userResult.cancelled) {
@@ -82,8 +87,8 @@ const pkg = {
                       app: "video",
                       watchParty: true,
                       partyCode: parsedData.partyId,
-                      partyName: parsedData.name,
-                    },
+                      partyName: parsedData.name
+                    }
                   ],
                   true
                 );
@@ -123,7 +128,7 @@ const pkg = {
     let topBarButtonList = [
       { label: LangManager.getString("menu.apps") },
       { label: LangManager.getString("menu.store") },
-      { label: LangManager.getString("menu.friends") },
+      { label: LangManager.getString("menu.friends") }
     ];
 
     let topBarButtons = topBarButtonList.map((button) => {
@@ -196,7 +201,7 @@ const pkg = {
             backgroundPosition: "center",
             backgroundSize: "45%",
             backgroundRepeat: "no-repeat",
-            backgroundImage: `url("${m.image}")`,
+            backgroundImage: `url("${m.image}")`
           })
           .on("click", async (e) => {
             if (m.id !== undefined) {
@@ -219,9 +224,9 @@ const pkg = {
                 buttons: [
                   {
                     type: "primary",
-                    text: langManager.getString("actions.ok"),
-                  },
-                ],
+                    text: langManager.getString("actions.ok")
+                  }
+                ]
               });
               location.reload();
             }
@@ -304,7 +309,7 @@ const pkg = {
               width: "12.5rem",
               height: "12.5rem",
               background: `${idToColor(user.id)}`,
-              "border-radius": "0.15rem",
+              "border-radius": "0.15rem"
             })
             .append(
               new Html("span")
@@ -316,7 +321,7 @@ const pkg = {
                   "justify-content": "center",
                   "align-items": "center",
                   "font-size": "4.5rem",
-                  flex: "1",
+                  flex: "1"
                 })
                 .text(idToEmoji(user.id))
             ),
@@ -406,7 +411,7 @@ const pkg = {
                     width: "12.5rem",
                     height: "12.5rem",
                     background: `var(--controller-color-${f.id % 5})`,
-                    "border-radius": "0.15rem",
+                    "border-radius": "0.15rem"
                   })
                   .append(new Html("span").style({ flex: "1" }).text(f.id)),
                 new Html("span").class("title").text(f.data.name),
@@ -434,7 +439,7 @@ const pkg = {
                     width: "12.5rem",
                     height: "12.5rem",
                     background: `var(--controller-color-${f.id % 5})`,
-                    "border-radius": "0.15rem",
+                    "border-radius": "0.15rem"
                   })
                   .append(new Html("span").style({ flex: "1" }).text(f.id)),
                 new Html("span").class("title").text(f.data.name),
@@ -451,8 +456,8 @@ const pkg = {
                   buttons: [
                     { type: "positive", text: "Accept" },
                     { type: "negative", text: "Deny" },
-                    { type: "primary", text: "Cancel" },
-                  ],
+                    { type: "primary", text: "Cancel" }
+                  ]
                 });
 
                 let choice = result.id;
@@ -462,7 +467,7 @@ const pkg = {
                   let response = (
                     await ws.sendMessage({
                       type: "accept-friend-request",
-                      message: String(f.id),
+                      message: String(f.id)
                     })
                   ).result;
 
@@ -472,7 +477,7 @@ const pkg = {
                   let response = (
                     await ws.sendMessage({
                       type: "reject-friend-request",
-                      message: String(f.id),
+                      message: String(f.id)
                     })
                   ).result;
 
@@ -484,12 +489,12 @@ const pkg = {
 
       if (incomingFriendListHtml.length === 0) {
         incomingFriendListHtml = [
-          new Html("button").class("invisible").text("Nothing to see here.."),
+          new Html("button").class("invisible").text("Nothing to see here..")
         ];
       }
       if (outgoingFriendListHtml.length === 0) {
         outgoingFriendListHtml = [
-          new Html("button").class("invisible").text("Nothing to see here.."),
+          new Html("button").class("invisible").text("Nothing to see here..")
         ];
       }
 
@@ -503,7 +508,7 @@ const pkg = {
               .styleJs({
                 width: "12.5rem",
                 height: "12.5rem",
-                borderRadius: "0.15rem",
+                borderRadius: "0.15rem"
               })
               .html(
                 `<svg style="width: 8rem;height: 8rem;" width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -521,14 +526,14 @@ const pkg = {
               parent: document.body,
               pid: Root.Pid,
               value: "",
-              type: "text",
+              type: "text"
             };
 
             let result = (await Root.Libs.Modal.showKeyboard(options)).value;
 
             let data = await ws.sendMessage({
               type: "send-friend-request",
-              message: result,
+              message: result
             });
           })
       );
@@ -570,7 +575,7 @@ const pkg = {
       currentMenuList = [
         friendListWrapper.elm.children,
         outgoingFriendListHtml,
-        incomingFriendListHtml,
+        incomingFriendListHtml
       ];
     }
 
@@ -616,7 +621,7 @@ const pkg = {
 
     let uiArrays = [
       topBarBtnHtml,
-      ...currentMenuList,
+      ...currentMenuList
       // buttonList.elm.children,
     ];
 
@@ -669,7 +674,7 @@ const pkg = {
                 topBarBtnHtml,
                 friendListWrapper.elm.children,
                 outgoingFriendListHtml.map((m) => m.elm),
-                incomingFriendListHtml.map((m) => m.elm),
+                incomingFriendListHtml.map((m) => m.elm)
               ];
             }
           }
@@ -688,7 +693,7 @@ const pkg = {
   end: async function () {
     // Close the window when the process is exited
     wrapper.cleanup();
-  },
+  }
 };
 
 export default pkg;
