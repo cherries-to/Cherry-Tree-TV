@@ -125,7 +125,7 @@ const pkg = {
 
       parent.dataset.realText = result.value;
       if (isPassword === true) {
-        parent.textContent = "•".repeat(result.length);
+        parent.textContent = "•".repeat(result.value.length);
       } else parent.textContent = result.value;
       textData[resultName] = result.value;
     }

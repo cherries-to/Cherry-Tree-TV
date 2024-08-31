@@ -30,7 +30,7 @@ const pkg = {
     await vfs.importFS();
 
     let textData = {};
-
+    
     async function promptForInput(
       title,
       description,
@@ -47,13 +47,13 @@ const pkg = {
         type: isPassword === true ? "password" : "text",
       };
 
-      let result = (await Root.Libs.Modal.showKeyboard(options));
+      let result = await Root.Libs.Modal.showKeyboard(options);
 
       if (result.canceled === true) return;
 
       parent.dataset.realText = result.value;
       if (isPassword === true) {
-        parent.textContent = "•".repeat(result.length);
+        parent.textContent = "•".repeat(result.value.length);
       } else parent.textContent = result.value;
       textData[resultName] = result.value;
     }
