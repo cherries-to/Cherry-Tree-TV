@@ -24,14 +24,14 @@ function dispatchPlayerSwapEvent(plr) {
   document.dispatchEvent(
     new CustomEvent("CherryTree.Ui.ControllerChange", {
       detail: plr,
-    })
+    }),
   );
 }
 
 function updatePlayer(plr) {
   document.body.style.setProperty(
     "--current-player",
-    `var(--controller-color-${plr})`
+    `var(--controller-color-${plr})`,
   );
 
   if (window.p !== undefined) {
@@ -107,7 +107,7 @@ const pkg = {
         const parent = child.closest(".ui-box,.ui,.game-list");
 
         const rootFontSize = parseInt(
-          getComputedStyle(document.documentElement).fontSize
+          getComputedStyle(document.documentElement).fontSize,
         );
 
         if (parent) {
@@ -140,7 +140,7 @@ const pkg = {
                 Sfx.playSfx(
                   UiInfo[pid] !== undefined
                     ? UiInfo[pid].customSfx.hover
-                    : "deck_ui_misc_10.wav"
+                    : "deck_ui_misc_10.wav",
                 );
               pkg.data.focus.focusCurrent(pid);
               UiInfo[pid].parentCallback(UiInfo[pid].cursor);
@@ -317,7 +317,7 @@ const pkg = {
           function x(plr) {
             if (r.Input.focusedApp === pid) callback(action, plr);
           },
-          pid
+          pid,
         );
       });
     },
@@ -334,7 +334,7 @@ const pkg = {
       customSfx = {
         hover: "deck_ui_misc_10.wav",
         activate: "deck_ui_default_activation.wav",
-      }
+      },
     ) {
       if (type === "horizontal") {
         let elmLists = elementLists
@@ -358,13 +358,13 @@ const pkg = {
         };
         pkg.data.focus.setupElmLists(pid, elmLists);
 
-        // On mouse/kb, we don't want to auto-highlight a selection
-        if (window.p !== 4) {
-          // Focus the current item
-          pkg.data.focus.focusCurrent(pid);
-        } else {
+        // On mouse, we don't want to auto-highlight a selection
+        if (window.p === 4 && window.mouseDisabled === false) {
           // Don't highlight the current
           pkg.data.focus.unfocusCurrent(pid);
+        } else {
+          // Focus the current item for controller/keyboard users
+          pkg.data.focus.focusCurrent(pid);
         }
 
         this.listenAll(pid, async function callback(e, plr) {
@@ -381,14 +381,14 @@ const pkg = {
                 if (UiInfo[pid].cursor.x < 0) {
                   UiInfo[pid].cursor.x = 0;
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx("deck_ui_bumper_end_02.wav");
                   }
                 } else {
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx(UiInfo[pid].customSfx.hover);
@@ -410,14 +410,14 @@ const pkg = {
                   UiInfo[pid].cursor.x =
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx("deck_ui_bumper_end_02.wav");
                   }
                 } else {
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx(UiInfo[pid].customSfx.hover);
@@ -435,14 +435,14 @@ const pkg = {
                 if (UiInfo[pid].cursor.y < 0) {
                   UiInfo[pid].cursor.y = 0;
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx("deck_ui_bumper_end_02.wav");
                   }
                 } else {
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx(UiInfo[pid].customSfx.hover);
@@ -470,14 +470,14 @@ const pkg = {
                   // UiInfo[pid].cursor.y = 0;
                   UiInfo[pid].cursor.y = UiInfo[pid].lists.length - 1;
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx("deck_ui_bumper_end_02.wav");
                   }
                 } else {
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx(UiInfo[pid].customSfx.hover);
@@ -567,14 +567,14 @@ const pkg = {
                 if (UiInfo[pid].cursor.x < 0) {
                   UiInfo[pid].cursor.x = 0;
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx("deck_ui_bumper_end_02.wav");
                   }
                 } else {
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx(UiInfo[pid].customSfx.hover);
@@ -596,14 +596,14 @@ const pkg = {
                   UiInfo[pid].cursor.x =
                     UiInfo[pid].lists[UiInfo[pid].cursor.y].length - 1;
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx("deck_ui_bumper_end_02.wav");
                   }
                 } else {
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx(UiInfo[pid].customSfx.hover);
@@ -620,14 +620,14 @@ const pkg = {
                 if (UiInfo[pid].cursor.y < 0) {
                   UiInfo[pid].cursor.y = UiInfo[pid].lists.length - 1;
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx("deck_ui_bumper_end_02.wav");
                   }
                 } else {
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx(UiInfo[pid].customSfx.hover);
@@ -653,14 +653,14 @@ const pkg = {
                 if (UiInfo[pid].cursor.y >= UiInfo[pid].lists.length) {
                   UiInfo[pid].cursor.y = 0;
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx("deck_ui_bumper_end_02.wav");
                   }
                 } else {
                   returnCallbackValue = await UiInfo[pid].parentCallback(
-                    UiInfo[pid].cursor
+                    UiInfo[pid].cursor,
                   );
                   if (returnCallbackValue !== false) {
                     Sfx.playSfx(UiInfo[pid].customSfx.hover);

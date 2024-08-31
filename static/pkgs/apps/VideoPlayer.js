@@ -133,7 +133,7 @@ const pkg = {
           peer.destroy();
           document.removeEventListener(
             "CherryTree.VideoPlayer.Close",
-            closePeer
+            closePeer,
           );
         }
         document.addEventListener("CherryTree.VideoPlayer.Close", closePeer);
@@ -170,7 +170,7 @@ const pkg = {
               } else {
                 Root.Libs.Notify.show(
                   `${data.username} has joined the party 🎉`,
-                  `They're now watching with you.`
+                  `They're now watching with you.`,
                 );
                 console.log(stream);
                 let call = peer.call(conn.peer, stream);
@@ -209,7 +209,7 @@ const pkg = {
           conn.on("close", () => {
             Root.Libs.Notify.show(
               "User left",
-              `This user has left the watch party.`
+              `This user has left the watch party.`,
             );
             peer.destroy();
           });
@@ -421,7 +421,7 @@ const pkg = {
       timeElapsed.appendMany(
         timeElapsedFront,
         timeElapsedMiddle,
-        timeElapsedBack
+        timeElapsedBack,
       );
       return timeElapsed;
     }
@@ -468,7 +468,7 @@ const pkg = {
         captionToggle.on("click", () => {
           Root.Libs.Notify.show(
             `This video doesn't have captions`,
-            `To show captions, please put subtitle files (.vtt) in the video's directory.`
+            `To show captions, please put subtitle files (.vtt) in the video's directory.`,
           );
         });
       }
@@ -550,7 +550,7 @@ const pkg = {
         timeElapsedFront.text(`${elapsed.minutes}:${elapsed.seconds}`);
         timeElapsedBack.text(`${duration.minutes}:${duration.seconds}`);
         updateProgressValue(
-          (videoElm.elm.currentTime / videoElm.elm.duration) * 100
+          (videoElm.elm.currentTime / videoElm.elm.duration) * 100,
         );
         renderer.currentTime = videoElm.elm.currentTime;
       });
@@ -599,7 +599,7 @@ const pkg = {
           renderer.changeTrack({ regions, cues });
           Root.Libs.Notify.show(
             "Captions toggled",
-            `Now using caption ${data.captionName}`
+            `Now using caption ${data.captionName}`,
           );
         }
         if (data.type == "captions") {
@@ -610,7 +610,7 @@ const pkg = {
       conn.on("close", () => {
         Root.Libs.Notify.show(
           "Watch party ended",
-          `This watch party has ended.`
+          `This watch party has ended.`,
         );
         pkg.end();
       });
@@ -626,7 +626,7 @@ const pkg = {
       captions = null,
       displayName = null,
       isLocal = true,
-      autoplay = true
+      autoplay = true,
     ) {
       let fileName = path.split(/.*[\/|\\]/)[1];
       let noExt = fileName.replace(/\.[^/.]+$/, "");
@@ -658,7 +658,7 @@ const pkg = {
         Pid,
         "horizontal",
         [top.elm.children, bottom.elm.children],
-        handleUiNavigation
+        handleUiNavigation,
       );
     }
 
@@ -678,7 +678,7 @@ const pkg = {
         Root.Pid,
         function (a) {
           closeModalCb = a;
-        }
+        },
       );
       peer = new Peer();
       function closePeer() {
@@ -704,7 +704,7 @@ const pkg = {
             Pid,
             "horizontal",
             [top.elm.children, bottom.elm.children],
-            handleUiNavigation
+            handleUiNavigation,
           );
           peer.on("call", (call) => {
             call.answer();
@@ -737,7 +737,7 @@ const pkg = {
         trackFetchAbort?.abort();
         const signal = (trackFetchAbort = new AbortController()).signal;
         const { regions, cues } = await parseResponse(
-          fetch(captionPath, { signal })
+          fetch(captionPath, { signal }),
         );
         renderer.changeTrack({ regions, cues });
       } catch (e) {
@@ -773,7 +773,7 @@ const pkg = {
           Pid,
           "horizontal",
           [top.elm.children, bottom.elm.children],
-          handleUiNavigation
+          handleUiNavigation,
         );
       }, 200);
     }
@@ -802,7 +802,7 @@ const pkg = {
         .html(
           `Get a friend to watch <strong>${
             displayName ? displayName : noExt
-          }</strong> with you`
+          }</strong> with you`,
         )
         .appendTo(overlay);
       new Html("br").appendTo(overlay);
@@ -840,7 +840,7 @@ const pkg = {
               if (result.type == "success") {
                 Root.Libs.Notify.show(
                   "Successfully invited",
-                  `${friend.name} has been invited to your watch party.`
+                  `${friend.name} has been invited to your watch party.`,
                 );
               }
             });
@@ -1083,7 +1083,7 @@ const pkg = {
             displayName
               ? displayName
               : path.split(/.*[\/|\\]/)[1].replace(/\.[^/.]+$/, "")
-          }</strong>`
+          }</strong>`,
         )
         .appendTo(overlay);
       new Html("br").appendTo(overlay);
@@ -1110,7 +1110,7 @@ const pkg = {
             loadNewTrack(urlObj.href);
             Root.Libs.Notify.show(
               `Captions toggled`,
-              `Now using caption: ${lang}`
+              `Now using caption: ${lang}`,
             );
           });
         tempUiElems.push(row.elm.children);
@@ -1144,7 +1144,7 @@ const pkg = {
         .html(
           `Enable captions for <strong>${
             partyName ? partyName : "this watch party."
-          }</strong>`
+          }</strong>`,
         )
         .appendTo(overlay);
       new Html("br").appendTo(overlay);
@@ -1219,6 +1219,11 @@ const pkg = {
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
     Ui.giveUpUi(Pid);
+    const audio = Sfx.getAudio();
+    let playBgm = await window.localforage.getItem("settings__playBgm");
+    if (playBgm) {
+      audio.play();
+    }
     wrapper.cleanup();
     document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
     document.dispatchEvent(
@@ -1226,7 +1231,7 @@ const pkg = {
         detail: {
           destroyPeer: true,
         },
-      })
+      }),
     );
   },
 };

@@ -49,7 +49,7 @@ const pkg = {
         row0.appendMany(
           new Html("button")
             .text(
-              langManager.getString("settings.categories.setup.items.userInfo")
+              langManager.getString("settings.categories.setup.items.userInfo"),
             )
             .on("click", async (e) => {
               await Ui.giveUpUi(Root.Pid, true);
@@ -61,7 +61,7 @@ const pkg = {
                 Root.Pid,
                 async function (a) {
                   let info = await Users.getUserInfo(
-                    await Root.Security.getToken()
+                    await Root.Security.getToken(),
                   );
                   a();
                   setTimeout(() => {
@@ -69,7 +69,7 @@ const pkg = {
                       parent: wrapper,
                       pid: Root.Pid,
                       title: langManager.getString(
-                        "settings.categories.setup.items.userInfoTitle"
+                        "settings.categories.setup.items.userInfoTitle",
                       ),
                       description: JSON.stringify(info, null, 4),
                       buttons: [
@@ -80,12 +80,12 @@ const pkg = {
                       ],
                     });
                   }, 500);
-                }
+                },
               );
             }),
           new Html("button")
             .text(
-              langManager.getString("settings.categories.setup.items.logout")
+              langManager.getString("settings.categories.setup.items.logout"),
             )
             .on("click", async (e) => {
               // Delegate UI while loading the app
@@ -93,10 +93,10 @@ const pkg = {
                 parent: wrapper,
                 pid: Root.Pid,
                 title: langManager.getString(
-                  "settings.categories.setup.items.logoutTitle"
+                  "settings.categories.setup.items.logoutTitle",
                 ),
                 description: langManager.getString(
-                  "settings.categories.setup.items.logoutDescription"
+                  "settings.categories.setup.items.logoutDescription",
                 ),
                 buttons: [
                   {
@@ -116,7 +116,7 @@ const pkg = {
             }),
           new Html("button")
             .text(
-              langManager.getString("settings.categories.setup.items.delete")
+              langManager.getString("settings.categories.setup.items.delete"),
             )
             .on("click", async (e) => {
               // Delegate UI while loading the app
@@ -124,10 +124,10 @@ const pkg = {
                 parent: wrapper,
                 pid: Root.Pid,
                 title: langManager.getString(
-                  "settings.categories.setup.items.deleteTitle"
+                  "settings.categories.setup.items.deleteTitle",
                 ),
                 description: langManager.getString(
-                  "settings.categories.setup.items.deleteDescription"
+                  "settings.categories.setup.items.deleteDescription",
                 ),
                 buttons: [
                   {
@@ -145,7 +145,7 @@ const pkg = {
                 await window.localforage.setItem("fs", null);
                 location.reload();
               }
-            })
+            }),
         );
         ui.add(row0.elm.children);
       },
@@ -164,8 +164,8 @@ const pkg = {
         let phoneLinkStatus = new Html("p")
           .html(
             langManager.getString(
-              "settings.categories.input.items.phoneLinkCode"
-            )
+              "settings.categories.input.items.phoneLinkCode",
+            ),
           )
           .append(new Html("strong").text(window.phoneLinkCode))
           .appendTo(wrapper);
@@ -223,10 +223,10 @@ const pkg = {
           new Html("button")
             .text(
               langManager.getString(
-                "settings.categories.input.items.phoneLinkToggle"
-              )
+                "settings.categories.input.items.phoneLinkToggle",
+              ),
             )
-            .on("click", () => settingsLib.togglePhoneLink(Root.Pid, wrapper))
+            .on("click", () => settingsLib.togglePhoneLink(Root.Pid, wrapper)),
         );
         ui.add(row1.elm.children);
       },
@@ -239,7 +239,7 @@ const pkg = {
           .appendTo(wrapper);
         new Html("p")
           .text(
-            langManager.getString("settings.categories.display.description")
+            langManager.getString("settings.categories.display.description"),
           )
           .appendTo(wrapper);
         new Html("br").appendTo(wrapper);
@@ -250,27 +250,27 @@ const pkg = {
           new Html("button")
             .text(
               langManager.getString(
-                "settings.categories.display.items.uiScaling"
-              )
+                "settings.categories.display.items.uiScaling",
+              ),
             )
             .on("click", () => settingsLib.uiScaling(Root.Pid, wrapper, Ui)),
           new Html("button")
             .text(
               langManager.getString(
-                "settings.categories.display.items.background"
-              )
+                "settings.categories.display.items.background",
+              ),
             )
             .on("click", () =>
-              settingsLib.background(Root.Pid, wrapper, Background)
-            )
+              settingsLib.background(Root.Pid, wrapper, Background),
+            ),
         );
         ui.add(row2.elm.children);
         new Html("br").appendTo(wrapper);
         new Html("h1")
           .text(
             langManager.getString(
-              "settings.categories.pictureCalibration.title"
-            )
+              "settings.categories.pictureCalibration.title",
+            ),
           )
           .appendTo(wrapper);
         new Html("br").appendTo(wrapper);
@@ -280,8 +280,8 @@ const pkg = {
           new Html("button")
             .text(
               langManager.getString(
-                "settings.categories.pictureCalibration.testPattern"
-              )
+                "settings.categories.pictureCalibration.testPattern",
+              ),
             )
             .on("click", async () => {
               await Root.Libs.startPkg(
@@ -291,15 +291,15 @@ const pkg = {
                     app: "video",
                     videoPath: "../../assets/video/color_bars.mp4",
                     displayName: langManager.getString(
-                      "settings.categories.pictureCalibration.testPatternName"
+                      "settings.categories.pictureCalibration.testPatternName",
                     ),
                     isOnline: true,
                     autoplay: false,
                   },
                 ],
-                true
+                true,
               );
-            })
+            }),
         );
         ui.add(row4.elm.children);
       },
@@ -320,22 +320,22 @@ const pkg = {
         row3.appendMany(
           new Html("button")
             .text(
-              langManager.getString("settings.categories.audio.items.volume")
+              langManager.getString("settings.categories.audio.items.volume"),
             )
             .on("click", () =>
-              settingsLib.changeVolume(Root.Pid, wrapper, Sfx)
+              settingsLib.changeVolume(Root.Pid, wrapper, Sfx),
             ),
           new Html("button")
             .text(langManager.getString("settings.categories.audio.items.sfx"))
             .on("click", () => settingsLib.sfx(Root.Pid, wrapper, Sfx)),
           new Html("button")
             .text(langManager.getString("settings.categories.audio.items.bgm"))
-            .on("click", () => settingsLib.bgm(Root.Pid, wrapper, Sfx))
+            .on("click", () => settingsLib.bgm(Root.Pid, wrapper, Sfx)),
         );
         ui.add(row3.elm.children);
       },
     };
-    new TabbedUI({
+    this.tabbedUi = new TabbedUI({
       pid: Pid,
       tabs: tabs,
       wrapper: wrapper,
@@ -350,6 +350,7 @@ const pkg = {
   },
   end: async function () {
     // Exit this UI when the process is exited
+    this.tabbedUi.cleanup();
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
     // await Ui.transition("popOut", wrapper);

@@ -4,6 +4,11 @@ import { buttons, getFriendlyButtonName } from "./getButton.js";
 
 export default class ControllerStatusBar {
   constructor(...buttons) {
+    if (document.querySelector(".controller-status-bar") !== null) {
+      this.pastBar = document.querySelector(".controller-status-bar");
+      this.pastBar.classList.add("slideDownOut");
+    }
+
     const bar = new Html("div")
       .class("controller-status-bar", "slideDownIn")
       .appendTo("body");
@@ -12,10 +17,12 @@ export default class ControllerStatusBar {
     this.buttons = buttons;
 
     document.addEventListener("CherryTree.Ui.ControllerChange", (e) =>
-      this.update(e.detail)
+      this.update(e.detail),
     );
 
-    this.update(window.currentPlayerId === undefined ? 4 : window.currentPlayerId);
+    this.update(
+      window.currentPlayerId === undefined ? 4 : window.currentPlayerId,
+    );
   }
 
   update(newPlayer) {
@@ -43,7 +50,8 @@ export default class ControllerStatusBar {
             btnIcon = new Html("kbd").class("csb-button-icon").appendTo(btn);
           }
           btnIcon.html(name);
-          let btnLabel = new Html("div")
+          /* btnLabel */
+          new Html("div")
             .class("csb-button-label")
             .text(button.label)
             .appendTo(btn);
@@ -59,6 +67,10 @@ export default class ControllerStatusBar {
       this.update(this);
     });
     this.bar.classOff("slideDownIn").classOn("slideDownOut");
+    if (this.pastBar !== undefined) {
+      this.pastBar.classList.remove("slideDownOut");
+      this.pastBar.classList.add("slideDownIn");
+    }
     setTimeout(() => {
       this.bar.cleanup();
     }, 500);

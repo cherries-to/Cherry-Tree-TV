@@ -1,4 +1,6 @@
 import Html from "./html.js";
+import controllerStatusBar from "./controllerStatusBar.js";
+import langManager from "./l10n/manager.js";
 
 class TabbedUI {
   constructor(obj) {
@@ -8,10 +10,18 @@ class TabbedUI {
     let Sfx = obj.sfx;
     let callback = obj.callback;
     let Pid = obj.pid;
+    this.csb = new controllerStatusBar(
+      { type: "any-dir", label: langManager.getString("actions.move") },
+      {
+        type: "confirm",
+        label: langManager.getString("actions.confirm"),
+      },
+      { type: "back", label: langManager.getString("actions.cancel") },
+    );
 
     wrapper.styleJs({
       display: "flex",
-      gap: "25px",
+      gap: "1.25rem",
       alignItems: "center",
       justifyContent: "center",
       flexDirection: "row",
@@ -19,18 +29,21 @@ class TabbedUI {
 
     let tabsList = new Html("div")
       .styleJs({
-        height: "75%",
+        height: "calc(100% - 12rem)",
         width: "max-content",
         display: "flex",
         flexDirection: "column",
         backgroundColor: "var(--background-light)",
         borderRadius: "5px",
+        gap: "0.5rem",
+        padding: "1.25rem 0",
+        width: "11.25rem",
       })
       .appendTo(wrapper);
 
     let tabContents = new Html("div")
       .styleJs({
-        height: "75%",
+        height: "calc(100% - 12rem)",
         width: "75%",
         display: "flex",
         flexDirection: "column",
@@ -54,24 +67,35 @@ class TabbedUI {
     };
 
     let first;
-
     Object.keys(tabs).forEach((tab) => {
       if (!first) {
         first = tab;
       }
       let tabDiv = new Html("div").appendTo(tabsList).styleJs({
-        width: "100%",
-        height: "4rem",
+        width: "calc(100% - 1.5rem)",
+        alignSelf: "center",
       });
       let tabElement = new Html("button").styleJs({
-        width: "100%",
-        height: "100%",
+        height: "3.5rem",
+        minWidth: "9.75rem",
+        padding: "0 1.25rem",
         textAlign: "left",
+        width: "9.75rem",
       });
       tabElement.on("click", () => {
         tabContents.clear();
         tabContentButtons = [];
         tabs[tab](tabContents, uiFuncs);
+        Sfx.playSfx("deck_ui_tab_transition_01.wav");
+
+        for (const button of tabButtons) {
+          if (button[0]) {
+            button[0].classList.remove("pressed");
+            if (button[0] === tabElement.elm) {
+              button[0].classList.add("pressed");
+            }
+          }
+        }
       });
       tabElement.text(tab);
       tabElement.appendTo(tabDiv);
@@ -81,6 +105,8 @@ class TabbedUI {
     let focusedOnTab = false;
     let prevValue = 0;
     let hoverValue = 0;
+
+    let isPlaying = false;
 
     function handleTabFocus(e) {
       console.log(e);
@@ -108,7 +134,13 @@ class TabbedUI {
         Ui.updatePos(Pid, { x: 0, y: hoverValue });
         focusedOnTab = false;
       } else {
+        // loud sound fix by avoiding duplicates
+        if (isPlaying === true) return;
         Sfx.playSfx(window.uiInfo[Pid].customSfx.hover);
+        isPlaying = true;
+        setTimeout(() => {
+          isPlaying = false;
+        }, 150);
       }
       prevValue = e.x;
       callback(e);
@@ -117,9 +149,13 @@ class TabbedUI {
 
     tabContents.clear();
     tabContentButtons = [];
-    tabs[first](tabContents, uiFuncs);
+    tabsList.qs("button").elm.click();
+    // tabs[first](tabContents, uiFuncs);
 
     Ui.init(Pid, "horizontal", tabButtons, handleTabFocus);
+  }
+  cleanup() {
+    this.csb.cleanup();
   }
 }
 
