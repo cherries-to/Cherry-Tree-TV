@@ -37,7 +37,6 @@ const pkg = {
       parent,
       isPassword = false,
       resultName,
-      callback,
     ) {
       let options = {
         title,
@@ -52,12 +51,11 @@ const pkg = {
 
       if (result.canceled === true) return;
 
-      parent.dataset.realText = result;
+      parent.dataset.realText = result.value;
       if (isPassword === true) {
         parent.textContent = "•".repeat(result.length);
-      } else parent.textContent = result;
-      textData[resultName] = result;
-      callback;
+      } else parent.textContent = result.value;
+      textData[resultName] = result.value;
     }
 
     async function searchShow(showName) {

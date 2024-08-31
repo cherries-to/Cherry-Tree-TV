@@ -529,13 +529,13 @@ const pkg = {
               type: "text",
             };
 
-            let result = (await Root.Libs.Modal.showKeyboard(options)).value;
+            let result = await Root.Libs.Modal.showKeyboard(options);
 
             if (result.canceled === true) return;
 
             let data = await ws.sendMessage({
               type: "send-friend-request",
-              message: result,
+              message: result.value,
             });
           }),
       );

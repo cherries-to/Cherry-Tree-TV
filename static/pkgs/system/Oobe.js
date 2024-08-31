@@ -123,11 +123,11 @@ const pkg = {
 
       if (result.canceled === true) return;
 
-      parent.dataset.realText = result;
+      parent.dataset.realText = result.value;
       if (isPassword === true) {
         parent.textContent = "•".repeat(result.length);
-      } else parent.textContent = result;
-      textData[resultName] = result;
+      } else parent.textContent = result.value;
+      textData[resultName] = result.value;
     }
 
     let introWelcomeDiv = new Html("div")
