@@ -119,7 +119,7 @@ const pkg = {
         type: isPassword === true ? "password" : "text",
       };
 
-      let result = (await Root.Libs.Modal.showKeyboard(options)).value;
+      let result = await Root.Libs.Modal.showKeyboard(options);
 
       if (result.canceled === true) return;
 
