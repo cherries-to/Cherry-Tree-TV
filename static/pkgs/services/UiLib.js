@@ -165,7 +165,15 @@ const pkg = {
       },
     },
     customScrollIntoView(element, container, extraSpace = 50) {
-      if (window.snapScroll !== undefined && window.snapScroll !== false) {
+      const eBCR = element.getBoundingClientRect();
+      // force snap scroll off-screen elements
+      if (
+        eBCR.left > window.innerWidth ||
+        eBCR.right < 0 ||
+        eBCR.top > window.innerHeight ||
+        eBCR.bottom < 0 ||
+        (window.snapScroll !== undefined && window.snapScroll !== false)
+      ) {
         element.scrollIntoView();
       } else {
         element.scrollIntoView({
