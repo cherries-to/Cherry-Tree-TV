@@ -67,7 +67,7 @@ const pkg = {
       },
     };
 
-    new TabbedUI({
+    this.tabbedUI = new TabbedUI({
       pid: Pid,
       tabs: tabs,
       wrapper: wrapper,
@@ -82,6 +82,7 @@ const pkg = {
   },
   end: async function () {
     // Exit this UI when the process is exited
+    this.tabbedUi.cleanup();
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
     // await Ui.transition("popOut", wrapper);

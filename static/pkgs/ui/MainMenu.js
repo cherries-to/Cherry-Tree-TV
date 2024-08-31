@@ -539,7 +539,6 @@ const pkg = {
             });
           }),
       );
-      // }
 
       if (friendListWrapperWrapper !== undefined) {
         friendListWrapperWrapper.cleanup();
