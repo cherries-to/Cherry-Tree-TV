@@ -26,7 +26,7 @@ const pkg = {
 
     Sfx = Root.Processes.getService("SfxLib").data;
 
-    Sfx.playSfx("deck_ui_into_game_detail.wav");
+    // Sfx.playSfx("deck_ui_into_game_detail.wav");
 
     const Background = Root.Processes.getService("Background").data;
 
@@ -67,7 +67,7 @@ const pkg = {
       },
     };
 
-    this.tabbedUI = new TabbedUI({
+    this.tabbedUi = new TabbedUI({
       pid: Pid,
       tabs: tabs,
       wrapper: wrapper,
