@@ -37,7 +37,7 @@ const pkg = {
       parent,
       isPassword = false,
       resultName,
-      callback
+      callback,
     ) {
       let options = {
         title,
@@ -49,6 +49,8 @@ const pkg = {
       };
 
       let result = (await Root.Libs.Modal.showKeyboard(options)).value;
+
+      if (result.canceled === true) return;
 
       parent.dataset.realText = result;
       if (isPassword === true) {
@@ -111,7 +113,7 @@ const pkg = {
             detail: {
               background: `inherit`,
             },
-          })
+          }),
         );
         setTimeout(() => {
           cover.cleanup();
@@ -124,7 +126,7 @@ const pkg = {
             detail: {
               background: `inherit`,
             },
-          })
+          }),
         );
         pkg.end();
       }
@@ -193,12 +195,12 @@ const pkg = {
                   detail: {
                     background: `url(${coverPath})`,
                   },
-                })
+                }),
               );
             } else {
               Root.Libs.Notify.show(
                 "Cover hidden",
-                `This movie contains NSFW content`
+                `This movie contains NSFW content`,
               );
               cover.styleJs({ opacity: "0", transform: "scale(1.5)" });
             }
@@ -217,7 +219,7 @@ const pkg = {
       });
       Root.Libs.Notify.show(
         "Movies found",
-        `Found ${apiData.results.length} results that match "${textData["movieName"]}"`
+        `Found ${apiData.results.length} results that match "${textData["movieName"]}"`,
       );
       foundInd.styleJs({ display: "block" });
       foundList.styleJs({ display: "flex" });
@@ -237,7 +239,7 @@ const pkg = {
           "Enter your movie's name",
           e.target,
           false,
-          "movieName"
+          "movieName",
         );
       })
       .appendTo(row);
@@ -284,7 +286,7 @@ const pkg = {
                 },
               },
             ],
-            true
+            true,
           );
         }),
         new Html("button").text("Add movie").on("click", async (e) => {
@@ -332,7 +334,7 @@ const pkg = {
             }, 500);
             pkg.end();
           }
-        })
+        }),
       )
       .appendTo(wrapper);
 

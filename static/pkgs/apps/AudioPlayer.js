@@ -15,8 +15,8 @@ const pkg = {
 
     wrapper = new Html("div").class("full-ui").appendTo("body");
 
-    cherrywoo.ipc.send("setRPC", {
-      details: "Listening to music"
+    window.desktopIntegration.ipc.send("setRPC", {
+      details: "Listening to music",
     });
 
     Ui.transition("popIn", wrapper);
@@ -38,7 +38,7 @@ const pkg = {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: "20px"
+        gap: "20px",
       })
       .appendTo(wrapper);
 
@@ -47,12 +47,12 @@ const pkg = {
         display: "flex",
         gap: "20px",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
       })
       .appendTo(container);
     let albumCover = new Html("img")
       .attr({
-        src: "assets/img/maxresdefault.png"
+        src: "assets/img/maxresdefault.png",
       })
       .styleJs({
         width: "15rem",
@@ -65,7 +65,7 @@ const pkg = {
   12.5px 12.5px 10px rgba(0, 0, 0, 0.035),
   22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
   41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05),
-  100px 100px 80px rgba(0, 0, 0, 0.07)`
+  100px 100px 80px rgba(0, 0, 0, 0.07)`,
       })
       .appendTo(songDisplay);
 
@@ -84,7 +84,7 @@ const pkg = {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "0.8rem"
+        padding: "0.8rem",
       });
     }
 
@@ -96,7 +96,7 @@ const pkg = {
         justifyContent: "center",
         padding: "1rem",
         borderRadius: "5px",
-        background: "rgba(0,0,0,0.5)"
+        background: "rgba(0,0,0,0.5)",
       })
       .appendTo(container);
     let skipBack = createButton(icons["stepBack"], function () {
@@ -117,7 +117,7 @@ const pkg = {
       container.styleJs({
         backgroundColor: `rgb(${color[0] - 10},${color[1] - 10}, ${
           color[2] - 10
-        })`
+        })`,
       });
     }
 
@@ -140,7 +140,7 @@ const pkg = {
     // await Ui.transition("popOut", wrapper);
     Ui.giveUpUi(Pid);
     wrapper.cleanup();
-  }
+  },
 };
 
 export default pkg;

@@ -5,7 +5,6 @@ const nodeDiskInfo = require("node-disk-info");
 const { Player } = require("yt-cast-receiver");
 const { Worker } = require("worker_threads");
 const { Server } = require("socket.io");
-const ffmpeg = require("fluent-ffmpeg");
 const express = require("express");
 const mime = require("mime-types");
 const qrcode = require("qrcode");
@@ -43,8 +42,8 @@ const createWindow = () => {
     icon: "icon.png",
     autoHideMenuBar: true,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js")
-    }
+      preload: path.join(__dirname, "preload.js"),
+    },
   });
 
   win.loadURL(`http://127.0.0.1:${port}/index.html`);
@@ -164,8 +163,8 @@ class SocketPlayer extends Player {
   }
 }
 
-const client = new Client({
-  clientId: "1278852361053405336"
+let client = new Client({
+  clientId: "1278852361053405336",
 });
 
 client.on("ready", () => {
@@ -173,8 +172,40 @@ client.on("ready", () => {
   client.user?.setActivity({
     details: "Chillin' in the main menu",
     largeImageKey: "cherrylogo",
-    largeImageText: "Cherry Tree TV"
+    largeImageText: "Cherry Tree TV",
   });
+});
+
+let reconnectionAttempts = 0,
+  isReconnecting = false;
+client.on("disconnected", () => {
+  if (isReconnecting) {
+    console.log(
+      "[DISCORD] Not attempting to reconnect while another reconnection attempt is in progress.",
+    );
+    return;
+  }
+  console.log(
+    "[DISCORD] Discord IPC disconnected. Reconnecting in 15 seconds...",
+  );
+
+  isReconnecting = true;
+  let interval = setInterval(() => {
+    reconnectionAttempts++;
+    console.log(`[DISCORD] Trying to reconnect... ${reconnectionAttempts}/3`);
+    client.destroy();
+    client = new Client({
+      clientId: "1278852361053405336",
+    });
+    if (reconnectionAttempts === 3) {
+      console.log(
+        "[DISCORD] Not reconnecting after 3 failed connection attempts.",
+      );
+      clearInterval(interval);
+      reconnectionAttempts = 0;
+      isReconnecting = false;
+    }
+  }, 15_000);
 });
 
 app.whenReady().then(() => {
@@ -188,8 +219,8 @@ app.whenReady().then(() => {
         name: details.name,
         screenName: details.screenName,
         brand: details.brand,
-        model: details.model
-      }
+        model: details.model,
+      },
     });
     receiver.on("senderConnect", (sender) => {
       socket.emit("clientConnected", sender);
@@ -241,7 +272,7 @@ app.whenReady().then(() => {
   server.get("/thumbnail", (req, res) => {
     const fPath = req.query.path;
     const worker = new Worker("./thumbnailer.js", {
-      workerData: { vidPath: fPath }
+      workerData: { vidPath: fPath },
     });
     worker.on("message", (data) => {
       console.log(data);
@@ -309,7 +340,7 @@ app.whenReady().then(() => {
               name: file,
               type: fileStats.isFile() ? "file" : "folder",
               created: new Date(fileStats.ctime).getTime(),
-              modified: new Date(fileStats.mtime).getTime()
+              modified: new Date(fileStats.mtime).getTime(),
             });
           } catch (error) {
             console.error(`Error reading file ${file}: ${error.message}`);
@@ -360,7 +391,6 @@ app.whenReady().then(() => {
   });
 
   // Electron IPC
-
   ipcMain.on("setRPC", (event, arg) => {
     client.user?.setActivity({
       state: arg.state,
@@ -371,9 +401,9 @@ app.whenReady().then(() => {
       buttons: arg.button1 && [
         {
           label: arg.button1.label,
-          url: arg.button1.url
-        }
-      ]
+          url: arg.button1.url,
+        },
+      ],
     });
   });
 });

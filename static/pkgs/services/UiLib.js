@@ -63,7 +63,7 @@ const pkg = {
     console.log("[UiLib] Loading success.", Root);
     r = Root;
 
-    let uiScale = await localforage.getItem("settings__uiScale");
+    let uiScale = await window.localforage.getItem("settings__uiScale");
 
     if (uiScale !== undefined) {
       document.documentElement.style.fontSize = uiScale;
@@ -796,7 +796,7 @@ window.uis = uis;
 //     console.log("[UiLib] Loading success.", Root);
 //     r = Root;
 
-//     let uiScale = await localforage.getItem("settings__uiScale");
+//     let uiScale = await window.localforage.getItem("settings__uiScale");
 
 //     if (uiScale !== undefined) {
 //       document.documentElement.style.fontSize = uiScale;

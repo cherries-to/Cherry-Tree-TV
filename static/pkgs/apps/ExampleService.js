@@ -21,8 +21,7 @@ const pkg = {
     },
   },
   end: async function () {
-    // Close the window when the process is exited
-    myWindow.close();
+    // nothing
   },
 };
 

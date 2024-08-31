@@ -1,7 +1,7 @@
 import controllerStatusBar from "./controllerStatusBar.js";
 import langManager from "./l10n/manager.js";
-import Html from "/libs/html.js";
-import Keyboard from "/libs/keyboard.js";
+import Html from "./html.js";
+import Keyboard from "./keyboard.js";
 
 let Processes, Ui;
 let Sfx = { playSfx() {} };
@@ -35,7 +35,6 @@ const Modal = {
               ],
             });
             return;
-            // return proxied.apply(this, arguments);
           };
         })(window.alert);
       }
@@ -195,7 +194,7 @@ const Modal = {
         data.lists = [modalButtons.elm.children];
       else if (data.lists === undefined && data.type === "custom")
         data.lists = Array.from(
-          data.customData.elm.querySelector(".buttons").children
+          data.customData.elm.querySelector(".buttons").children,
         ).map((s) => Array.from(s.children));
 
       Sfx.playSfx("deck_ui_show_modal.wav");
@@ -222,7 +221,7 @@ const Modal = {
             }
           data.buttonCallback !== undefined && data.buttonCallback(t);
         },
-        data.customSfx
+        data.customSfx,
       );
 
       if (data.ephemeral === true) return resolve({ killModal });
@@ -251,7 +250,7 @@ const Modal = {
       .text(
         options.type === "password"
           ? "•".repeat(options.value.length)
-          : options.value || ""
+          : options.value || "",
       )
       .appendTo(ContainerDiv);
 
@@ -259,37 +258,55 @@ const Modal = {
 
     let cb;
 
-    const kb = Keyboard.new;
+    // probably dangerous to have to guess the modal pid
+    let num = numb - 1;
 
-    const keyboard = await kb(function (e) {
-      switch (e.type) {
-        case "key":
-          text += e.data;
-          if (options.type === "password") {
-            inputBox.elm.textContent += "•";
-          } else {
-            if (e.data === " ") {
-              inputBox.elm.innerHTML += "&nbsp;";
+    const keyboard = await Keyboard.new(
+      function (e) {
+        switch (e.type) {
+          case "key":
+            text += e.data;
+            if (options.type === "password") {
+              inputBox.elm.textContent += "•";
             } else {
-              inputBox.elm.textContent += e.data;
-            }
-          }
-          break;
-        case "special":
-          switch (e.data) {
-            case "backspace":
-              text = text.substring(0, text.length - 1);
-              if (options.type === "password") {
-                inputBox.elm.textContent = "•".repeat(text.length);
+              if (e.data === " ") {
+                inputBox.elm.innerHTML += "&nbsp;";
               } else {
-                inputBox.elm.textContent = text;
+                inputBox.elm.textContent += e.data;
               }
-              break;
-          }
-          break;
-      }
-      console.log("type");
-    });
+            }
+            break;
+          case "special":
+            switch (e.data) {
+              case "backspace":
+                text = text.substring(0, text.length - 1);
+                if (options.type === "password") {
+                  inputBox.elm.textContent = "•".repeat(text.length);
+                } else {
+                  inputBox.elm.textContent = text;
+                }
+                break;
+              case "complete":
+                cb({
+                  canceled: false,
+                  text: inputBox.elm.textContent,
+                  id: -1,
+                });
+                break;
+              case "cancel":
+                cb({
+                  canceled: true,
+                  text: options.value,
+                  id: -1,
+                });
+                break;
+            }
+            break;
+        }
+      },
+      layout,
+      num,
+    );
 
     // input list
     new Html("div")
@@ -297,18 +314,18 @@ const Modal = {
       .class("flex-col-small", "buttons")
       .appendMany(
         ...keyboard.keysListHtml,
-        new Html("div").class("flex-row-small").appendMany(
-          new Html("button").text("Confirm").on("click", (e) => {
-            cb({
-              canceled: false,
-              text: inputBox.elm.textContent,
-              id: -1,
-            });
-          }),
-          new Html("button").text("Cancel").on("click", (e) => {
-            cb({ canceled: true, text: null, id: -1 });
-          })
-        )
+        // new Html("div").class("flex-row-small").appendMany(
+        //   new Html("button").text("Confirm").on("click", (e) => {
+        //     cb({
+        //       canceled: false,
+        //       text: inputBox.elm.textContent,
+        //       id: -1,
+        //     });
+        //   }),
+        //   new Html("button").text("Cancel").on("click", (e) => {
+        //     cb({ canceled: true, text: null, id: -1 });
+        //   })
+        // )
       );
 
     document.dispatchEvent(
@@ -319,7 +336,7 @@ const Modal = {
           type: options.type,
           value: options.value,
         },
-      })
+      }),
     );
 
     document.addEventListener("CherryTree.Input.FinishKeyboard", (e) => {});

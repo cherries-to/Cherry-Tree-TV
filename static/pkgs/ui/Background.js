@@ -111,7 +111,7 @@ const pkg = {
     // Start the animation
     createStars();
 
-    let result = await localforage.getItem("settings__backgroundType");
+    let result = await window.localforage.getItem("settings__backgroundType");
     if (result === "stars") {
       space.style({ opacity: "0.5" });
       animate();

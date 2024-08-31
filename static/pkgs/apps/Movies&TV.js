@@ -16,8 +16,8 @@ const pkg = {
 
     wrapper = new Html("div").class("ui", "pad-top-sm", "gap").appendTo("body");
 
-    cherrywoo.ipc.send("setRPC", {
-      details: "Searching for movies and shows"
+    window.desktopIntegration.ipc.send("setRPC", {
+      details: "Searching for movies and shows",
     });
 
     Ui.transition("popIn", wrapper);
@@ -27,7 +27,7 @@ const pkg = {
     Sfx = Root.Processes.getService("SfxLib").data;
     let watchList = {
       movies: [],
-      shows: []
+      shows: [],
     };
 
     await vfs.importFS();
@@ -131,7 +131,7 @@ const pkg = {
           flexDirection: "column",
           width: "40px",
           height: "100%",
-          gap: "10px"
+          gap: "10px",
         })
         .on("click", async (e) => {
           Ui.transition("popOut", wrapper, 500, true);
@@ -147,8 +147,8 @@ const pkg = {
                     button.cleanup();
                     updateMovieList();
                   }
-                }
-              }
+                },
+              },
             ],
             true
           );
@@ -176,7 +176,7 @@ const pkg = {
           flexDirection: "column",
           width: "40px",
           height: "100%",
-          gap: "10px"
+          gap: "10px",
         })
         .on("click", async (e) => {
           Ui.transition("popOut", wrapper, 500, true);
@@ -192,8 +192,8 @@ const pkg = {
                     button.cleanup();
                     updateShowList();
                   }
-                }
-              }
+                },
+              },
             ],
             true
           );
@@ -225,9 +225,9 @@ const pkg = {
           buttons: [
             {
               type: "primary",
-              text: "OK"
-            }
-          ]
+              text: "OK",
+            },
+          ],
         });
       }, 500);
     }
@@ -250,9 +250,9 @@ const pkg = {
           buttons: [
             {
               type: "primary",
-              text: "OK"
-            }
-          ]
+              text: "OK",
+            },
+          ],
         });
       }, 500);
     }
@@ -295,7 +295,7 @@ const pkg = {
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
     Ui.giveUpUi(Pid);
     wrapper.cleanup();
-  }
+  },
 };
 
 export default pkg;

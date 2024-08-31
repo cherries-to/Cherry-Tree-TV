@@ -19,9 +19,9 @@ const pkg = {
 
     wrapper = new Html("div").class("full-ui").appendTo("body");
 
-    cherrywoo.ipc.send("setRPC", {
+    window.desktopIntegration.ipc.send("setRPC", {
       details: "Configuring settings",
-    })
+    });
 
     Ui.transition("popIn", wrapper);
 
@@ -35,7 +35,7 @@ const pkg = {
     let tabs = {
       Setup: (wrapper, ui) => {
         wrapper.styleJs({
-          padding: "20px"
+          padding: "20px",
         });
         new Html("h1")
           .text(langManager.getString("settings.categories.setup.title"))
@@ -75,9 +75,9 @@ const pkg = {
                       buttons: [
                         {
                           type: "primary",
-                          text: "OK"
-                        }
-                      ]
+                          text: "OK",
+                        },
+                      ],
                     });
                   }, 500);
                 }
@@ -101,13 +101,13 @@ const pkg = {
                 buttons: [
                   {
                     type: "primary",
-                    text: "No"
+                    text: "No",
                   },
                   {
                     type: "negative",
-                    text: "Yes"
-                  }
-                ]
+                    text: "Yes",
+                  },
+                ],
               });
 
               // Delegate UI while loading the app
@@ -132,17 +132,17 @@ const pkg = {
                 buttons: [
                   {
                     type: "primary",
-                    text: "No"
+                    text: "No",
                   },
                   {
                     type: "negative",
-                    text: "Yes"
-                  }
-                ]
+                    text: "Yes",
+                  },
+                ],
               });
 
               if (result.id === 1) {
-                await localforage.setItem("fs", null);
+                await window.localforage.setItem("fs", null);
                 location.reload();
               }
             })
@@ -151,7 +151,7 @@ const pkg = {
       },
       Input: async (wrapper, ui) => {
         wrapper.styleJs({
-          padding: "20px"
+          padding: "20px",
         });
         new Html("h1")
           .text(langManager.getString("settings.categories.input.title"))
@@ -175,7 +175,7 @@ const pkg = {
         let qr = new Html("img")
           .styleJs({
             borderRadius: "5px",
-            width: "20%"
+            width: "20%",
           })
           .appendTo(wrapper);
 
@@ -192,7 +192,7 @@ const pkg = {
             .then((res) => res.text())
             .then((ip) => {
               qr.attr({
-                src: `${location.protocol}//${location.hostname}:9864/qr?url=${location.protocol}//${ip}:${location.port}/link/index.html?code=${window.phoneLinkCode}`
+                src: `${location.protocol}//${location.hostname}:9864/qr?url=${location.protocol}//${ip}:${location.port}/link/index.html?code=${window.phoneLinkCode}`,
               });
             });
         }
@@ -209,7 +209,9 @@ const pkg = {
           hideTvLinkCode();
         });
 
-        if ((await localforage.getItem("settings__phoneLink")) === true) {
+        if (
+          (await window.localforage.getItem("settings__phoneLink")) === true
+        ) {
           showTvLinkCode();
         } else {
           hideTvLinkCode();
@@ -230,7 +232,7 @@ const pkg = {
       },
       Display: (wrapper, ui) => {
         wrapper.styleJs({
-          padding: "20px"
+          padding: "20px",
         });
         new Html("h1")
           .text(langManager.getString("settings.categories.display.title"))
@@ -292,8 +294,8 @@ const pkg = {
                       "settings.categories.pictureCalibration.testPatternName"
                     ),
                     isOnline: true,
-                    autoplay: false
-                  }
+                    autoplay: false,
+                  },
                 ],
                 true
               );
@@ -303,7 +305,7 @@ const pkg = {
       },
       Audio: (wrapper, ui) => {
         wrapper.styleJs({
-          padding: "20px"
+          padding: "20px",
         });
         new Html("h1")
           .text(langManager.getString("settings.categories.audio.title"))
@@ -331,7 +333,7 @@ const pkg = {
             .on("click", () => settingsLib.bgm(Root.Pid, wrapper, Sfx))
         );
         ui.add(row3.elm.children);
-      }
+      },
     };
     new TabbedUI({
       pid: Pid,
@@ -343,7 +345,7 @@ const pkg = {
         if (e == "back") {
           pkg.end();
         }
-      }
+      },
     });
   },
   end: async function () {
@@ -353,7 +355,7 @@ const pkg = {
     // await Ui.transition("popOut", wrapper);
     Ui.giveUpUi(Pid);
     wrapper.cleanup();
-  }
+  },
 };
 
 export default pkg;

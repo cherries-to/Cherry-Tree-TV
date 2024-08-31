@@ -115,7 +115,7 @@ const pkg = {
         });
 
         if (result.id === 1) {
-          await localforage.setItem("fs", null);
+          await window.localforage.setItem("fs", null);
           location.reload();
         }
       })
@@ -164,7 +164,7 @@ const pkg = {
       hideTvLinkCode();
     });
 
-    if ((await localforage.getItem("settings__phoneLink")) === true) {
+    if ((await window.localforage.getItem("settings__phoneLink")) === true) {
       showTvLinkCode();
     } else {
       hideTvLinkCode();

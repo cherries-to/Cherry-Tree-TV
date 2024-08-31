@@ -86,8 +86,8 @@ const Vfs = {
   // and the value is either a string (for file contents) or another object (for a subfolder)
   fileSystem: {},
   async save() {
-    await localforage.setItem("fs", JSON.stringify(this.fileSystem));
-    this.fileSystem = JSON.parse(await localforage.getItem("fs"));
+    await window.localforage.setItem("fs", JSON.stringify(this.fileSystem));
+    this.fileSystem = JSON.parse(await window.localforage.getItem("fs"));
   },
   async exportFS() {
     return this.fileSystem;
@@ -96,14 +96,14 @@ const Vfs = {
     if (fsObject === true) {
       this.fileSystem = templateFsLayout;
     } else if (
-      !(await localforage.getItem("fs")) &&
+      !(await window.localforage.getItem("fs")) &&
       fsObject === templateFsLayout
     ) {
       this.fileSystem = fsObject;
     } else if (fsObject !== templateFsLayout) {
       this.fileSystem = fsObject;
     } else {
-      const existingFs = JSON.parse(await localforage.getItem("fs"));
+      const existingFs = JSON.parse(await window.localforage.getItem("fs"));
       this.fileSystem = existingFs;
     }
     this.save();

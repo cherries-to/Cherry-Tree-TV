@@ -13,8 +13,8 @@ const pkg = {
   async start(Root) {
     console.log("[SfxLib] Started.");
 
-    let s = await localforage.getItem("settings__bgmSong");
-    let sv = await localforage.getItem("settings__soundVolume");
+    let s = await window.localforage.getItem("settings__bgmSong");
+    let sv = await window.localforage.getItem("settings__soundVolume");
     if (s === null || s === undefined) {
       s = "/assets/audio/bgm_dreamy.mp3";
     }
@@ -35,7 +35,7 @@ const pkg = {
     // console.error('Loaded Music');
     // alert('Loaded Music');
 
-    let r = await localforage.getItem("settings__playBgm");
+    let r = await window.localforage.getItem("settings__playBgm");
 
     window.onclick = firstPlay;
 
@@ -53,7 +53,7 @@ const pkg = {
       firstPlay();
     }, 1000);
 
-    let sfxPack = await localforage.getItem("settings__sfxPack");
+    let sfxPack = await window.localforage.getItem("settings__sfxPack");
 
     if (sfxPack === null) {
       sfxPack = "/assets/audio/sfx_dreamy.zip";
@@ -82,7 +82,7 @@ const pkg = {
           const blob = await response.blob();
 
           // Create a new zip file
-          const reader = new zip.ZipReader(new zip.BlobReader(blob));
+          const reader = new window.zip.ZipReader(new window.zip.BlobReader(blob));
 
           // Get all the entries in the zip file
           const entries = await reader.getEntries();
@@ -92,7 +92,7 @@ const pkg = {
           for (const entry of entries) {
             const name = extractFilename(entry.filename); // Extract the file name
             // Extract the file data as a Blob
-            const blob = await entry.getData(new zip.Uint8ArrayWriter());
+            const blob = await entry.getData(new window.zip.Uint8ArrayWriter());
             soundEffects[name] = blob.buffer; // Add the audio to the soundEffects object with its name
           }
 

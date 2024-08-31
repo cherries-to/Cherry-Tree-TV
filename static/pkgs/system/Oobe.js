@@ -13,6 +13,10 @@ const pkg = {
     console.log("Hi! From Oobe");
     console.log(vfs);
 
+    window.desktopIntegration.ipc.send("setRPC", {
+      details: "In the first-time setup",
+    });
+
     if (Root.Arguments && Root.Arguments.length > 0) cb = Root.Arguments[0];
 
     Sfx = Root.Processes.getService("SfxLib").data;
@@ -66,13 +70,13 @@ const pkg = {
           new Html("div")
             .class("flex-col")
             .appendMany(
-              new Html("h1").text(langManager.getString("status.checking"))
+              new Html("h1").text(langManager.getString("status.checking")),
             ),
           new Html("div")
             .class("flex-col")
             .html(
-              `<img style="width:4rem;height:4rem" class="loading" draggable="false" src="data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_1114_2788)'%3E%3Cpath d='M44.3563 24C46.3687 24 48.0283 22.3595 47.7239 20.3703C47.4328 18.4675 46.9131 16.6022 46.1731 14.8156C44.967 11.9038 43.1992 9.25804 40.9706 7.02944C38.742 4.80083 36.0962 3.033 33.1844 1.82689C30.2726 0.620778 27.1517 -1.37766e-07 24 0C20.8483 1.37766e-07 17.7274 0.620779 14.8156 1.82689C11.9038 3.033 9.25804 4.80083 7.02944 7.02944C4.80083 9.25804 3.033 11.9038 1.82689 14.8156C1.08686 16.6022 0.56719 18.4675 0.276061 20.3703C-0.0282817 22.3595 1.63132 24 3.64366 24C5.656 24 7.24768 22.3498 7.68294 20.3851C7.89306 19.4367 8.18597 18.5061 8.55949 17.6043C9.39938 15.5767 10.6304 13.7343 12.1823 12.1823C13.7343 10.6304 15.5767 9.39939 17.6043 8.55949C19.632 7.7196 21.8053 7.28732 24 7.28732C26.1947 7.28732 28.368 7.7196 30.3957 8.55949C32.4233 9.39939 34.2657 10.6304 35.8176 12.1823C37.3696 13.7343 38.6006 15.5767 39.4405 17.6043C39.814 18.5061 40.1069 19.4367 40.3171 20.3851C40.7523 22.3498 42.344 24 44.3563 24Z' fill='url(%23paint0_linear_1114_2788)'/%3E%3C/g%3E%3Cdefs%3E%3ClinearGradient id='paint0_linear_1114_2788' x1='0' y1='24' x2='48' y2='24' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-opacity='0'/%3E%3Cstop offset='1' stop-color='white'/%3E%3C/linearGradient%3E%3CclipPath id='clip0_1114_2788'%3E%3Crect width='48' height='48' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E" />`
-            )
+              `<img style="width:4rem;height:4rem" class="loading" draggable="false" src="data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_1114_2788)'%3E%3Cpath d='M44.3563 24C46.3687 24 48.0283 22.3595 47.7239 20.3703C47.4328 18.4675 46.9131 16.6022 46.1731 14.8156C44.967 11.9038 43.1992 9.25804 40.9706 7.02944C38.742 4.80083 36.0962 3.033 33.1844 1.82689C30.2726 0.620778 27.1517 -1.37766e-07 24 0C20.8483 1.37766e-07 17.7274 0.620779 14.8156 1.82689C11.9038 3.033 9.25804 4.80083 7.02944 7.02944C4.80083 9.25804 3.033 11.9038 1.82689 14.8156C1.08686 16.6022 0.56719 18.4675 0.276061 20.3703C-0.0282817 22.3595 1.63132 24 3.64366 24C5.656 24 7.24768 22.3498 7.68294 20.3851C7.89306 19.4367 8.18597 18.5061 8.55949 17.6043C9.39938 15.5767 10.6304 13.7343 12.1823 12.1823C13.7343 10.6304 15.5767 9.39939 17.6043 8.55949C19.632 7.7196 21.8053 7.28732 24 7.28732C26.1947 7.28732 28.368 7.7196 30.3957 8.55949C32.4233 9.39939 34.2657 10.6304 35.8176 12.1823C37.3696 13.7343 38.6006 15.5767 39.4405 17.6043C39.814 18.5061 40.1069 19.4367 40.3171 20.3851C40.7523 22.3498 42.344 24 44.3563 24Z' fill='url(%23paint0_linear_1114_2788)'/%3E%3C/g%3E%3Cdefs%3E%3ClinearGradient id='paint0_linear_1114_2788' x1='0' y1='24' x2='48' y2='24' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-opacity='0'/%3E%3Cstop offset='1' stop-color='white'/%3E%3C/linearGradient%3E%3CclipPath id='clip0_1114_2788'%3E%3Crect width='48' height='48' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E" />`,
+            ),
         ),
       barButtons: {
         left: [],
@@ -90,7 +94,7 @@ const pkg = {
 
     try {
       let a = await fetch("http://localhost:9864/local_ip").then((t) =>
-        t.text()
+        t.text(),
       );
       ip = a;
     } catch (e) {
@@ -104,7 +108,7 @@ const pkg = {
       description,
       parent,
       isPassword = false,
-      resultName
+      resultName,
     ) {
       let options = {
         title,
@@ -116,6 +120,8 @@ const pkg = {
       };
 
       let result = (await Root.Libs.Modal.showKeyboard(options)).value;
+
+      if (result.canceled === true) return;
 
       parent.dataset.realText = result;
       if (isPassword === true) {
@@ -159,10 +165,10 @@ const pkg = {
         elm: new Html("div").class("flex-list", "oobe-spaced").appendMany(
           new Html("div").class("flex-col").appendMany(
             new Html("h1").text(
-              langManager.getString("system.oobe.phoneLink.title")
+              langManager.getString("system.oobe.phoneLink.title"),
             ),
             new Html("p").text(
-              langManager.getString("system.oobe.phoneLink.description")
+              langManager.getString("system.oobe.phoneLink.description"),
             ),
             new Html("div").class("button-row").appendMany(
               new Html("button")
@@ -170,13 +176,13 @@ const pkg = {
                 .on("click", async (e) => {
                   Root.Libs.Modal.Show({
                     title: langManager.getString(
-                      "system.oobe.phoneLink.helpText"
+                      "system.oobe.phoneLink.helpText",
                     ),
                     description: langManager.getString(
                       "system.oobe.phoneLink.helpInfo",
                       {
                         url: `${location.protocol}//${ip}:${location.port}/link`,
-                      }
+                      },
                     ),
                     parent: document.body,
                     pid: Root.Pid,
@@ -187,8 +193,8 @@ const pkg = {
                       },
                     ],
                   });
-                })
-            )
+                }),
+            ),
           ),
           new Html("div").class("flex-col").appendMany(
             new Html("img")
@@ -202,8 +208,8 @@ const pkg = {
                 width: "16rem",
                 height: "16rem",
                 imageRendering: "pixelated",
-              })
-          )
+              }),
+          ),
         ),
         // bottom bar buttons
         barButtons: {
@@ -250,39 +256,39 @@ const pkg = {
           new Html("div").class("flex-col").appendMany(
             new Html("h1").text("Configuration"),
             new Html("p").html(
-              "Modify some settings before you get into the app."
+              "Modify some settings before you get into the app.",
             ),
             new Html("div").class("button-row", "flex-list").appendMany(
               new Html("button")
                 .text(
-                  langManager.getString("settings.categories.display.title")
+                  langManager.getString("settings.categories.display.title"),
                 )
                 .on("click", async () => {
                   let result = await Root.Libs.Modal.Show({
                     parent: wrapper,
                     pid: Root.Pid,
                     title: langManager.getString(
-                      "settings.categories.display.title"
+                      "settings.categories.display.title",
                     ),
                     description: langManager.getString(
-                      "settings.categories.display.description"
+                      "settings.categories.display.description",
                     ),
                     buttons: [
                       {
                         type: "primary",
                         text: langManager.getString(
-                          "settings.categories.display.items.uiScaling"
+                          "settings.categories.display.items.uiScaling",
                         ),
                       },
                       {
                         type: "primary",
                         text: langManager.getString(
-                          "settings.categories.display.items.background"
+                          "settings.categories.display.items.background",
                         ),
                       },
                     ],
                   });
-                  
+
                   if (result.canceled === true) return;
 
                   switch (result.id) {
@@ -301,28 +307,28 @@ const pkg = {
                     parent: wrapper,
                     pid: Root.Pid,
                     title: langManager.getString(
-                      "settings.categories.audio.title"
+                      "settings.categories.audio.title",
                     ),
                     description: langManager.getString(
-                      "settings.categories.audio.description"
+                      "settings.categories.audio.description",
                     ),
                     buttons: [
                       {
                         type: "primary",
                         text: langManager.getString(
-                          "settings.categories.audio.items.volume"
+                          "settings.categories.audio.items.volume",
                         ),
                       },
                       {
                         type: "primary",
                         text: langManager.getString(
-                          "settings.categories.audio.items.sfx"
+                          "settings.categories.audio.items.sfx",
                         ),
                       },
                       {
                         type: "primary",
                         text: langManager.getString(
-                          "settings.categories.audio.items.bgm"
+                          "settings.categories.audio.items.bgm",
                         ),
                       },
                     ],
@@ -341,10 +347,10 @@ const pkg = {
                       settingsLib.bgm(Root.Pid, wrapper, Sfx);
                       break;
                   }
-                })
+                }),
             ),
-            new Html("p").html("You can modify these later in Settings.")
-          )
+            new Html("p").html("You can modify these later in Settings."),
+          ),
         ),
         // bottom bar buttons
         barButtons: {
@@ -370,11 +376,11 @@ const pkg = {
             .class("flex-col")
             .appendMany(
               new Html("h1").text(
-                langManager.getString("system.oobe.account.title")
+                langManager.getString("system.oobe.account.title"),
               ),
               new Html("p").text(
-                langManager.getString("system.oobe.account.description")
-              )
+                langManager.getString("system.oobe.account.description"),
+              ),
             ),
           new Html("div").class("flex-col").appendMany(
             new Html("div").class("button-row").appendMany(
@@ -382,16 +388,16 @@ const pkg = {
                 .text(langManager.getString("actions.login"))
                 .on("click", (e) => {
                   switchPage("login");
-                })
+                }),
             ),
             new Html("div").class("button-row").appendMany(
               new Html("button")
                 .text(langManager.getString("actions.register"))
                 .on("click", (e) => {
                   switchPage("register");
-                })
-            )
-          )
+                }),
+            ),
+          ),
         ),
         // bottom bar buttons
         barButtons: {
@@ -409,7 +415,7 @@ const pkg = {
                 let result = await Root.Libs.Modal.Show({
                   title: langManager.getString("system.oobe.modal.skip.title"),
                   description: langManager.getString(
-                    "system.oobe.modal.skip.description"
+                    "system.oobe.modal.skip.description",
                   ),
                   pid: Root.Pid,
                   parent: document.body,
@@ -444,28 +450,28 @@ const pkg = {
             .class("flex-col")
             .appendMany(
               new Html("h1").text(
-                langManager.getString("system.oobe.login.title")
+                langManager.getString("system.oobe.login.title"),
               ),
               new Html("p").html(
-                langManager.getString("system.oobe.login.description")
-              )
+                langManager.getString("system.oobe.login.description"),
+              ),
             ),
           new Html("div").class("flex-col").appendMany(
             new Html("div").class("button-row", "flex-col").appendMany(
               new Html("span").text(
-                langManager.getString("label.usernameOrEmail")
+                langManager.getString("label.usernameOrEmail"),
               ),
               new Html("button").class("input-box").on("click", (e) => {
                 promptForInput(
                   langManager.getString("system.oobe.modal.username.title"),
                   langManager.getString(
-                    "system.oobe.modal.username.description"
+                    "system.oobe.modal.username.description",
                   ),
                   e.target,
                   false,
-                  "login_username"
+                  "login_username",
                 );
-              })
+              }),
             ),
             new Html("div").class("button-row", "flex-col").appendMany(
               new Html("span").text(langManager.getString("label.password")),
@@ -473,15 +479,15 @@ const pkg = {
                 promptForInput(
                   langManager.getString("system.oobe.modal.password.title"),
                   langManager.getString(
-                    "system.oobe.modal.password.description"
+                    "system.oobe.modal.password.description",
                   ),
                   e.target,
                   true,
-                  "login_password"
+                  "login_password",
                 );
-              })
-            )
-          )
+              }),
+            ),
+          ),
         ),
         // bottom bar buttons
         barButtons: {
@@ -496,14 +502,14 @@ const pkg = {
                 try {
                   result = await UserSvc.login(
                     textData["login_username"],
-                    textData["login_password"]
+                    textData["login_password"],
                   );
 
                   if (result.success === false) throw result; // trigger catch
                 } catch (e) {
                   Root.Libs.Notify.show(
                     "Failed to login",
-                    "Something went wrong: " + e.message
+                    "Something went wrong: " + e.message,
                   );
                 } finally {
                   e.target.disabled = false;
@@ -542,11 +548,11 @@ const pkg = {
             .class("flex-col")
             .appendMany(
               new Html("h1").text(
-                langManager.getString("system.oobe.register.title")
+                langManager.getString("system.oobe.register.title"),
               ),
               new Html("p").html(
-                langManager.getString("system.oobe.register.description")
-              )
+                langManager.getString("system.oobe.register.description"),
+              ),
             ),
           new Html("div").class("flex-col").appendMany(
             new Html("div").class("button-row", "flex-col").appendMany(
@@ -555,13 +561,13 @@ const pkg = {
                 promptForInput(
                   langManager.getString("system.oobe.modal.username.title"),
                   langManager.getString(
-                    "system.oobe.modal.username.description"
+                    "system.oobe.modal.username.description",
                   ),
                   e.target,
                   false,
-                  "register_username"
+                  "register_username",
                 );
-              })
+              }),
             ),
             new Html("div").class("button-row", "flex-col").appendMany(
               new Html("span").text(langManager.getString("label.email")),
@@ -571,9 +577,9 @@ const pkg = {
                   langManager.getString("system.oobe.modal.email.description"),
                   e.target,
                   false,
-                  "register_email"
+                  "register_email",
                 );
-              })
+              }),
             ),
             new Html("div").class("button-row", "flex-col").appendMany(
               new Html("span").text(langManager.getString("label.password")),
@@ -581,15 +587,15 @@ const pkg = {
                 promptForInput(
                   langManager.getString("system.oobe.modal.password.title"),
                   langManager.getString(
-                    "system.oobe.modal.password.description"
+                    "system.oobe.modal.password.description",
                   ),
                   e.target,
                   true,
-                  "register_password"
+                  "register_password",
                 );
-              })
-            )
-          )
+              }),
+            ),
+          ),
         ),
         // bottom bar buttons
         barButtons: {
@@ -607,13 +613,13 @@ const pkg = {
                   let result2 = await UserSvc.register(
                     textData["register_username"],
                     textData["register_password"],
-                    textData["register_email"]
+                    textData["register_email"],
                   );
                   console.log(result2);
 
                   result = await UserSvc.login(
                     textData["register_username"],
-                    textData["register_password"]
+                    textData["register_password"],
                   );
                   console.log(result);
 
@@ -621,7 +627,7 @@ const pkg = {
                 } catch (e) {
                   Root.Libs.Notify.show(
                     "Failed to login",
-                    "Something went wrong: " + e.message
+                    "Something went wrong: " + e.message,
                   );
                 } finally {
                   e.target.disabled = false;
@@ -662,12 +668,12 @@ const pkg = {
               .class("flex-col")
               .appendMany(
                 new Html("h1").text(
-                  langManager.getString("system.oobe.thanks.title")
+                  langManager.getString("system.oobe.thanks.title"),
                 ),
                 new Html("p").html(
-                  langManager.getString("system.oobe.thanks.description")
-                )
-              )
+                  langManager.getString("system.oobe.thanks.description"),
+                ),
+              ),
           ),
         // bottom bar buttons
         barButtons: {
@@ -721,7 +727,7 @@ const pkg = {
                 if (result === false) return;
                 if (typeof result === "string") await switchPage(result);
               }
-            })
+            }),
           );
         });
       }
@@ -735,7 +741,7 @@ const pkg = {
                 if (result === false) return;
                 if (typeof result === "string") await switchPage(result);
               }
-            })
+            }),
           );
         });
       }
@@ -744,7 +750,7 @@ const pkg = {
         let buttonRows = [[]];
         if (pages[name].elm.elm.querySelector(".button-row") !== undefined) {
           buttonRows = Array.from(
-            pages[name].elm.elm.querySelectorAll(".button-row")
+            pages[name].elm.elm.querySelectorAll(".button-row"),
           ).map((m) => {
             return m.children;
           });
@@ -754,7 +760,7 @@ const pkg = {
         Ui.update(Root.Pid, [
           ...buttonRows,
           Array.from(barLeft.elm.children).concat(
-            Array.from(barRight.elm.children)
+            Array.from(barRight.elm.children),
           ),
         ]);
         if (window.p !== 4) Ui.focus.focusCurrent(Root.Pid);
@@ -768,7 +774,7 @@ const pkg = {
     Ui.init(
       Root.Pid,
       "horizontal",
-      [[], []]
+      [[], []],
       // function (e) {
       //   if (e === "menu" || e === "back") {
       //     pkg.end();

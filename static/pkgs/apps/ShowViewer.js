@@ -152,17 +152,6 @@ const pkg = {
         opensWith: "apps:AudioPlayer",
         icon: "fileAudio",
       },
-      shrt: {
-        type: "text",
-        label: "Desktop shortcut",
-        opensWith: "apps:Notepad",
-      },
-      theme: {
-        type: "text",
-        label: "Theme",
-        opensWith: "apps:Notepad",
-        icon: "brush",
-      },
     };
 
     let UiElems = [];
@@ -191,14 +180,11 @@ const pkg = {
           detail: {
             background: `inherit`,
           },
-        })
+        }),
       );
       setTimeout(() => {
         cover.cleanup();
       }, 500);
-      if (launchArgs.callback) {
-        launchArgs.callback(responseData);
-      }
       pkg.end();
     }
 
@@ -235,7 +221,7 @@ const pkg = {
       .text(
         launchArgs.showDesc
           ? launchArgs.showDesc
-          : "This show doesn't have an overview."
+          : "This show doesn't have an overview.",
       )
       .appendTo(wrapper);
 
@@ -248,12 +234,12 @@ const pkg = {
             detail: {
               background: `url(${launchArgs.showCover})`,
             },
-          })
+          }),
         );
       } else {
         Root.Libs.Notify.show(
           "Cover hidden",
-          `This show contains NSFW content`
+          `This show contains NSFW content`,
         );
         cover.styleJs({ opacity: "0", transform: "scale(1.5)" });
       }
@@ -301,7 +287,7 @@ const pkg = {
           let thumbnailURL = new URL("http://localhost:9864/thumbnail");
           thumbnailURL.searchParams.set(
             "path",
-            launchArgs.showFolder + item.name
+            launchArgs.showFolder + item.name,
           );
           let showPreview = new Html("img")
             .styleJs({
@@ -349,7 +335,7 @@ const pkg = {
                     } EP${episodes[item.name]}`,
                   },
                 ],
-                true
+                true,
               );
             });
           UiElems.push(row.elm.children);
@@ -368,7 +354,7 @@ const pkg = {
       .on("click", () => {
         sortCreated = sortCreated ? false : true;
         sortButton.text(
-          `Sort by ${sortCreated ? "file creation" : "file modified"}`
+          `Sort by ${sortCreated ? "file creation" : "file modified"}`,
         );
         renderEpisodes(sortCreated);
       })

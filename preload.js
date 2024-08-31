@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require("electron");
-contextBridge.exposeInMainWorld("cherrywoo", {
+contextBridge.exposeInMainWorld("desktopIntegration", {
   ipc: {
     send: (channel, data) => {
       ipcRenderer.send(channel, data);
