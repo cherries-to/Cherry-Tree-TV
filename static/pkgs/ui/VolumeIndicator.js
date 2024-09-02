@@ -93,7 +93,7 @@ const pkg = {
       document.dispatchEvent(
         new CustomEvent("CherryTree.Ui.VolumeChange", {
           detail: volume,
-        })
+        }),
       );
 
       clearInterval(sInterval);
@@ -105,6 +105,18 @@ const pkg = {
       }, 3000);
     }
     console.log("volume is ready", volumeIndicator);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "PageUp") {
+        e.preventDefault();
+        volume += 5;
+        showVolume();
+      } else if (e.key === "PageDown") {
+        e.preventDefault();
+        volume -= 5;
+        showVolume();
+      }
+    });
 
     document.addEventListener("CherryTree.Input.VolumeChange", (data) => {
       if (data) {

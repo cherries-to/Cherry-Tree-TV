@@ -14,9 +14,10 @@ const pkg = {
 
       wrapper = new Html("div").class("ui", "pad-top", "gap").appendTo("body");
 
-      window.desktopIntegration.ipc.send("setRPC", {
-        details: "Managing files",
-      });
+      window.desktopIntegration !== undefined &&
+        window.desktopIntegration.ipc.send("setRPC", {
+          details: "Managing files",
+        });
 
       Ui.transition("popIn", wrapper);
 
@@ -205,12 +206,17 @@ const pkg = {
         let re = /(?:\.([^.]+))?$/;
         let ext = re.exec(fileName)[1];
         let mapping = mappings[ext];
+        if (mapping === undefined) {
+          return alert(
+            `This file cannot be opened because there is no app associated with its file type (${ext}).`,
+          );
+        }
         if (mapping.type == "video") {
           Ui.transition("popOut", wrapper, 500, true);
           await Root.Libs.startPkg(
             mapping.opensWith,
             [{ app: "video", videoPath: path }],
-            true
+            true,
           );
         }
       }
@@ -228,10 +234,10 @@ const pkg = {
           return;
         }
         let trimmed = curPath.slice(0, -1);
+        Sfx.playSfx("deck_ui_out_of_game_detail.wav");
         if (trimmed.split("/").length == 1) {
           console.log("rendering drives");
           Ui.transition("popOut", wrapper, 500, true);
-          Sfx.playSfx("deck_ui_into_game_detail.wav");
           renderDrives();
         } else {
           let index = trimmed.lastIndexOf("/");
@@ -293,6 +299,7 @@ const pkg = {
               if (item.type == "folder") {
                 pathOpen = true;
                 Ui.transition("popOut", wrapper, 500, true);
+                Sfx.playSfx("deck_ui_into_game_detail.wav");
                 renderList(path + item.name + "/");
               } else {
                 openFile(path + item.name);
@@ -344,7 +351,6 @@ const pkg = {
           }
           UiElems.push(row.elm.children);
         });
-        Sfx.playSfx("deck_ui_into_game_detail.wav");
         Ui.transition("popIn", wrapper);
         Ui.init(Pid, "horizontal", UiElems, function (e) {
           if (e === "back") {
@@ -365,7 +371,7 @@ const pkg = {
 
         let tempLabel = new Html("p")
           .text(
-            "Your drives are loading, if you have a lot of drives this may take a moment."
+            "Your drives are loading, if you have a lot of drives this may take a moment.",
           )
           .styleJs({ width: "100%" })
           .appendTo(row);
@@ -379,6 +385,7 @@ const pkg = {
             .appendTo(row)
             .on("click", () => {
               pathOpen = true;
+              Sfx.playSfx("deck_ui_into_game_detail.wav");
               Ui.transition("popOut", wrapper, 500, true);
               renderList(drive + "/");
             });

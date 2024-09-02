@@ -88,7 +88,7 @@ import "./libs/gamecontroller.js";
       startFromUrl: async function (
         url,
         Arguments,
-        RunWithoutSecurity = false
+        RunWithoutSecurity = false,
       ) {
         const pkg = await import(url);
         const pkgData = pkg.default;
@@ -115,7 +115,7 @@ import "./libs/gamecontroller.js";
           if (pkgData.privs === 1) {
             if (
               confirm(
-                `The app ${pkgData.name} wants to start with privileges. Confirm or deny?`
+                `The app ${pkgData.name} wants to start with privileges. Confirm or deny?`,
               ) === true
             ) {
               privs = true;
@@ -153,6 +153,12 @@ import "./libs/gamecontroller.js";
 
             // If the process doesn't want to end it can return false
             if (result !== false) Core.process.cleanup(pid);
+
+            document.dispatchEvent(
+              new CustomEvent("CherryTree.Core.ProcessExit", {
+                detail: { url, name: pkgData.name, pid },
+              }),
+            );
           },
         };
 
@@ -175,6 +181,12 @@ import "./libs/gamecontroller.js";
 
         pkg.default.start(Root);
 
+        document.dispatchEvent(
+          new CustomEvent("CherryTree.Core.ProcessStart", {
+            detail: { url, name: pkgData.name, pid },
+          }),
+        );
+
         return Processes.list[pid];
       },
 
@@ -186,7 +198,7 @@ import "./libs/gamecontroller.js";
         return await this.startFromUrl(
           `/pkgs/${cat}/${nam}.js`,
           args,
-          rwp !== true ? securedCats.includes(cat) : true
+          rwp !== true ? securedCats.includes(cat) : true,
         );
       },
     },
