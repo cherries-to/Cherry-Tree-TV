@@ -128,7 +128,7 @@ const pkg = {
 </div>`,
         )
         .appendTo(wrapper);
-      captionsElm.qs("span").style({ display: "none" });
+      captionsElm.style({ display: "none" });
 
       if (Hls.isSupported()) {
         let hls = new Hls();
@@ -775,6 +775,7 @@ const pkg = {
                   hlsPlayer.subtitleTrackController.media.textTracks[0]
                     .activeCues[0] !== undefined
                 ) {
+                  captionsElm.style({ display: "block" });
                   captionsElm
                     .qs("span")
                     .style({ display: "block" })
