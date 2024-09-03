@@ -29,160 +29,7 @@ const pkg = {
 
     console.log(Sfx);
 
-    let mappings = {
-      txt: {
-        type: "text",
-        label: "Text document",
-        opensWith: "apps:Notepad",
-        icon: "file",
-      },
-      panic: {
-        type: "text",
-        label: "Panic Log",
-        opensWith: "apps:Notepad",
-        icon: "filePanic",
-      },
-      md: {
-        type: "text",
-        label: "Markdown document",
-        opensWith: "apps:Notepad",
-        icon: "fileMd",
-      },
-      app: {
-        type: "executable",
-        label: "Executable Application",
-        opensWith: "evaluate",
-        ctxMenuApp: {
-          launch: "apps:DevEnv",
-          name: "systemApp_DevEnv",
-        },
-        icon: "box",
-      },
-      pml: {
-        type: "executable",
-        label: "PML Application",
-        opensWith: "apps:PML",
-        ctxMenuApp: {
-          launch: "apps:DevEnv",
-          name: "systemApp_DevEnv",
-        },
-        icon: "box",
-      },
-      json: {
-        type: "code",
-        label: "JSON file",
-        opensWith: "apps:DevEnv",
-        icon: "fileJson",
-      },
-      js: {
-        type: "code",
-        label: "JavaScript file",
-        opensWith: "apps:DevEnv",
-        icon: "fileJson",
-      },
-      png: {
-        type: "image",
-        label: "PNG image",
-        opensWith: "apps:ImageViewer",
-        icon: "fileImage",
-      },
-      jpg: {
-        type: "image",
-        label: "JPG image",
-        opensWith: "apps:ImageViewer",
-        icon: "fileImage",
-      },
-      jpeg: {
-        type: "image",
-        label: "JPG image",
-        opensWith: "apps:ImageViewer",
-        icon: "fileImage",
-      },
-      gif: {
-        type: "image",
-        label: "GIF image",
-        opensWith: "apps:ImageViewer",
-        icon: "fileImage",
-      },
-      mp4: {
-        type: "video",
-        label: "MP4 video",
-        opensWith: "apps:VideoPlayer",
-        icon: "fileVideo",
-      },
-      mov: {
-        type: "video",
-        label: "MOV video",
-        opensWith: "apps:VideoPlayer",
-        icon: "fileVideo",
-      },
-      mkv: {
-        type: "video",
-        label: "MKV video",
-        opensWith: "apps:VideoPlayer",
-        icon: "fileVideo",
-      },
-      avi: {
-        type: "video",
-        label: "AVI video",
-        opensWith: "apps:VideoPlayer",
-        icon: "fileVideo",
-      },
-      webm: {
-        type: "video",
-        label: "WebM video",
-        opensWith: "apps:VideoPlayer",
-        icon: "fileVideo",
-      },
-      wav: {
-        type: "audio",
-        label: "WAV audio",
-        opensWith: "apps:AudioPlayer",
-        icon: "fileAudio",
-      },
-      m4a: {
-        type: "audio",
-        label: "MPEG audio",
-        opensWith: "apps:AudioPlayer",
-        icon: "fileAudio",
-      },
-      mp3: {
-        type: "audio",
-        label: "MP3 audio",
-        opensWith: "apps:AudioPlayer",
-        icon: "fileAudio",
-      },
-      shrt: {
-        type: "text",
-        label: "Desktop shortcut",
-        opensWith: "apps:Notepad",
-      },
-      theme: {
-        type: "text",
-        label: "Theme",
-        opensWith: "apps:Notepad",
-        icon: "brush",
-      },
-    };
-
     let UiElems = [];
-
-    async function GetFolder(path) {
-      const url = `http://localhost:9864/list`;
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ dir: path }),
-      };
-      return new Promise((resolve, reject) => {
-        fetch(url, options)
-          .then((res) => res.json())
-          .then((json) => resolve(json))
-          .catch((err) => reject("error:" + err));
-      });
-    }
 
     async function closeSequence() {
       cover.styleJs({ opacity: "0", transform: "scale(1.5)" });
@@ -191,7 +38,7 @@ const pkg = {
           detail: {
             background: `inherit`,
           },
-        })
+        }),
       );
       setTimeout(() => {
         cover.cleanup();
@@ -232,7 +79,7 @@ const pkg = {
       .text(
         launchArgs.movieDesc
           ? launchArgs.movieDesc
-          : "This movie doesn't have an overview."
+          : "This movie doesn't have an overview.",
       )
       .appendTo(wrapper);
 
@@ -245,12 +92,12 @@ const pkg = {
             detail: {
               background: `url(${launchArgs.movieCover})`,
             },
-          })
+          }),
         );
       } else {
         Root.Libs.Notify.show(
           "Cover hidden",
-          `This movie contains NSFW content`
+          `This movie contains NSFW content`,
         );
         cover.styleJs({ opacity: "0", transform: "scale(1.5)" });
       }
@@ -270,7 +117,7 @@ const pkg = {
               displayName: launchArgs.movieName,
             },
           ],
-          true
+          true,
         );
       });
     new Html("button")

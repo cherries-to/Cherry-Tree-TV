@@ -6,7 +6,7 @@ import Notify from "./notify.js";
 export default {
   togglePhoneLink: async (pid, wrapper) => {
     let remoteLinkState = await window.localforage.getItem(
-      "settings__phoneLink"
+      "settings__phoneLink",
     );
 
     const result = await Modal.Show({
@@ -32,12 +32,12 @@ export default {
     if (result.id === 0) {
       // enable
       document.dispatchEvent(
-        new CustomEvent("CherryTree.Input.EnableTvRemote")
+        new CustomEvent("CherryTree.Input.EnableTvRemote"),
       );
     } else if (result.id === 1) {
       // disable
       document.dispatchEvent(
-        new CustomEvent("CherryTree.Input.DisableTvRemote")
+        new CustomEvent("CherryTree.Input.DisableTvRemote"),
       );
     }
   },
@@ -96,7 +96,7 @@ export default {
     document.documentElement.style.fontSize = values[result.id].scale;
     await window.localforage.setItem(
       "settings__uiScale",
-      values[result.id].scale
+      values[result.id].scale,
     );
   },
   background: async (pid, wrapper, Background) => {
@@ -125,7 +125,7 @@ export default {
       case 0:
         value = "none";
         break;
-        case 1:
+      case 1:
         value = "stars";
         break;
     }
@@ -134,7 +134,7 @@ export default {
 
     await window.localforage.setItem(
       "settings__backgroundType",
-      value === true ? "stars" : "none"
+      value === true ? "stars" : "none",
     );
   },
   changeVolume: async (pid, wrapper, Sfx) => {
@@ -159,17 +159,17 @@ export default {
         new Html("div").class("flex-row").appendMany(
           new Html("button").text("1").on("click", (e) => handleInput(e)),
           new Html("button").text("2").on("click", (e) => handleInput(e)),
-          new Html("button").text("3").on("click", (e) => handleInput(e))
+          new Html("button").text("3").on("click", (e) => handleInput(e)),
         ),
         new Html("div").class("flex-row").appendMany(
           new Html("button").text("4").on("click", (e) => handleInput(e)),
           new Html("button").text("5").on("click", (e) => handleInput(e)),
-          new Html("button").text("6").on("click", (e) => handleInput(e))
+          new Html("button").text("6").on("click", (e) => handleInput(e)),
         ),
         new Html("div").class("flex-row").appendMany(
           new Html("button").text("7").on("click", (e) => handleInput(e)),
           new Html("button").text("8").on("click", (e) => handleInput(e)),
-          new Html("button").text("9").on("click", (e) => handleInput(e))
+          new Html("button").text("9").on("click", (e) => handleInput(e)),
         ),
         new Html("div").class("flex-row").appendMany(
           new Html("button")
@@ -179,8 +179,8 @@ export default {
               (e) =>
                 (inputBox.elm.textContent = inputBox.elm.textContent.substring(
                   0,
-                  inputBox.elm.textContent.length - 1
-                ))
+                  inputBox.elm.textContent.length - 1,
+                )),
             ),
           new Html("button").text("0").on("click", (e) => handleInput(e)),
           new Html("button").text("Confirm").on("click", (e) =>
@@ -188,9 +188,9 @@ export default {
               canceled: false,
               text: inputBox.elm.textContent,
               id: -1,
-            })
-          )
-        )
+            }),
+          ),
+        ),
       );
 
     const result = await Modal.Show({
@@ -214,7 +214,7 @@ export default {
     Sfx.setVolume(parseInt(inputBox.elm.textContent) / 100);
     await window.localforage.setItem(
       "settings__soundVolume",
-      inputBox.elm.textContent
+      inputBox.elm.textContent,
     );
   },
   sfx: async (pid, wrapper, Sfx) => {
@@ -276,6 +276,10 @@ export default {
             type: "primary",
             text: "PS Sounds (PS5)",
           },
+          {
+            type: "primary",
+            text: "Cherry Tree TV",
+          },
         ],
       });
 
@@ -298,7 +302,7 @@ export default {
           sfxPack = "/assets/audio/sfx_ps.zip";
           break;
         case 5:
-          sfxPack = "/assets/audio/sfx_mp8.zip";
+          sfxPack = "/assets/audio/sfx_new.zip";
           break;
       }
 
@@ -313,7 +317,7 @@ export default {
         pid,
         function (a) {
           A = a;
-        }
+        },
       );
 
       await Sfx.init(sfxPack);
@@ -327,10 +331,7 @@ export default {
     let bgmSong = await window.localforage.getItem("settings__bgmSong");
 
     async function promptDone() {
-      Notify.show(
-        "Actions Applied",
-        `Your actions have been applied.`
-      );
+      Notify.show("Actions Applied", `Your actions have been applied.`);
     }
 
     const menuResult = await Modal.Show({
@@ -352,17 +353,17 @@ export default {
 
     if (menuResult.canceled === true) return;
     if (menuResult.id === 0) {
-        if (playBgm === null) playBgm = true;
+      if (playBgm === null) playBgm = true;
 
-        const value = playBgm === false ? true : false;
-        await window.localforage.setItem("settings__playBgm", value);
+      const value = playBgm === false ? true : false;
+      await window.localforage.setItem("settings__playBgm", value);
 
-        const audio = Sfx.getAudio();
-        if (value === true) {
-          audio.play();
-        } else {
-          audio.pause();
-        }
+      const audio = Sfx.getAudio();
+      if (value === true) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
 
       await promptDone();
     } else if (menuResult.id === 1) {
@@ -433,7 +434,7 @@ export default {
         pid,
         function (a) {
           A = a;
-        }
+        },
       );
 
       await Sfx.changeBgm(bgmSong);

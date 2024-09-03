@@ -19,9 +19,10 @@ const pkg = {
 
     wrapper = new Html("div").class("full-ui").appendTo("body");
 
-    window.desktopIntegration.ipc.send("setRPC", {
-      details: "Configuring settings",
-    });
+    window.desktopIntegration !== undefined &&
+      window.desktopIntegration.ipc.send("setRPC", {
+        details: "Configuring settings",
+      });
 
     Ui.transition("popIn", wrapper);
 

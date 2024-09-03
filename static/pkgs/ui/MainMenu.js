@@ -16,9 +16,10 @@ const pkg = {
     // Get the window body
     wrapper = new Html("div").class("ui", "main-menu").appendTo("body");
 
-    window.desktopIntegration.ipc.send("setRPC", {
-      details: "Chillin' in the main menu",
-    });
+    window.desktopIntegration !== undefined &&
+      window.desktopIntegration.ipc.send("setRPC", {
+        details: "Chillin' in the main menu",
+      });
 
     const Sfx = Root.Processes.getService("SfxLib").data;
     const User = Root.Processes.getService("UserSvc").data;
@@ -55,6 +56,28 @@ const pkg = {
       logStep("No WebSocket detected");
     }
 
+    let friendsPlaying = new Map();
+
+    document.addEventListener("CherryTree.Core.ProcessStart", () => {
+      let currentUi = Ui.getTopUi();
+      // console.log("UI Info", currentUi, Root.Processes.get(currentUi));
+      try {
+        ws.sendMessage({
+          type: "now-playing",
+          message: Root.Processes.get(currentUi).name,
+        });
+      } catch (e) {}
+    });
+    document.addEventListener("CherryTree.Core.ProcessExit", () => {
+      let currentUi = Ui.getTopUi();
+      // console.log("UI Info", currentUi, Root.Processes.get(currentUi));
+      try {
+        ws.sendMessage({
+          type: "now-playing",
+          message: Root.Processes.get(currentUi).name,
+        });
+      } catch (e) {}
+    });
     document.addEventListener("CherryTree.WebSocket.Message", (e) => {
       let s = e.detail;
       console.log("WS message on MainMenu", s);
@@ -96,6 +119,9 @@ const pkg = {
             }
           },
         );
+      } else if (s.type === "now-playing") {
+        if (s.data.who === info.id) return;
+        friendsPlaying.set(s.data.who, s.data.app);
       }
     });
 
@@ -106,22 +132,18 @@ const pkg = {
     async function giveUpToApp(launchPkg, launchArgs = undefined) {
       Sfx.playSfx("deck_ui_into_game_detail.wav");
 
-      let split = launchPkg.split(":");
-      let url = `/pkgs/${split[0]}/${split[1]}.js`;
-      let data = await import(url);
+      // let split = launchPkg.split(":");
+      // let url = `/pkgs/${split[0]}/${split[1]}.js`;
+      // let data = await import(url);
 
-      if (data.default) {
-        try {
-          ws.sendMessage({ type: "now-playing", message: data.default.name });
-        } catch (e) {}
-      }
+      // if (data.default) {
+      //   try {
+      //     ws.sendMessage({ type: "now-playing", message: data.default.name });
+      //   } catch (e) {}
+      // }
 
       // Ui.cleanup(Pid);
       Ui.transition("popOut", wrapper, 500, true);
-      // await Ui.giveUpUi(Root.Pid);
-      // await Ui.giveUpUi(Root.Pid);
-      // // await Ui.transition("popOut", wrapper, 500, true);
-      // wrapper.classOn("popOut");
       await Root.Libs.startPkg(launchPkg, launchArgs);
     }
 
@@ -346,13 +368,16 @@ const pkg = {
       console.log(uFriendList, friendsList);
 
       const updatedFriends = mergedFriends.sort((friendA, friendB) => {
-        // Sort name (a-z) for each case
-        const nameA = friendA.data?.name || "";
-        const nameB = friendB.data?.name || "";
-        return nameA.localeCompare(nameB);
+        // Sort by status (0/1) first, then by name (a-z) for each case
+        let statusComparison = friendB.status - friendA.status;
+        if (statusComparison !== 0) {
+          return statusComparison;
+        } else {
+          const nameA = friendA.data?.name || "";
+          const nameB = friendB.data?.name || "";
+          return nameA.localeCompare(nameB);
+        }
       });
-
-      // friendsCount.text(mergedFriends.filter((u) => u.status === 1).length);
 
       console.log(updatedFriends);
 
@@ -361,23 +386,7 @@ const pkg = {
           ...updatedFriends.map((f) => {
             let label, button;
 
-            // console.log("Friend", f);
-
             button = renderUserButton(f);
-            // console.log(f);
-
-            // if (f.lastOnline) {
-            //   label = new Html("label").text(
-            //     `last online ${timeDifference(
-            //       new Date(),
-            //       new Date(f.lastOnline)
-            //     )}`
-            //   );
-            // }
-            // if (f.type) {
-            // if (f.type === "incoming" || f.type === "outgoing") {
-            //   label = new Html("label").text(f.type);
-            // } else {
 
             label = new Html("label").text(
               `last online ${timeDifference(
@@ -387,7 +396,13 @@ const pkg = {
             );
 
             if (f.status === 1) {
-              label.classOn("positive-text").text("online");
+              label
+                .classOn("positive-text")
+                .text(
+                  friendsPlaying.has(f.id)
+                    ? friendsPlaying.get(f.id)
+                    : "online",
+                );
             }
 
             label.appendTo(button);

@@ -60,7 +60,8 @@ const Modal = {
       }
 
       if (typeof data.description !== "string") {
-        throw new Error("Description must be a string");
+        data.description = JSON.stringify(data.description);
+        // throw new Error("Description must be a string");
       }
 
       if (data.type !== "custom" && !Array.isArray(data.buttons)) {

@@ -13,9 +13,10 @@ const pkg = {
     console.log("Hi! From Oobe");
     console.log(vfs);
 
-    window.desktopIntegration.ipc.send("setRPC", {
-      details: "In the first-time setup",
-    });
+    window.desktopIntegration !== undefined &&
+      window.desktopIntegration.ipc.send("setRPC", {
+        details: "In the first-time setup",
+      });
 
     if (Root.Arguments && Root.Arguments.length > 0) cb = Root.Arguments[0];
 
