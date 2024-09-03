@@ -362,54 +362,61 @@ const pkg = {
 
     if (result.canceled === true) return;
 
-    let thumbnailWrapper = new Html("button");
+    try {
+      let ytQuery = await fetch(
+        `https://olive.nxw.pw:8080/search?term=${encodeURIComponent(result)}`
+      ).then(t => t.json());
 
-    let ytQuery = await fetch(
-      `https://olive.nxw.pw:8080/search?term=${result}`,
-    ).then((t) => {
-      Ui.transition("popIn", thumbnailWrapper);
-      t.json();
-    });
-    ytQuery.items.forEach((i) => {
-      console.log(i);
-      thumbnailWrapper.styleJs({
-        background: "transparent",
-        scrollSnapAlign: "center",
-        objectFit: "contain",
-        minWidth: "22rem",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      });
-      let img = new Html("img")
-        .appendTo(thumbnailWrapper)
-        .attr({ src: `https://i.ytimg.com/vi/${i.id}/maxresdefault.jpg` })
-        .styleJs({
-          aspectRatio: "16 / 9",
-          minWidth: "20rem",
-          height: "11.25rem",
-          borderRadius: "10px",
+      ytQuery.items.forEach((i) => {
+        console.log(i);
+        let thumbnailWrapper = new Html("button");
+        thumbnailWrapper.styleJs({
+          background: "transparent",
+          scrollSnapAlign: "center",
+          objectFit: "contain",
+          minWidth: "22rem",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         });
-      let title = new Html("p").text(i.title).styleJs({
-        width: "100%",
-        textAlign: "left",
-        padding: "10px",
+        let img = new Html("img")
+          .appendTo(thumbnailWrapper)
+          .attr({ src: `https://i.ytimg.com/vi/${i.id}/maxresdefault.jpg` })
+          .styleJs({
+            aspectRatio: "16 / 9",
+            minWidth: "20rem",
+            height: "11.25rem",
+            borderRadius: "10px",
+          });
+        let title = new Html("p").text(i.title).styleJs({
+          width: "100%",
+          textAlign: "left",
+          padding: "10px",
+        });
+        title.appendTo(thumbnailWrapper);
+        thumbnailWrapper.on("click", async () => {
+          this.play(i.id);
+        });
+        thumbnailWrapper.appendTo(this.searchRow);
       });
-      title.appendTo(thumbnailWrapper);
-      thumbnailWrapper.on("click", async () => {
-        this.play(i.id);
-      });
-      thumbnailWrapper.appendTo(this.searchRow);
+
+      Ui.transition("popIn", this.searchRow);
+
       this.updateUi(
         [this.actionRow.elm.children, this.searchRow.elm.children],
         (e) => {
           if (e === "back") {
             this.home();
           }
-        },
+        }
       );
-    });
+
+    } catch (error) {
+      console.error("Error fetching YouTube search results:", error);
+      // Optionally, show an error message to the user
+      this.Root.Libs.Notify.show("Error:", "Search failed.");
+    }
   },
 
   cast: async function () {
@@ -431,6 +438,7 @@ const pkg = {
         "This TV is now discoverable",
         `This TV is being discovered as "${tvName}"`,
       );
+      // i was testing notifications: this.Root.Libs.Notify.show("Fun fact!", "Did you know my life is a lie?");
     });
 
     this.socket.on("clientConnected", (sender) => {
