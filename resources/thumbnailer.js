@@ -3,8 +3,8 @@ const mime = require("mime-types");
 const path = require("path");
 const fs = require("fs");
 
-ffmpeg.setFfmpegPath("bin/ffmpeg.exe");
-ffmpeg.setFfprobePath("bin/ffprobe.exe");
+ffmpeg.setFfmpegPath("resources/bin/ffmpeg.exe");
+ffmpeg.setFfprobePath("resources/bin/ffprobe.exe");
 
 const { workerData, parentPort } = require("worker_threads");
 
@@ -75,6 +75,6 @@ fs.stat(fPath, (err, stats) => {
         count: 1,
         timemarks: ["50%"], // number of seconds
       },
-      `thumbnails/${fName}`
+      `thumbnails/${fName}`,
     );
 });

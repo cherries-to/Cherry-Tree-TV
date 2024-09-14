@@ -1,3 +1,5 @@
+if (require("electron-squirrel-startup")) app.quit();
+
 const YouTubeCastReceiver = require("yt-cast-receiver");
 const { app, BrowserWindow, ipcMain } = require("electron");
 const { Client } = require("@xhayper/discord-rpc");
@@ -31,7 +33,7 @@ s.connect(80, "8.8.8.8", () => {
   s.close();
 });
 
-server.use(express.static("static"));
+server.use(express.static("resources/static"));
 server.use(express.json());
 server.use(cors());
 
@@ -271,7 +273,7 @@ app.whenReady().then(() => {
   });
   server.get("/thumbnail", (req, res) => {
     const fPath = req.query.path;
-    const worker = new Worker("./thumbnailer.js", {
+    const worker = new Worker("./resources/thumbnailer.js", {
       workerData: { vidPath: fPath },
     });
     worker.on("message", (data) => {
