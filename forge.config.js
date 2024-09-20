@@ -1,37 +1,35 @@
 const { FusesPlugin } = require("@electron-forge/plugin-fuses");
 const { FuseV1Options, FuseVersion } = require("@electron/fuses");
-const path = require("path");
-const fs = require("fs");
 
 module.exports = {
   packagerConfig: {
     asar: true,
     name: "Cherry Tree",
-    icon: "icon.png",
-    extraResource: [
-      "resources/static",
-      "resources/bin",
-      "resources/thumbnailer.js",
-    ],
+    icon: "icon",
+    extraResource: ["resources/static", "resources/bin", "resources/icon.png"],
   },
   rebuildConfig: {},
   makers: [
     {
       name: "@electron-forge/maker-squirrel",
-      config: {},
+      config: {
+        authors: "Cherries.to & Tranch Software",
+        description: "Easily your PC into a home theatre.",
+        loadingGif: "installer.gif",
+      },
     },
-    {
-      name: "@electron-forge/maker-zip",
-      platforms: ["darwin"],
-    },
-    {
-      name: "@electron-forge/maker-deb",
-      config: {},
-    },
-    {
-      name: "@electron-forge/maker-rpm",
-      config: {},
-    },
+    // {
+    //   name: "@electron-forge/maker-zip",
+    //   platforms: ["darwin"],
+    // },
+    // {
+    //   name: "@electron-forge/maker-deb",
+    //   config: {},
+    // },
+    // {
+    //   name: "@electron-forge/maker-rpm",
+    //   config: {},
+    // },
   ],
   plugins: [
     {

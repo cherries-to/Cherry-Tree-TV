@@ -1,5 +1,3 @@
-if (require("electron-squirrel-startup")) app.quit();
-
 const YouTubeCastReceiver = require("yt-cast-receiver");
 const { app, BrowserWindow, ipcMain } = require("electron");
 const { Client } = require("@xhayper/discord-rpc");
@@ -7,6 +5,7 @@ const nodeDiskInfo = require("node-disk-info");
 const { Player } = require("yt-cast-receiver");
 const { Worker } = require("worker_threads");
 const { Server } = require("socket.io");
+const ffmpeg = require("fluent-ffmpeg");
 const express = require("express");
 const mime = require("mime-types");
 const qrcode = require("qrcode");
@@ -16,14 +15,14 @@ const cors = require("cors");
 const http = require("http");
 const fs = require("fs");
 
+if (require("electron-squirrel-startup")) {
+  app.quit();
+}
+
 const port = 9864;
 const server = express();
 const serverHttp = http.createServer(server);
 const io = new Server(serverHttp);
-
-if (!fs.existsSync("thumbnails/")) {
-  fs.mkdirSync("thumbnails");
-}
 
 let local_ip = null;
 const s = dgram.createSocket("udp4");
@@ -44,10 +43,10 @@ const createWindow = () => {
     icon: "icon.png",
     autoHideMenuBar: true,
     webPreferences: {
+      webSecurity: false,
       preload: path.join(__dirname, "preload.js"),
     },
   });
-
   win.loadURL(`http://127.0.0.1:${port}/index.html`);
 
   win.webContents.on("devtools-opened", () => {
@@ -211,6 +210,12 @@ client.on("disconnected", () => {
 });
 
 app.whenReady().then(() => {
+  ffmpeg.setFfmpegPath("resources/bin/ffmpeg.exe");
+  ffmpeg.setFfprobePath("resources/bin/ffprobe.exe");
+
+  if (!fs.existsSync("resources/thumbnails/")) {
+    fs.mkdirSync("resources/thumbnails/");
+  }
   client.login();
   io.on("connection", async (socket) => {
     console.log("connection attempt");
@@ -273,19 +278,74 @@ app.whenReady().then(() => {
   });
   server.get("/thumbnail", (req, res) => {
     const fPath = req.query.path;
-    const worker = new Worker("./resources/thumbnailer.js", {
-      workerData: { vidPath: fPath },
-    });
-    worker.on("message", (data) => {
-      console.log(data);
-      if (data.success) {
-        res.sendFile(data.path, { root: __dirname });
-      } else {
-        res.status(500).send({ error: true, error_msg: data.error_msg });
+    const fName = path.basename(fPath);
+    if (!fPath) {
+      res.status(500).send({
+        error: true,
+        error_msg: "Please provide file path.",
+      });
+      return;
+    }
+    fs.stat(fPath, (err, stats) => {
+      if (err) {
+        res.status(500).send({
+          error: true,
+          error_msg: "Error accessing file!",
+        });
+        return;
       }
-    });
-    worker.on("error", (msg) => {
-      res.status(500).send({ error: true, error_msg: msg });
+
+      if (stats.isDirectory()) {
+        res.status(500).send({
+          error: true,
+          error_msg: "This is a directory.",
+        });
+        return;
+      }
+
+      const mimeType = mime.lookup(fPath);
+      if (!mimeType) {
+        res.status(500).send({ error: true, error_msg: "Unknown mime type" });
+        return;
+      }
+
+      if (!mimeType.includes("video")) {
+        res.status(500).send({
+          error: true,
+          error_msg: "File must be a video",
+        });
+        return;
+      }
+
+      if (fs.existsSync(`thumbnails/${fName}/tn.png`)) {
+        res.sendFile(`thumbnails/${fName}/tn.png`, {
+          root: __dirname,
+        });
+        return;
+      }
+
+      new ffmpeg(fPath)
+        .on("end", () => {
+          res.sendFile(`thumbnails/${fName}/tn.png`, {
+            root: __dirname,
+          });
+          return;
+        })
+        .on("error", function (err, stdout, stderr) {
+          console.log("Cannot process video: " + err.message);
+          res.status(500).send({
+            error: true,
+            error_msg: err.message,
+          });
+          return;
+        })
+        .takeScreenshots(
+          {
+            count: 1,
+            timemarks: ["50%"], // number of seconds
+          },
+          `thumbnails/${fName}`,
+        );
     });
   });
   server.get("/drives", (req, res) => {

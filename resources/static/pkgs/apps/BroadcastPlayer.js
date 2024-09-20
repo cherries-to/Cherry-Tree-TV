@@ -8,6 +8,7 @@ import "../../libs/hls.min.js";
 // console.log(CaptionsRenderer);
 
 let wrapper, Ui, Pid, Sfx, volumeUpdate;
+let hls;
 
 let brightness = localStorage.getItem("videoBrightness")
   ? parseInt(localStorage.getItem("videoBrightness"))
@@ -121,7 +122,7 @@ const pkg = {
       --cue-bottom: 0.03341288782815904%;
     "
   >
-    <div part="cue">
+    <div part="cue" style="justify-content:center; align-items:center;">
       <span></span>
     </div>
   </div>
@@ -131,14 +132,56 @@ const pkg = {
       captionsElm.style({ display: "none" });
 
       if (Hls.isSupported()) {
-        let hls = new Hls();
+        let notifShown = false;
+        hls = new Hls();
         hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+          notifShown = false;
           console.log("video and hls.js are now bound together !");
         });
         hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
           console.log(
             "manifest loaded, found " + data.levels.length + " quality level",
           );
+        });
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                console.log("fatal media error encountered, trying to recover");
+                Root.Libs.Notify.show(
+                  "Media error",
+                  "A media error has occurred, attempting to recover...",
+                );
+                hls.recoverMediaError();
+                break;
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.error("fatal network error encountered", data);
+                if (!notifShown) {
+                  Root.Libs.Notify.show(
+                    "Network error",
+                    `There is a problem with your network or with the station 
+                  that is preventing you from playing this channel.
+                  
+                  Attempting to reconnect...`,
+                  );
+                  notifShown = true;
+                }
+                setTimeout(() => {
+                  hls.loadSource(url);
+                  // hls.attachMedia(videoElm.elm);
+                  videoElm.elm.play();
+                }, 1000);
+                break;
+              default:
+                console.log(data);
+                Root.Libs.Notify.show(
+                  "An unknown error occured",
+                  `An unknown error prevented this channel from being played.`,
+                );
+                hls.destroy();
+                break;
+            }
+          }
         });
         hls.loadSource(url);
         hls.attachMedia(videoElm.elm);
@@ -832,6 +875,7 @@ const pkg = {
   },
 
   end: async function () {
+    hls.destroy();
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
     Ui.giveUpUi(Pid);
