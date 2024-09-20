@@ -31,3 +31,5 @@ An open-source, web-based front-end for your HTPC that can runs as an app using 
 - [ ] Friend chats
 - [ ] Fully functional YouTube app
 - [ ] Audio player
+- [ ] Installable package
+- [ ] Embedded video subtitles
