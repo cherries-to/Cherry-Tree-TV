@@ -175,45 +175,53 @@ const pkg = {
 
       console.log(file);
 
-      data.items.forEach((item) => {
-        let re = /(?:\.([^.]+))?$/;
-        let ext = re.exec(item.name)[1];
+      const extRegex = /(?:\.([^.]+))?$/;
+      const flexListStyle = { width: "100%" };
+      const imageStyle = {
+        aspectRatio: "16 / 9",
+        height: "85%",
+        borderRadius: "5px",
+      };
+      const showCountNameStyle = {
+        display: "flex",
+        flexDirection: "column",
+        gap: "5px",
+        width: "50%",
+      };
+      const buttonStyle = {
+        width: "100%",
+        height: "200px",
+        display: "flex",
+        gap: "15px",
+        alignItems: "center",
+        justifyContent: "center",
+      };
+      const textStyle = { textAlign: "left" };
+
+      for (const item of data.items) {
+        const ext = extRegex.exec(item.name)[1];
         console.log(ext);
         console.log(item);
-        let row = new Html("div")
+
+        const row = new Html("div")
           .class("flex-list")
           .appendTo(wrapper)
-          .styleJs({ width: "100%" });
-        let showPreview = new Html("img")
-          .styleJs({
-            aspectRatio: "16 / 9",
-            height: "85%",
-            borderRadius: "5px",
-          })
-          .attr({
-            "data-src": "/assets/img/broadcast_no_poster.svg",
-            class: "lazyload",
-          });
-        let showCountName = new Html("div").styleJs({
-          display: "flex",
-          flexDirection: "column",
-          gap: "5px",
-          width: "50%",
+          .styleJs(flexListStyle);
+
+        const showPreview = new Html("img").styleJs(imageStyle).attr({
+          "data-src": "/assets/img/broadcast_no_poster.svg",
+          class: "lazyload",
         });
+
+        const showCountName = new Html("div").styleJs(showCountNameStyle);
         new Html("p")
           .text(item.name.replace(/\.[^/.]+$/, ""))
           .appendTo(showCountName)
-          .styleJs({ textAlign: "left" });
+          .styleJs(textStyle);
+
         new Html("button")
           .appendMany(showPreview, showCountName)
-          .styleJs({
-            width: "100%",
-            height: "200px",
-            display: "flex",
-            gap: "15px",
-            alignItems: "center",
-            justifyContent: "center",
-          })
+          .styleJs(buttonStyle)
           .appendTo(row)
           .on("click", async () => {
             console.log(item);
@@ -230,14 +238,12 @@ const pkg = {
               true,
             );
           });
+
         UiElems.push(row.elm.children);
         buttons.push(row);
-        Ui.init(Pid, "horizontal", UiElems, function (e) {
-          if (e === "back") {
-            closeSequence();
-          }
-        });
-      });
+      }
+
+      Ui.update(Pid, UiElems);
     }
     const row = new Html("div").class("flex-list").appendTo(wrapper);
     new Html("button")

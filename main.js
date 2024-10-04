@@ -213,8 +213,11 @@ app.whenReady().then(() => {
   ffmpeg.setFfmpegPath("resources/bin/ffmpeg.exe");
   ffmpeg.setFfprobePath("resources/bin/ffprobe.exe");
 
-  if (!fs.existsSync("resources/thumbnails/")) {
-    fs.mkdirSync("resources/thumbnails/");
+  let userData = app.getPath("userData");
+  console.log("userData", userData);
+
+  if (!fs.existsSync(`${userData}/thumbnails/`)) {
+    fs.mkdirSync(`${userData}/thumbnails/`);
   }
   client.login();
   io.on("connection", async (socket) => {
@@ -317,18 +320,14 @@ app.whenReady().then(() => {
         return;
       }
 
-      if (fs.existsSync(`thumbnails/${fName}/tn.png`)) {
-        res.sendFile(`thumbnails/${fName}/tn.png`, {
-          root: __dirname,
-        });
+      if (fs.existsSync(path.join(userData, `thumbnails/${fName}/tn.png`))) {
+        res.sendFile(path.join(userData, `thumbnails/${fName}/tn.png`));
         return;
       }
 
       new ffmpeg(fPath)
         .on("end", () => {
-          res.sendFile(`thumbnails/${fName}/tn.png`, {
-            root: __dirname,
-          });
+          res.sendFile(path.join(userData, `thumbnails/${fName}/tn.png`));
           return;
         })
         .on("error", function (err, stdout, stderr) {
@@ -344,7 +343,7 @@ app.whenReady().then(() => {
             count: 1,
             timemarks: ["50%"], // number of seconds
           },
-          `thumbnails/${fName}`,
+          path.join(userData, `thumbnails/${fName}/`),
         );
     });
   });
