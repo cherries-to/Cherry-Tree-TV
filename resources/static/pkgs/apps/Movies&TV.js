@@ -184,6 +184,15 @@ const pkg = {
           gap: "10px",
         })
         .on("click", async (e) => {
+          document.dispatchEvent(
+            new CustomEvent("CherryTree.Ui.ChangePreview", {
+              detail: {
+                title: `${movie.movieName}`,
+                description: `Hop on to Movies and TV and rewatch ${movie.movieName}.`,
+                image: movie.movieCover,
+              },
+            }),
+          );
           Ui.transition("popOut", wrapper, 500, true);
           await Root.Libs.startPkg(
             "apps:MovieViewer",
@@ -229,6 +238,15 @@ const pkg = {
           gap: "10px",
         })
         .on("click", async (e) => {
+          document.dispatchEvent(
+            new CustomEvent("CherryTree.Ui.ChangePreview", {
+              detail: {
+                title: `${show.showName}`,
+                description: `Hop on to Movies and TV and continue watching ${show.showName}.`,
+                image: show.showCover,
+              },
+            }),
+          );
           Ui.transition("popOut", wrapper, 500, true);
           await Root.Libs.startPkg(
             "apps:ShowViewer",

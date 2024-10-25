@@ -194,10 +194,73 @@ const pkg = {
 
     // const container = new Html("div").class('main-menu-attached').style({'width':'100%'}).appendTo(wrapper);
 
+    const gamePreview = new Html("div")
+      .styleJs({
+        display: "flex",
+        flexDirection: "column",
+        height: "10rem",
+        width: "100%",
+        padding: "0 9rem 8rem 9rem",
+        background: "#0004",
+      })
+      .appendTo(wrapper)
+      .appendMany(new Html("br").styleJs({ height: "50%" }));
+
+    let gameTitle = new Html("h1").text("Game name").appendTo(gamePreview);
+    let gameDescription = new Html("p")
+      .text("No description provided.")
+      .appendTo(gamePreview);
+
     const gameList = new Html("div")
       .class("flex-row", "game-list")
       .appendTo(wrapper)
       .appendMany();
+
+    let gamesList;
+    let opened;
+
+    let cover = new Html("img")
+      .styleJs({
+        zIndex: -1,
+        filter: "brightness(20%)",
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "100%",
+        opacity: "0",
+        aspectRatio: "16 / 9",
+        objectFit: "cover",
+        transition: "all 0.2s linear",
+      })
+      .appendTo("body");
+
+    function changePreview(id, coverEnabled = true) {
+      let game = gamesList[id];
+      if (!game.preview) {
+        gameTitle.text(game.name);
+        gameDescription.text("No description provided");
+        return;
+      }
+      if (coverEnabled) {
+        if (game.preview.image) {
+          cover.attr({ src: game.preview.image });
+          cover.elm.addEventListener("load", () => {
+            setTimeout(() => {
+              cover.styleJs({ opacity: "1" });
+            }, 100);
+          });
+        } else {
+          cover.styleJs({ opacity: "0" });
+        }
+      }
+      gameTitle.text(game.preview.title ? game.preview.title : game.name);
+      gameDescription.text(
+        game.preview.description
+          ? game.preview.description
+          : "No description provided",
+      );
+    }
 
     async function populateAppList() {
       gameList.clear();
@@ -213,9 +276,9 @@ const pkg = {
         );
       }
 
-      const gamesList = gameListData.list;
+      gamesList = gameListData.list;
 
-      let gamesListHtml = gamesList.map((m) => {
+      let gamesListHtml = gamesList.map((m, index) => {
         return new Html("button")
           .class("game")
           .styleJs({
@@ -253,6 +316,26 @@ const pkg = {
               location.reload();
             }
             if (m.launchPkg) {
+              opened = index;
+              cover.styleJs({ opacity: "0" });
+              console.log("Opened app", opened);
+              console.log(gamesList[opened]);
+              document.addEventListener(
+                "CherryTree.Ui.ChangePreview",
+                async (e) => {
+                  gamesList[opened].preview = e.detail;
+                  changePreview(opened, false);
+                  console.log(gamesList);
+                  let updatedFile = {
+                    last_updated: Date.now(),
+                    list: gamesList,
+                  };
+                  await vfs.writeFile(
+                    "Root/CherryTree/user/apps.json",
+                    JSON.stringify(updatedFile),
+                  );
+                },
+              );
               await giveUpToApp(m.launchPkg, m.launchArgs);
             } else if (m.launchUrl) {
               // Click the URL.
@@ -602,18 +685,21 @@ const pkg = {
       switch (x) {
         case 0:
           // Show games list
+          gamePreview.styleJs({ display: "flex" });
           gameList.classOff("hidden");
           storeList.classOn("hidden");
           moreList.classOn("hidden");
           break;
         case 1:
           // Show friend list
+          gamePreview.styleJs({ display: "none" });
           gameList.classOn("hidden");
           storeList.classOff("hidden");
           moreList.classOn("hidden");
           break;
         case 2:
           // Show friend list
+          gamePreview.styleJs({ display: "none" });
           gameList.classOn("hidden");
           storeList.classOn("hidden");
           moreList.classOff("hidden");
@@ -699,12 +785,20 @@ const pkg = {
         } else {
           lastXPositions[selectedTab] = curX;
         }
+
+        console.log("Selected tab", selectedTab);
+        console.log("Current Y", curY);
+        console.log("Current X", curX);
+        if (selectedTab == 0 && curY == 1) {
+          changePreview(curX);
+        }
       },
     );
 
     await populateAppList();
     Ui.update(Root.Pid, uiArrays);
     Ui.updatePos(Root.Pid, { x: 0, y: 1 });
+    changePreview(0);
   },
   end: async function () {
     // Close the window when the process is exited

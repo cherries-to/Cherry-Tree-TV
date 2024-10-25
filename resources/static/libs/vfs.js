@@ -19,6 +19,11 @@ let templateFsLayout = {
               image:
                 "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS10diI+PHJlY3Qgd2lkdGg9IjIwIiBoZWlnaHQ9IjE1IiB4PSIyIiB5PSI3IiByeD0iMiIgcnk9IjIiLz48cG9seWxpbmUgcG9pbnRzPSIxNyAyIDEyIDcgNyAyIi8+PC9zdmc+",
               launchPkg: "apps:Movies&TV",
+              preview: {
+                title: "Movies & TV",
+                description:
+                  "Watch live TV as well as your favorite movies and TV shows.",
+              },
             },
             {
               id: "audioplayer",
@@ -28,6 +33,10 @@ let templateFsLayout = {
               image:
                 "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-speaker'%3E%3Crect width='16' height='20' x='4' y='2' rx='2'/%3E%3Cpath d='M12 6h.01'/%3E%3Ccircle cx='12' cy='14' r='4'/%3E%3Cpath d='M12 14h.01'/%3E%3C/svg%3E",
               launchPkg: "apps:AudioPlayer",
+              preview: {
+                title: "Audio Player",
+                description: "Listen to audio files.",
+              },
             },
             {
               id: "filemanager",
@@ -37,6 +46,10 @@ let templateFsLayout = {
               image:
                 "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1mb2xkZXIiPjxwYXRoIGQ9Ik0yMCAyMGEyIDIgMCAwIDAgMi0yVjhhMiAyIDAgMCAwLTItMmgtNy45YTIgMiAwIDAgMS0xLjY5LS45TDkuNiAzLjlBMiAyIDAgMCAwIDcuOTMgM0g0YTIgMiAwIDAgMC0yIDJ2MTNhMiAyIDAgMCAwIDIgMloiLz48L3N2Zz4=",
               launchPkg: "apps:FileManager",
+              preview: {
+                title: "File Manager",
+                description: "Manage files on this system.",
+              },
             },
             {
               id: "systemsettings",
@@ -46,6 +59,10 @@ let templateFsLayout = {
               image:
                 "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-settings'%3E%3Cpath d='M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E",
               launchPkg: "apps:Settings",
+              preview: {
+                title: "Settings",
+                description: "Configure your system the way you want.",
+              },
             },
             {
               id: "debug",
@@ -55,6 +72,10 @@ let templateFsLayout = {
               image:
                 "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1oYW1tZXIiPjxwYXRoIGQ9Im0xNSAxMi04LjM3MyA4LjM3M2ExIDEgMCAxIDEtMy0zTDEyIDkiLz48cGF0aCBkPSJtMTggMTUgNC00Ii8+PHBhdGggZD0ibTIxLjUgMTEuNS0xLjkxNC0xLjkxNEEyIDIgMCAwIDEgMTkgOC4xNzJWN2wtMi4yNi0yLjI2YTYgNiAwIDAgMC00LjIwMi0xLjc1Nkw5IDIuOTZsLjkyLjgyQTYuMTggNi4xOCAwIDAgMSAxMiA4LjRWMTBsMiAyaDEuMTcyYTIgMiAwIDAgMSAxLjQxNC41ODZMMTguNSAxNC41Ii8+PC9zdmc+",
               launchPkg: "apps:DebugApp",
+              preview: {
+                title: "Debug",
+                description: "For Cherry Tree developers & tinkerers only.",
+              },
             },
             {
               id: "tabbed",
@@ -73,6 +94,11 @@ let templateFsLayout = {
               image:
                 "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-tv-minimal-play'%3E%3Cpath d='M10 7.75a.75.75 0 0 1 1.142-.638l3.664 2.249a.75.75 0 0 1 0 1.278l-3.664 2.25a.75.75 0 0 1-1.142-.64z'/%3E%3Cpath d='M7 21h10'/%3E%3Crect width='20' height='14' x='2' y='3' rx='2'/%3E%3C/svg%3E",
               launchPkg: "apps:YouTube",
+              preview: {
+                title: "YouTube",
+                description:
+                  "Watch YouTube videos directly or by casting through your phone.",
+              },
             },
           ],
         }),
@@ -212,7 +238,7 @@ const Vfs = {
             return null;
           }
           return { item: m, type: await this.whatIs(path + "/" + m) };
-        })
+        }),
       )
     ).filter((m) => m !== null);
     return result;
@@ -254,7 +280,7 @@ const Vfs = {
               obj1[key] = obj2[key]; // Assign the value if the key doesn't exist in obj1
             } else {
               console.log(
-                `File "${key}" already exists and will not be overwritten.`
+                `File "${key}" already exists and will not be overwritten.`,
               );
             }
           }
