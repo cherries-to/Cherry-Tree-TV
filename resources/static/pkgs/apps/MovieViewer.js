@@ -11,7 +11,36 @@ const pkg = {
 
     Ui = Root.Processes.getService("UiLib").data;
 
-    wrapper = new Html("div").class("ui", "pad-top", "gap").appendTo("body");
+    wrapper = new Html("div")
+      .class("full-ui")
+      .styleJs({
+        display: "flex",
+        flexDirection: "row",
+      })
+      .appendTo("body");
+
+    let coverWrapper = new Html("div")
+      .styleJs({
+        width: "35%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      })
+      .appendTo(wrapper);
+
+    let contentWrapper = new Html("div")
+      .styleJs({
+        width: "62.5%",
+        height: "100%",
+        overflow: "scroll",
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
+        scrollBehavior: "smooth",
+        justifyContent: "center",
+      })
+      .appendTo(wrapper);
 
     Ui.transition("popIn", wrapper);
 
@@ -26,6 +55,19 @@ const pkg = {
     let launchArgs = Root.Arguments !== undefined ? Root.Arguments[0] : {};
     let callback =
       Root.Arguments !== undefined ? Root.Arguments[1].callback : null;
+
+    if (!launchArgs.moviePoster) {
+      wrapper.styleJs({
+        alignItems: "center",
+        justifyContent: "center",
+      });
+      contentWrapper.styleJs({
+        width: "80%",
+      });
+      coverWrapper.styleJs({
+        width: "0",
+      });
+    }
 
     console.log(Sfx);
 
@@ -69,19 +111,19 @@ const pkg = {
     new Html("img")
       .attr({ src: launchArgs.moviePoster })
       .styleJs({
-        width: "15vw",
+        width: "80%",
         borderRadius: "10px",
       })
-      .appendTo(wrapper);
+      .appendTo(coverWrapper);
 
-    new Html("h1").text(launchArgs.movieName).appendTo(wrapper);
+    new Html("h1").text(launchArgs.movieName).appendTo(contentWrapper);
     new Html("p")
       .text(
         launchArgs.movieDesc
           ? launchArgs.movieDesc
           : "This movie doesn't have an overview.",
       )
-      .appendTo(wrapper);
+      .appendTo(contentWrapper);
 
     setTimeout(() => {
       if (!launchArgs.nsfw) {
@@ -102,7 +144,7 @@ const pkg = {
         cover.styleJs({ opacity: "0", transform: "scale(1.5)" });
       }
     }, 100);
-    const row = new Html("div").class("flex-list").appendTo(wrapper);
+    const row = new Html("div").class("flex-list").appendTo(contentWrapper);
     new Html("button")
       .text(`Play movie`)
       .appendTo(row)
@@ -127,7 +169,7 @@ const pkg = {
           parent: wrapper,
           pid: Root.Pid,
           title: "Are you sure you want to remove this movie?",
-          description: "This movie will be removed in your library.",
+          description: "This movie will be removed from your library.",
           buttons: [
             {
               type: "primary",
