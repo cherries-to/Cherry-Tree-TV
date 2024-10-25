@@ -11,7 +11,35 @@ const pkg = {
 
     Ui = Root.Processes.getService("UiLib").data;
 
-    wrapper = new Html("div").class("ui", "pad-top", "gap").appendTo("body");
+    wrapper = new Html("div")
+      .class("full-ui")
+      .styleJs({
+        display: "flex",
+        flexDirection: "row",
+      })
+      .appendTo("body");
+
+    let coverWrapper = new Html("div")
+      .styleJs({
+        width: "35%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      })
+      .appendTo(wrapper);
+
+    let contentWrapper = new Html("div")
+      .styleJs({
+        width: "62.5%",
+        height: "100%",
+        overflow: "scroll",
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
+        scrollBehavior: "smooth",
+      })
+      .appendTo(wrapper);
 
     Ui.transition("popIn", wrapper);
 
@@ -26,6 +54,19 @@ const pkg = {
     let launchArgs = Root.Arguments !== undefined ? Root.Arguments[0] : {};
     let callback =
       Root.Arguments !== undefined ? Root.Arguments[1].callback : null;
+
+    if (!launchArgs.showPoster) {
+      wrapper.styleJs({
+        alignItems: "center",
+        justifyContent: "center",
+      });
+      contentWrapper.styleJs({
+        width: "80%",
+      });
+      coverWrapper.styleJs({
+        width: "0",
+      });
+    }
 
     console.log(Sfx);
 
@@ -208,22 +249,28 @@ const pkg = {
     new Html("img")
       .attr({ src: launchArgs.showPoster })
       .styleJs({
-        width: "15vw",
+        width: "80%",
         borderRadius: "10px",
       })
-      .appendTo(wrapper);
+      .appendTo(coverWrapper);
+
+    new Html("br")
+      .styleJs({
+        height: "20%",
+      })
+      .appendTo(contentWrapper);
 
     new Html("h2")
       .text(launchArgs.season ? `Season ${launchArgs.season}` : "Season 1")
-      .appendTo(wrapper);
-    new Html("h1").text(launchArgs.showName).appendTo(wrapper);
+      .appendTo(contentWrapper);
+    new Html("h1").text(launchArgs.showName).appendTo(contentWrapper);
     new Html("p")
       .text(
         launchArgs.showDesc
           ? launchArgs.showDesc
           : "This show doesn't have an overview.",
       )
-      .appendTo(wrapper);
+      .appendTo(contentWrapper);
 
     setTimeout(() => {
       if (!launchArgs.nsfw) {
@@ -313,7 +360,7 @@ const pkg = {
 
           const row = new Html("div")
             .class("flex-list")
-            .appendTo(wrapper)
+            .appendTo(contentWrapper)
             .styleJs(flexListStyle);
 
           const thumbnailURL = new URL(thumbnailBaseUrl); // Clone the base URL
@@ -364,14 +411,9 @@ const pkg = {
       }
 
       // Batch UI updates
-      Ui.init(Pid, "horizontal", UiElems, function (e) {
-        // Initialize *after* loop
-        if (e === "back") {
-          closeSequence();
-        }
-      });
+      Ui.update(Pid, UiElems);
     }
-    const row = new Html("div").class("flex-list").appendTo(wrapper);
+    const row = new Html("div").class("flex-list").appendTo(contentWrapper);
     let sortButton = new Html("button")
       .text(`Sort by ${sortCreated ? "file creation" : "file modified"}`)
       .on("click", () => {
@@ -389,7 +431,7 @@ const pkg = {
           parent: wrapper,
           pid: Root.Pid,
           title: "Are you sure you want to remove this show?",
-          description: "This show will be removed in your library.",
+          description: "This show will be removed from your library.",
           buttons: [
             {
               type: "primary",
@@ -415,6 +457,22 @@ const pkg = {
       if (e === "back") {
         closeSequence();
       }
+      setTimeout(() => {
+        let scrolled = false;
+        for (const div of buttons) {
+          let button = div.elm.children[0];
+          let focused = button.classList.contains("over");
+          console.log(focused);
+          if (focused) {
+            contentWrapper.elm.scrollTop =
+              div.elm.offsetTop + window.scrollY - window.innerHeight / 2 + 100;
+            scrolled = true;
+          }
+        }
+        if (!scrolled) {
+          contentWrapper.elm.scrollTop = 0;
+        }
+      }, 50);
     });
   },
   end: async function () {
