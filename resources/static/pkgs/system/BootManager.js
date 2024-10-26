@@ -116,22 +116,28 @@ const pkg = {
             "CHERRY_TREE_WS",
             await userSvc.subscribe(t),
           );
-          await Root.Core.pkg.run("ui:MainMenu", [], true);
+          await Root.Core.pkg.run("ui:Onboarding", [], true);
         } else if (result === false) {
           window.isOffline = true;
-          await Root.Libs.Modal.Show({
-            parent: document.body,
-            pid: -1,
-            title: langManager.getString("system.offline.title"),
-            description: langManager.getString("system.offline.description"),
-            buttons: [
-              {
-                type: "primary",
-                text: langManager.getString("actions.ok"),
-              },
-            ],
-          });
-          await Root.Core.pkg.run("ui:MainMenu", [], true);
+          // await Root.Libs.Modal.Show({
+          //   parent: document.body,
+          //   pid: -1,
+          //   title: langManager.getString("system.offline.title"),
+          //   description: langManager.getString("system.offline.description"),
+          //   buttons: [
+          //     {
+          //       type: "primary",
+          //       text: langManager.getString("actions.ok"),
+          //     },
+          //   ],
+          // });
+
+          // Notify instead
+          Root.Libs.Notify.show(
+            langManager.getString("system.offline.title"),
+            langManager.getString("system.offline.description"),
+          );
+          await Root.Core.pkg.run("ui:Onboarding", [], true);
         } else {
           runOobe();
         }
