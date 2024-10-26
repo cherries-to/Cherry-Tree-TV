@@ -235,9 +235,15 @@ const pkg = {
       })
       .appendTo("body");
 
+    let coverVisible = false;
+
     function changePreview(id, coverEnabled = true) {
       let game = gamesList[id];
+      console.log(game.preview);
       if (!game.preview) {
+        setTimeout(() => {
+          cover.styleJs({ opacity: "0" });
+        }, 100);
         gameTitle.text(game.name);
         gameDescription.text("No description provided");
         return;
@@ -247,11 +253,15 @@ const pkg = {
           cover.attr({ src: game.preview.image });
           cover.elm.addEventListener("load", () => {
             setTimeout(() => {
+              coverVisible = true;
               cover.styleJs({ opacity: "1" });
             }, 100);
           });
         } else {
-          cover.styleJs({ opacity: "0" });
+          setTimeout(() => {
+            coverVisible = false;
+            cover.styleJs({ opacity: "0" });
+          }, 100);
         }
       }
       gameTitle.text(game.preview.title ? game.preview.title : game.name);
@@ -317,14 +327,25 @@ const pkg = {
             }
             if (m.launchPkg) {
               opened = index;
+              let changed = false;
+              coverVisible = false;
               cover.styleJs({ opacity: "0" });
               console.log("Opened app", opened);
               console.log(gamesList[opened]);
+              document.addEventListener("CherryTree.Ui.ExitApp", async (e) => {
+                if (changed) {
+                  changePreview(0);
+                } else {
+                  coverVisible = true;
+                  cover.styleJs({ opacity: "1" });
+                }
+              });
               document.addEventListener(
                 "CherryTree.Ui.ChangePreview",
                 async (e) => {
-                  gamesList[opened].preview = e.detail;
-                  changePreview(opened, false);
+                  changed = true;
+                  gamesList[0].preview = e.detail;
+                  changePreview(0, false);
                   console.log(gamesList);
                   let updatedFile = {
                     last_updated: Date.now(),
@@ -685,6 +706,9 @@ const pkg = {
       switch (x) {
         case 0:
           // Show games list
+          if (coverVisible) {
+            cover.styleJs({ opacity: "1" });
+          }
           gamePreview.styleJs({ display: "flex" });
           gameList.classOff("hidden");
           storeList.classOn("hidden");
@@ -692,6 +716,7 @@ const pkg = {
           break;
         case 1:
           // Show friend list
+          cover.styleJs({ opacity: "0" });
           gamePreview.styleJs({ display: "none" });
           gameList.classOn("hidden");
           storeList.classOff("hidden");
@@ -699,6 +724,7 @@ const pkg = {
           break;
         case 2:
           // Show friend list
+          cover.styleJs({ opacity: "0" });
           gamePreview.styleJs({ display: "none" });
           gameList.classOn("hidden");
           storeList.classOn("hidden");
@@ -785,7 +811,6 @@ const pkg = {
         } else {
           lastXPositions[selectedTab] = curX;
         }
-
         console.log("Selected tab", selectedTab);
         console.log("Current Y", curY);
         console.log("Current X", curX);

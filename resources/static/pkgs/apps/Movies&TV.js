@@ -443,6 +443,7 @@ const pkg = {
     );
   },
   end: async function () {
+    document.dispatchEvent(new CustomEvent("CherryTree.Ui.ExitApp"));
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");
     Ui.giveUpUi(Pid);
