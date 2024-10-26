@@ -5,6 +5,7 @@ import settingsLib from "../../libs/settingsLib.js";
 import langManager from "../../libs/l10n/manager.js";
 
 let wrapper, Ui, Pid, Sfx;
+let screensaverInt;
 
 const pkg = {
   name: "Screen Saver",
@@ -83,7 +84,7 @@ const pkg = {
     bg.elm.src = `https://picsum.photos/${window.innerWidth}/${
       window.innerHeight
     }?t=${Math.random()}`;
-    setInterval(() => {
+    screensaverInt = setInterval(() => {
       console.log(bg);
       bg.styleJs({ opacity: "0" });
       bg.elm.src = `https://picsum.photos/${window.innerWidth}/${
@@ -110,6 +111,7 @@ const pkg = {
     });
   },
   end: async function () {
+    clearInterval(screensaverInt);
     document.dispatchEvent(new CustomEvent("CherryTree.Ui.ExitApp"));
     // Exit this UI when the process is exited
     Ui.cleanup(Pid);
