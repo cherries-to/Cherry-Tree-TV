@@ -30,6 +30,20 @@ const pkg = {
     const Background = Root.Processes.getService("Background").data;
     console.log(Sfx);
 
+    let rect = new Html("div")
+      .style({
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        opacity: "0",
+        objectFit: "cover",
+        transition: "all 0.2s linear",
+        background: "rgb(0,0,0)",
+      })
+      .appendTo(wrapper);
+
     let time = new Html("h1").text("").appendTo(wrapper);
     time.style({
       position: "fixed",
@@ -45,11 +59,13 @@ const pkg = {
       opacity: "0",
       transition: "all 0.2s linear",
     });
+
     setInterval(() => {
       time.text(new Date().toLocaleTimeString());
     }, 1000);
 
     setTimeout(() => {
+      rect.style({ opacity: "1" });
       time.styleJs({ opacity: "1" });
     }, 1000);
 
