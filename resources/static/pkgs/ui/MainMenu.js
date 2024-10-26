@@ -32,6 +32,7 @@ const pkg = {
     let ws = Root.Security.getSecureVariable("CHERRY_TREE_WS");
 
     let stepCount = 0;
+    let screensaverTimeout;
     function logStep(reason = "Step") {
       stepCount++;
       console.log("[MainMenu]", stepCount + ":", reason);
@@ -218,6 +219,7 @@ const pkg = {
 
     let gamesList;
     let opened;
+    let changed = false;
 
     let cover = new Html("img")
       .styleJs({
@@ -236,6 +238,17 @@ const pkg = {
       .appendTo("body");
 
     let coverVisible = false;
+
+    function initScreensaver() {
+      console.log("Screensaver starting...");
+      screensaverTimeout = setTimeout(async () => {
+        if (coverVisible) {
+          cover.styleJs({ opacity: "0" });
+        }
+        Ui.transition("popOut", wrapper, 500, true);
+        await Root.Libs.startPkg("ui:ScreenSaver", undefined);
+      }, 10000);
+    }
 
     function changePreview(id, coverEnabled = true) {
       let game = gamesList[id];
@@ -326,20 +339,13 @@ const pkg = {
               location.reload();
             }
             if (m.launchPkg) {
+              clearTimeout(screensaverTimeout);
               opened = index;
-              let changed = false;
               coverVisible = false;
               cover.styleJs({ opacity: "0" });
               console.log("Opened app", opened);
               console.log(gamesList[opened]);
-              document.addEventListener("CherryTree.Ui.ExitApp", async (e) => {
-                if (changed) {
-                  changePreview(0);
-                } else {
-                  coverVisible = true;
-                  cover.styleJs({ opacity: "1" });
-                }
-              });
+
               document.addEventListener(
                 "CherryTree.Ui.ChangePreview",
                 async (e) => {
@@ -716,6 +722,7 @@ const pkg = {
           break;
         case 1:
           // Show friend list
+          coverVisible = false;
           cover.styleJs({ opacity: "0" });
           gamePreview.styleJs({ display: "none" });
           gameList.classOn("hidden");
@@ -724,6 +731,7 @@ const pkg = {
           break;
         case 2:
           // Show friend list
+          coverVisible = false;
           cover.styleJs({ opacity: "0" });
           gamePreview.styleJs({ display: "none" });
           gameList.classOn("hidden");
@@ -760,6 +768,8 @@ const pkg = {
       "horizontal",
       [topBarBtnHtml, ...currentMenuList],
       async function parentCallback(n) {
+        clearTimeout(screensaverTimeout);
+        initScreensaver();
         // This is called after the input
         lastY = n.y;
         let curX = n.x;
@@ -824,6 +834,16 @@ const pkg = {
     Ui.update(Root.Pid, uiArrays);
     Ui.updatePos(Root.Pid, { x: 0, y: 1 });
     changePreview(0);
+    document.addEventListener("CherryTree.Ui.ExitApp", async (e) => {
+      if (changed) {
+        changePreview(0);
+      } else {
+        coverVisible = true;
+        cover.styleJs({ opacity: "1" });
+      }
+      initScreensaver();
+    });
+    initScreensaver();
   },
   end: async function () {
     // Close the window when the process is exited
