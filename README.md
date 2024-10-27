@@ -27,9 +27,9 @@ An open-source, web-based front-end for your HTPC that can runs as an app using 
 - [x] Movies support
 - [x] Watch parties
 - [x] Picture adjustments
+- [x] Audio player
 - [ ] App store
 - [ ] Friend chats
 - [ ] Fully functional YouTube app
-- [ ] Audio player
 - [ ] Installable package
 - [ ] Embedded video subtitles
