@@ -1,8 +1,16 @@
 import icons from "../../libs/icons.js";
 import Html from "/libs/html.js";
-// import ColorThief from "../../libs/color-thief.mjs";
 
-let wrapper, Ui, Pid, Sfx, bg, volumeUpdate, musicAudio;
+let wrapper,
+  Ui,
+  Pid,
+  Sfx,
+  bg,
+  volumeUpdate,
+  musicAudio,
+  visualizer,
+  audioMotion,
+  colorThief;
 
 const pkg = {
   name: "Audio Player",
@@ -38,7 +46,7 @@ const pkg = {
     }
 
     const Background = Root.Processes.getService("Background").data;
-    // colorThief = new ColorThief();
+    colorThief = new ColorThief();
 
     let launchArgs = Root.Arguments[0];
     let autoplay =
@@ -97,6 +105,7 @@ const pkg = {
         justifyContent: "center",
       })
       .appendTo(container);
+
     let albumCover = new Html("img")
       .attr({
         src: "assets/img/maxresdefault.png",
@@ -107,12 +116,6 @@ const pkg = {
         aspectRatio: "1 / 1",
         objectFit: "cover",
         borderRadius: "8px",
-        boxShadow: `2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02),
-  6.7px 6.7px 5.3px rgba(0, 0, 0, 0.028),
-  12.5px 12.5px 10px rgba(0, 0, 0, 0.035),
-  22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
-  41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05),
-  100px 100px 80px rgba(0, 0, 0, 0.07)`,
       })
       .appendTo(songDisplay);
 
@@ -129,6 +132,18 @@ const pkg = {
         aspectRatio: "16 / 9",
         objectFit: "cover",
         transition: "all 0.2s linear",
+      })
+      .appendTo("body");
+
+    visualizer = new Html("div")
+      .attr({ width: window.innerWidth, height: window.innerHeight / 2 })
+      .styleJs({
+        zIndex: -1,
+        position: "absolute",
+        bottom: "0",
+        left: "0",
+        width: "100%",
+        height: "50%",
       })
       .appendTo("body");
 
@@ -248,6 +263,7 @@ const pkg = {
     let urlObj = new URL("http://127.0.0.1:9864/getFile");
     urlObj.searchParams.append("path", launchArgs.audioPath);
     musicAudio = new Audio(urlObj.href);
+    musicAudio.crossOrigin = "anonymous";
     let songDuration = 0;
 
     function updateProgressValue(val) {
@@ -328,21 +344,49 @@ const pkg = {
     // wip
     // VERY PERFORMANCE HEAVY!
 
-    // function setAccentedBackground() {
-    //   let color = colorThief.getColor(albumCover.elm);
-    //   console.log("colors", color);
-    //   container.styleJs({
-    //     backgroundColor: `rgb(${color[0] - 10},${color[1] - 10}, ${
-    //       color[2] - 10
-    //     })`,
-    //   });
-    // }
+    function startVisualizer() {
+      let color = colorThief.getColor(albumCover.elm);
+      console.log("colors", color);
+      let colorMain = `rgb(${color[0] + 50},${color[1] + 50}, ${
+        color[2] + 50
+      })`;
+      let colorArr = `${color[0] + 50},${color[1] + 50}, ${color[2] + 50},`;
+      let colorDark = `rgb(${color[0]},${color[1]}, ${color[2]})`;
+      albumCover.styleJs({
+        boxShadow: `2.8px 2.8px 2.2px rgba(${colorArr}0.02),
+  6.7px 6.7px 5.3px rgba(${colorArr}0.028),
+  12.5px 12.5px 10px rgba(${colorArr}0.035),
+  22.3px 22.3px 17.9px rgba(${colorArr}0.042),
+  41.8px 41.8px 33.4px rgba(${colorArr}0.05),
+  100px 100px 80px rgba(${colorArr}0.07)`,
+      });
+      audioMotion = new AudioMotionAnalyzer(visualizer.elm, {
+        // canvas: visualizer.elm,
+        source: musicAudio,
+        ansiBands: false,
+        showScaleX: false,
+        bgAlpha: 0,
+        overlay: true,
+        mode: 5,
+        frequencyScale: "log",
+        radial: false,
+        showPeaks: false,
+        channelLayout: "single-vertical",
+        smoothing: 0.7,
+        volume: 0.5,
+        height: window.innerHeight / 2,
+      });
+      audioMotion.registerGradient("classic", {
+        dir: "v",
+        colorStops: [colorMain, colorDark],
+      });
+    }
 
-    // if (albumCover.elm.complete) {
-    //   setAccentedBackground();
-    // } else {
-    //   albumCover.elm.addEventListener("load", setAccentedBackground);
-    // }
+    if (albumCover.elm.complete) {
+      startVisualizer();
+    } else {
+      albumCover.elm.addEventListener("load", startVisualizer);
+    }
 
     Ui.init(Pid, "horizontal", [controlButtons.elm.children], function (e) {
       if (e === "back") {
@@ -351,6 +395,8 @@ const pkg = {
     });
   },
   end: async function () {
+    audioMotion.destroy();
+    visualizer.cleanup();
     musicAudio.pause();
     musicAudio = null;
     bg.styleJs({ opacity: "0" });
