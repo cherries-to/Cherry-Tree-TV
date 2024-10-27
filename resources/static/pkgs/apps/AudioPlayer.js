@@ -1,8 +1,8 @@
 import icons from "../../libs/icons.js";
 import Html from "/libs/html.js";
-import ColorThief from "../../libs/color-thief.mjs";
+// import ColorThief from "../../libs/color-thief.mjs";
 
-let wrapper, Ui, Pid, Sfx, colorThief;
+let wrapper, Ui, Pid, Sfx, bg, volumeUpdate, musicAudio;
 
 const pkg = {
   name: "Audio Player",
@@ -25,9 +25,55 @@ const pkg = {
     Ui.becomeTopUi(Pid, wrapper);
 
     Sfx = Root.Processes.getService("SfxLib").data;
+    const audio = Sfx.getAudio();
+
+    function stopBgm() {
+      audio.pause();
+    }
+    async function playBgm() {
+      let playBgm = await window.localforage.getItem("settings__playBgm");
+      if (playBgm) {
+        audio.play();
+      }
+    }
 
     const Background = Root.Processes.getService("Background").data;
-    colorThief = new ColorThief();
+    // colorThief = new ColorThief();
+
+    let launchArgs = Root.Arguments[0];
+    let autoplay =
+      launchArgs.autoplay == undefined ? true : launchArgs.autoplay;
+
+    let jsmediatags = window.jsmediatags;
+
+    function getTags(file) {
+      return new Promise((resolve, reject) => {
+        let urlObj = new URL("http://127.0.0.1:9864/getFile");
+        urlObj.searchParams.append("path", file);
+        jsmediatags.read(urlObj.href, {
+          onSuccess: function (tag) {
+            resolve(tag);
+          },
+          onError: function (error) {
+            reject(error);
+          },
+        });
+      });
+    }
+
+    console.log(launchArgs);
+    let tag = {
+      tags: {},
+    };
+    try {
+      tag = await getTags(launchArgs.audioPath);
+    } catch (e) {
+      console.log("Tag error", e);
+    }
+    let fileName = launchArgs.audioPath.split(/.*[\/|\\]/)[1];
+    let playerSong = fileName.replace(/\.[^/.]+$/, "");
+    let playerArtist = "Unknown artist";
+    console.log(tag);
 
     console.log(Sfx);
 
@@ -70,12 +116,58 @@ const pkg = {
       })
       .appendTo(songDisplay);
 
+    bg = new Html("img")
+      .styleJs({
+        zIndex: -1,
+        filter: "blur(100px) brightness(35%)",
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "100%",
+        opacity: "0",
+        aspectRatio: "16 / 9",
+        objectFit: "cover",
+        transition: "all 0.2s linear",
+      })
+      .appendTo("body");
+
     let songInfo = new Html("div")
       .styleJs({ display: "flex", flexDirection: "column", gap: "10px" })
       .appendTo(songDisplay);
 
     let songTitle = new Html("h1").text("Unknown song").appendTo(songInfo);
     let songArtist = new Html("p").text("Unknown artist").appendTo(songInfo);
+
+    if ("title" in tag.tags) {
+      playerSong = tag.tags.title;
+    }
+    if ("artist" in tag.tags) {
+      playerArtist = tag.tags.artist;
+    }
+    if ("album" in tag.tags) {
+      playerArtist = playerArtist + " • " + tag.tags.album;
+    }
+    if ("year" in tag.tags) {
+      playerArtist = playerArtist + " • " + tag.tags.year;
+    }
+
+    if ("picture" in tag.tags) {
+      let buf = new Uint8Array(tag.tags.picture.data);
+      let blob = new Blob([buf]);
+      console.log(blob);
+      let dataURL = URL.createObjectURL(blob);
+      albumCover.elm.src = dataURL;
+      bg.elm.src = dataURL;
+      setTimeout(() => {
+        bg.styleJs({
+          opacity: "1",
+        });
+      }, 200);
+    }
+
+    songTitle.text(playerSong);
+    songArtist.text(playerArtist);
 
     function createButton(content, callback) {
       return new Html("button").html(content).on("click", callback).styleJs({
@@ -89,9 +181,20 @@ const pkg = {
       });
     }
 
+    function formatTime(timeInSeconds) {
+      const result = new Date(timeInSeconds * 1000).toISOString().slice(11, 19);
+
+      return {
+        minutes: result.slice(3, 5),
+        seconds: result.slice(6, 8),
+      };
+    }
+
     let playerControls = new Html("div")
       .styleJs({
+        width: "50%",
         display: "flex",
+        flexDirection: "column",
         gap: "15px",
         alignItems: "center",
         justifyContent: "center",
@@ -100,41 +203,160 @@ const pkg = {
         background: "rgba(0,0,0,0.5)",
       })
       .appendTo(container);
+
+    let progressInd = new Html("div")
+      .styleJs({
+        display: "flex",
+        gap: "15px",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "90%",
+      })
+      .appendTo(playerControls);
+
+    let timeElapsed = new Html("span")
+      .styleJs({ fontSize: "1.3rem" })
+      .text("00:00");
+    let timeLength = new Html("span")
+      .styleJs({ fontSize: "1.3rem" })
+      .text("00:00");
+
+    timeElapsed.appendTo(progressInd);
+
+    let progress = new Html("div")
+      .class("vp-progress-bar")
+      .style({
+        "flex-grow": "1",
+      })
+      .appendTo(progressInd);
+
+    timeLength.appendTo(progressInd);
+
+    let progressBarValue = new Html("div")
+      .class("vp-progress-bar-value")
+      .appendTo(progress);
+
+    let controlButtons = new Html("div")
+      .styleJs({
+        display: "flex",
+        gap: "15px",
+        alignItems: "center",
+        justifyContent: "center",
+      })
+      .appendTo(playerControls);
+
+    let urlObj = new URL("http://127.0.0.1:9864/getFile");
+    urlObj.searchParams.append("path", launchArgs.audioPath);
+    musicAudio = new Audio(urlObj.href);
+    let songDuration = 0;
+
+    function updateProgressValue(val) {
+      progressBarValue.style({ width: `${val}%` });
+    }
+
+    musicAudio.addEventListener("loadedmetadata", () => {
+      songDuration = Math.round(musicAudio.duration);
+      const time = formatTime(songDuration);
+      timeLength.text(`${time.minutes}:${time.seconds}`);
+      updateProgressValue(0);
+    });
+
+    musicAudio.addEventListener("timeupdate", () => {
+      const duration = formatTime(songDuration);
+      const songElapsed = Math.round(musicAudio.currentTime);
+      const elapsed = formatTime(songElapsed);
+      timeElapsed.text(`${elapsed.minutes}:${elapsed.seconds}`);
+      timeLength.text(`${duration.minutes}:${duration.seconds}`);
+      updateProgressValue((musicAudio.currentTime / musicAudio.duration) * 100);
+      // Will be added for synced lyrics
+      // renderer.currentTime = musicAudio.elm.currentTime;
+    });
+
+    volumeUpdate = (e) => {
+      musicAudio.elm.volume = e.detail / 100;
+    };
+    document.addEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
+
     let skipBack = createButton(icons["stepBack"], function () {
-      alert("Back");
-    }).appendTo(playerControls);
+      let currentAudioTime = musicAudio.currentTime
+        ? musicAudio.currentTime
+        : 0;
+      let newTime = currentAudioTime - 10;
+      if (newTime < 0) {
+        newTime = 0;
+      }
+      musicAudio.currentTime = newTime;
+    }).appendTo(controlButtons);
     let playButton = createButton(icons["play"], function () {
-      alert("Play");
-    }).appendTo(playerControls);
+      if (musicAudio.paused) {
+        musicAudio.play();
+      } else {
+        musicAudio.pause();
+      }
+    }).appendTo(controlButtons);
     let skipForward = createButton(icons["stepForward"], function () {
-      alert("Back");
-    }).appendTo(playerControls);
+      let currentAudioTime = musicAudio.currentTime
+        ? musicAudio.currentTime
+        : 0;
+      let newTime = currentAudioTime + 10;
+      if (newTime > songDuration) {
+        newTime = songDuration;
+      }
+      musicAudio.currentTime = newTime;
+    }).appendTo(controlButtons);
+
+    musicAudio.addEventListener("play", () => {
+      playButton.html(icons["pause"]);
+      stopBgm();
+    });
+    musicAudio.addEventListener("pause", () => {
+      playButton.html(icons["play"]);
+      playBgm();
+    });
+
+    musicAudio.addEventListener("canplaythrough", () => {
+      window.desktopIntegration !== undefined &&
+        window.desktopIntegration.ipc.send("setRPC", {
+          details: playerSong,
+          state: playerArtist,
+        });
+      if (autoplay) {
+        musicAudio.play();
+      }
+    });
 
     // wip
+    // VERY PERFORMANCE HEAVY!
 
-    function setAccentedBackground() {
-      let color = colorThief.getColor(albumCover.elm);
-      console.log("colors", color);
-      container.styleJs({
-        backgroundColor: `rgb(${color[0] - 10},${color[1] - 10}, ${
-          color[2] - 10
-        })`,
-      });
-    }
+    // function setAccentedBackground() {
+    //   let color = colorThief.getColor(albumCover.elm);
+    //   console.log("colors", color);
+    //   container.styleJs({
+    //     backgroundColor: `rgb(${color[0] - 10},${color[1] - 10}, ${
+    //       color[2] - 10
+    //     })`,
+    //   });
+    // }
 
-    if (albumCover.elm.complete) {
-      setAccentedBackground();
-    } else {
-      albumCover.elm.addEventListener("load", setAccentedBackground);
-    }
+    // if (albumCover.elm.complete) {
+    //   setAccentedBackground();
+    // } else {
+    //   albumCover.elm.addEventListener("load", setAccentedBackground);
+    // }
 
-    Ui.init(Pid, "horizontal", [playerControls.elm.children], function (e) {
+    Ui.init(Pid, "horizontal", [controlButtons.elm.children], function (e) {
       if (e === "back") {
         pkg.end();
       }
     });
   },
   end: async function () {
+    musicAudio.pause();
+    musicAudio = null;
+    bg.styleJs({ opacity: "0" });
+    setTimeout(() => {
+      bg.cleanup();
+    }, 200);
     // Exit this UI when the process is exited
     Ui.cleanup(Pid);
     Sfx.playSfx("deck_ui_out_of_game_detail.wav");

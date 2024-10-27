@@ -219,6 +219,14 @@ const pkg = {
             true,
           );
         }
+        if (mapping.type == "audio") {
+          Ui.transition("popOut", wrapper, 500, true);
+          await Root.Libs.startPkg(
+            mapping.opensWith,
+            [{ app: "audio", audioPath: path }],
+            true,
+          );
+        }
       }
 
       function closeSequence() {
