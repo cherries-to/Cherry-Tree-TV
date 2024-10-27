@@ -14,6 +14,10 @@ An open-source, web-based front-end for your HTPC that can runs as an app using 
 
 <img src=resources/static/assets/img/readme-casting.png alt="YouTube casting example">
 
+### Listen to music in your PC
+
+<img src=resources/static/assets/img/readme-audio-player.png alt="Watch Party example">
+
 ### Add movies & shows to your library
 
 <img src=resources/static/assets/img/readme-movies.png alt="Movies list example">
