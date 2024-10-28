@@ -400,6 +400,7 @@ const pkg = {
     visualizer.cleanup();
     musicAudio.pause();
     musicAudio = null;
+    document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
     bg.styleJs({ opacity: "0" });
     setTimeout(() => {
       bg.cleanup();
