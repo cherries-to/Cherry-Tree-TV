@@ -8,7 +8,7 @@ const pkg = {
   start: async function (Root) {
     const controller = new Html("div")
       .html(
-        `<svg width="100%" height="100%" viewBox="0 0 22 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 17C15.4183 17 19 13.4183 19 9C19 4.58172 15.4183 1 11 1C6.58172 1 3 4.58172 3 9C3 13.4183 6.58172 17 11 17Z" fill="#707070" fill-opacity="0.35" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect y="21" width="22" height="4" rx="1" fill="#707070"/><path d="M8 12L14 6" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+        `<svg width="100%" height="100%" viewBox="0 0 22 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 17C15.4183 17 19 13.4183 19 9C19 4.58172 15.4183 1 11 1C6.58172 1 3 4.58172 3 9C3 13.4183 6.58172 17 11 17Z" fill="#707070" fill-opacity="0.35" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect y="21" width="22" height="4" rx="1" fill="#707070"/><path d="M8 12L14 6" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
       )
       .style({ width: "2rem", height: "2rem" });
 
@@ -32,7 +32,7 @@ const pkg = {
         `${d.getHours().toString().padStart(2, "0")}:${d
           .getMinutes()
           .toString()
-          .padStart(2, "0")}`
+          .padStart(2, "0")}`,
       );
     }
 
@@ -93,6 +93,7 @@ const pkg = {
     window.remoteState = false;
 
     function connectPeerJs() {
+      let customRemote;
       let str = "";
       for (let i = 0; i < 4; i++) {
         str += chars[Math.floor(Math.random() * chars.length)];
@@ -110,7 +111,7 @@ const pkg = {
       peer.on("connection", (conn) => {
         Root.Libs.Notify.show(
           "Remote Connected",
-          `A remote control has connected.`
+          `A remote control has connected.`,
         );
         code.text("");
         window.remoteState = true;
@@ -124,8 +125,24 @@ const pkg = {
               type: "showKeyboard",
               detail: e.detail,
             });
-          }
+          },
         );
+
+        document.addEventListener("CherryTree.Remote.DestroyCustom", (e) => {
+          customRemote = null;
+          conn.send({
+            type: "destroyCustom",
+          });
+        });
+
+        document.addEventListener("CherryTree.Remote.RegisterCustom", (e) => {
+          console.log(e.detail);
+          customRemote = e.detail;
+          conn.send({
+            type: "registerCustom",
+            detail: customRemote,
+          });
+        });
 
         document.addEventListener("CherryTree.Ui.ChangeBackground", (e) => {
           console.log(e.detail);
@@ -137,21 +154,37 @@ const pkg = {
 
         conn.on("data", (data) => {
           try {
+            if (data.canRecvData) {
+              if (customRemote) {
+                console.log("Resending remote");
+                conn.send({
+                  type: "registerCustom",
+                  detail: customRemote,
+                });
+              }
+            }
             if (data.input) {
               if (typeof data.input !== "string") return;
               if (!inputs.includes(data.input)) {
                 if (data.input === "volDown") {
                   document.dispatchEvent(
-                    new CustomEvent("CherryTree.Input.VolumeDown")
+                    new CustomEvent("CherryTree.Input.VolumeDown"),
                   );
                 } else if (data.input === "volUp") {
                   document.dispatchEvent(
-                    new CustomEvent("CherryTree.Input.VolumeUp")
+                    new CustomEvent("CherryTree.Input.VolumeUp"),
                   );
                 }
                 return;
               }
               window.Libs.Input.pop(data.input, 5);
+            }
+            if (data.customInput) {
+              if (typeof data.customInput !== "object") return;
+              console.log("input detected");
+              document.dispatchEvent(
+                new CustomEvent(data.customInput.eventName),
+              );
             }
             if (data.textInput !== undefined) {
               if (typeof data.textInput !== "string") return;
@@ -162,7 +195,7 @@ const pkg = {
                   detail: {
                     text: data.textInput,
                   },
-                })
+                }),
               );
               if (data.finish !== undefined) {
                 if (data.finish === true) {
@@ -171,16 +204,16 @@ const pkg = {
                       detail: {
                         text: data.textInput,
                       },
-                    })
+                    }),
                   );
                 }
               }
             }
           } catch (_) {}
         });
-        conn.on('disconnect', () => {
+        conn.on("disconnect", () => {
           window.remoteState = false;
-        })
+        });
       });
     }
 

@@ -38,7 +38,8 @@ async function start() {
   const pkInput = panelKeyboard.querySelector("input");
 
   let peer = null,
-    conn = null;
+    conn = null,
+    custRemoteWrapper = null;
 
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
@@ -72,13 +73,13 @@ async function start() {
     peer = new Peer();
     peer.on("open", () => {
       let c = peer.connect(
-        "cherry-tree-tv-link-" + pcInput.value.toUpperCase()
+        "cherry-tree-tv-link-" + pcInput.value.toUpperCase(),
       );
 
       c.on("open", () => {
         conn = c;
-
         animateIn(panelRemote);
+        conn.send({ canRecvData: true });
       });
       c.on("data", async (d) => {
         if (d.type === "showKeyboard") {
@@ -118,6 +119,58 @@ async function start() {
           pkInput.addEventListener("input", (e) => {
             conn.send({ textInput: pkInput.value });
           });
+        }
+        if (d.type === "registerCustom") {
+          console.log(d);
+          let wrapperStyles = d.detail.wrapperStyles;
+          if (!wrapperStyles) {
+            wrapperStyles = {
+              position: "absolute",
+              top: "0",
+              left: "0",
+              background: "rgb(0,0,0)",
+              width: "100%",
+              height: "100%",
+            };
+          }
+          let overrideStyles = {
+            background: "rgb(0,0,0)",
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100%",
+          };
+          let elementsList = Object.keys(d.detail.elements);
+          let elements = d.detail.elements;
+          custRemoteWrapper = new Html("div")
+            .styleJs(wrapperStyles)
+            .appendTo("body");
+          for (const element of elementsList) {
+            console.log("now rendering", elements[element]);
+            let elm = new Html(elements[element].type)
+              .text(elements[element].text)
+              .styleJs(elements[element].style)
+              .appendTo(custRemoteWrapper);
+            if (elements[element].events) {
+              let eventsList = Object.keys(elements[element].events);
+              let events = elements[element].events;
+              for (const event of eventsList) {
+                elm.on(event, (e) => {
+                  console.log(event);
+                  conn.send({
+                    customInput: {
+                      eventName: events[event],
+                    },
+                  });
+                });
+              }
+            }
+          }
+          custRemoteWrapper.styleJs(overrideStyles);
+        }
+        if (d.type === "destroyCustom") {
+          custRemoteWrapper.cleanup();
         }
         if (d.type === "changeWallpaper") {
           console.log(d);
