@@ -288,8 +288,9 @@ const pkg = {
       // renderer.currentTime = musicAudio.elm.currentTime;
     });
 
+    musicAudio.volume = Sfx.getVolume();
     volumeUpdate = (e) => {
-      musicAudio.elm.volume = e.detail / 100;
+      musicAudio.volume = e.detail / 100;
     };
     document.addEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
 
