@@ -71,7 +71,7 @@ let templateFsLayout = {
               lastPlayed: Date.now() - 1_000,
               image:
                 "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS10YWJsZS1wcm9wZXJ0aWVzIj48cGF0aCBkPSJNMTUgM3YxOCIvPjxyZWN0IHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgeD0iMyIgeT0iMyIgcng9IjIiLz48cGF0aCBkPSJNMjEgOUgzIi8+PHBhdGggZD0iTTIxIDE1SDMiLz48L3N2Zz4=",
-              launchPkg: "apps:TabbedUI",
+              launchPkg: "demos:TabbedUI",
             },
             {
               id: "youtube",
