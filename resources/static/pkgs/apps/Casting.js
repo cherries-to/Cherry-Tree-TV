@@ -13,7 +13,8 @@ let wrapper,
   connectionState,
   negotiatedType,
   isDisplayed,
-  video;
+  video,
+  volumeUpdate;
 
 const pkg = {
   name: "Casting",
@@ -87,6 +88,15 @@ const pkg = {
               isDisplayed = false;
             }
           });
+
+          conn.on("close", () => {
+            console.log("Stream ended");
+            video.elm.removeAttribute("src");
+            video.elm.remove();
+            connectionState = "ready";
+            isDisplayed = false;
+          });
+
           peer.on("call", (curCall) => {
             call = curCall;
             if (!negotiatedType) {
@@ -113,7 +123,8 @@ const pkg = {
             console.log(call.peer);
             call.answer();
             call.on("stream", (curStream) => {
-              if (isDisplayed) {
+              if (isDisplayed == true) {
+                console.log(isDisplayed);
                 console.log("Duplicate video element - returning");
                 return;
               }
@@ -125,12 +136,22 @@ const pkg = {
                   left: "0",
                   width: "100%",
                   height: "100%",
-                  zIndex: 10000000,
+                  zIndex: 100,
                   objectFit: "contain",
                 })
                 .appendTo("body");
+              video.elm.volume = Sfx.getVolume();
+
+              volumeUpdate = (e) => {
+                video.elm.volume = e.detail / 100;
+              };
+              document.addEventListener(
+                "CherryTree.Ui.VolumeChange",
+                volumeUpdate,
+              );
+
               video.elm.srcObject = curStream;
-              video.elm.controls = true;
+              video.elm.controls = false;
               video.elm.muted = false;
               video.elm.play();
               isDisplayed = true;
@@ -138,10 +159,14 @@ const pkg = {
               console.log(track);
             });
             call.on("close", () => {
+              connectionState = "ready";
+              isDisplayed = false;
               video.elm.removeAttribute("src");
               video.elm.remove();
             });
             call.on("disconnect", () => {
+              connectionState = "ready";
+              isDisplayed = false;
               video.elm.removeAttribute("src");
               video.elm.remove();
             });
@@ -179,6 +204,7 @@ const pkg = {
     });
   },
   end: async function () {
+    document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
     if (video) {
       video.elm.remove();
     }
