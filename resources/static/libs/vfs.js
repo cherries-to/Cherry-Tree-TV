@@ -26,6 +26,20 @@ let templateFsLayout = {
               },
             },
             {
+              id: "casting",
+              name: "Screen Mirroring",
+              color: "hsl(220, 65%, 62%)",
+              lastPlayed: Date.now() - 100,
+              image:
+                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1jYXN0Ij48cGF0aCBkPSJNMiA4VjZhMiAyIDAgMCAxIDItMmgxNmEyIDIgMCAwIDEgMiAydjEyYTIgMiAwIDAgMS0yIDJoLTYiLz48cGF0aCBkPSJNMiAxMmE5IDkgMCAwIDEgOCA4Ii8+PHBhdGggZD0iTTIgMTZhNSA1IDAgMCAxIDQgNCIvPjxsaW5lIHgxPSIyIiB4Mj0iMi4wMSIgeTE9IjIwIiB5Mj0iMjAiLz48L3N2Zz4=",
+              launchPkg: "apps:Casting",
+              preview: {
+                title: "Casting",
+                description:
+                  "Project your screen to this TV, powered by PlutoCast.",
+              },
+            },
+            {
               id: "filemanager",
               name: "File Manager",
               color: "hsl(130, 65%, 62%)",
