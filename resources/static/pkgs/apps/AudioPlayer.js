@@ -7,6 +7,7 @@ let wrapper,
   Sfx,
   bg,
   volumeUpdate,
+  playerInput,
   musicAudio,
   visualizer,
   audioMotion,
@@ -162,6 +163,8 @@ const pkg = {
     }
     if ("album" in tag.tags) {
       playerArtist = playerArtist + " • " + tag.tags.album;
+    } else {
+      playerArtist = playerArtist + " • " + "Unknown album";
     }
     if ("year" in tag.tags) {
       playerArtist = playerArtist + " • " + tag.tags.year;
@@ -284,6 +287,15 @@ const pkg = {
       timeElapsed.text(`${elapsed.minutes}:${elapsed.seconds}`);
       timeLength.text(`${duration.minutes}:${duration.seconds}`);
       updateProgressValue((musicAudio.currentTime / musicAudio.duration) * 100);
+      document.dispatchEvent(
+        new CustomEvent("CherryTree.Media.UpdatePosition", {
+          detail: {
+            duration: musicAudio.duration,
+            playbackRate: 1,
+            position: musicAudio.currentTime,
+          },
+        }),
+      );
       // Will be added for synced lyrics
       // renderer.currentTime = musicAudio.elm.currentTime;
     });
@@ -324,12 +336,35 @@ const pkg = {
 
     musicAudio.addEventListener("play", () => {
       playButton.html(icons["pause"]);
+      document.dispatchEvent(
+        new CustomEvent("CherryTree.Media.UpdatePlayState", {
+          detail: "playing",
+        }),
+      );
       stopBgm();
     });
+
     musicAudio.addEventListener("pause", () => {
       playButton.html(icons["play"]);
+      document.dispatchEvent(
+        new CustomEvent("CherryTree.Media.UpdatePlayState", {
+          detail: "paused",
+        }),
+      );
       playBgm();
     });
+
+    playerInput = (e) => {
+      let action = e.detail;
+      if (action.type === "pause") {
+        musicAudio.pause();
+      }
+      if (action.type === "play") {
+        musicAudio.play();
+      }
+    };
+
+    document.addEventListener("CherryTree.Media.PlayerAction", playerInput);
 
     musicAudio.addEventListener("canplaythrough", () => {
       window.desktopIntegration !== undefined &&
@@ -337,6 +372,16 @@ const pkg = {
           details: playerSong,
           state: playerArtist,
         });
+      let splitStr = playerArtist.split(" • ");
+      document.dispatchEvent(
+        new CustomEvent("CherryTree.Media.UpdateMetadata", {
+          detail: {
+            title: playerSong,
+            artist: splitStr[0],
+            album: splitStr[1],
+          },
+        }),
+      );
       if (autoplay) {
         musicAudio.play();
       }
@@ -401,6 +446,7 @@ const pkg = {
     musicAudio.pause();
     musicAudio = null;
     document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
+    document.removeEventListener("CherryTree.Media.PlayerAction", playerInput);
     bg.styleJs({ opacity: "0" });
     setTimeout(() => {
       bg.cleanup();
