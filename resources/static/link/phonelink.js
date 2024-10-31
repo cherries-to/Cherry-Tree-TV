@@ -39,7 +39,8 @@ async function start() {
 
   let peer = null,
     conn = null,
-    custRemoteWrapper = null;
+    custRemoteWrapper = null,
+    custRemoteToggle = null;
 
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
@@ -136,16 +137,40 @@ async function start() {
           let overrideStyles = {
             background: "rgb(0,0,0)",
             position: "absolute",
-            top: "0",
+            top: "8%",
             left: "0",
             width: "100%",
-            height: "100%",
+            height: "92%",
+            transition: "all 0.5s cubic-bezier(0.87, 0, 0.13, 1) ",
           };
           let elementsList = Object.keys(d.detail.elements);
           let elements = d.detail.elements;
+          custRemoteToggle = new Html("button")
+            .text("Hide custom remote")
+            .styleJs({
+              position: "absolute",
+              top: "0",
+              left: "0",
+              width: "100%",
+              maxHeight: "8%",
+              height: "8%",
+              background: "rgb(25,25,25)",
+              borderRadius: "0",
+            })
+            .appendTo("body");
+          let hidden = false;
           custRemoteWrapper = new Html("div")
             .styleJs(wrapperStyles)
             .appendTo("body");
+          custRemoteToggle.on("click", () => {
+            hidden = !hidden;
+            custRemoteWrapper.styleJs({
+              zIndex: hidden ? "-1" : "100000",
+              maxHeight: hidden ? "0%" : "92%",
+              opacity: hidden ? "0" : "1",
+            });
+            custRemoteToggle.text(`${hidden ? "Show" : "Hide"} custom remote`);
+          });
           for (const element of elementsList) {
             console.log("now rendering", elements[element]);
             let elm = new Html(elements[element].type)
@@ -171,6 +196,7 @@ async function start() {
         }
         if (d.type === "destroyCustom") {
           custRemoteWrapper.cleanup();
+          custRemoteToggle.cleanup();
         }
         if (d.type === "changeWallpaper") {
           console.log(d);
