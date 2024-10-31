@@ -1,7 +1,8 @@
 import Html from "/libs/html.js";
 import { Peer } from "https://esm.sh/peerjs@1.5.4?bundle-deps";
 
-let wrapper,
+let audio,
+  wrapper,
   row,
   Ui,
   Pid,
@@ -41,6 +42,7 @@ const pkg = {
     Ui.becomeTopUi(Pid, wrapper);
 
     Sfx = Root.Processes.getService("SfxLib").data;
+    audio = Sfx.getAudio();
 
     Sfx.playSfx("deck_ui_into_game_detail.wav");
 
@@ -51,7 +53,7 @@ const pkg = {
 
     console.log(Sfx);
 
-    function setupCasting(onReady) {
+    function setupCasting(onReady, onEnd) {
       socket = io("https://olive.nxw.pw:4190", {
         query: {
           name: tvName,
@@ -86,15 +88,25 @@ const pkg = {
               video.elm.remove();
               connectionState = "ready";
               isDisplayed = false;
+              socket.disconnect();
+              peer.destroy();
+              onEnd();
             }
           });
 
-          conn.on("close", () => {
+          conn.on("close", async () => {
             console.log("Stream ended");
             video.elm.removeAttribute("src");
             video.elm.remove();
             connectionState = "ready";
             isDisplayed = false;
+            let playBgm = await window.localforage.getItem("settings__playBgm");
+            if (playBgm) {
+              audio.play();
+            }
+            socket.disconnect();
+            peer.destroy();
+            onEnd();
           });
 
           peer.on("call", (curCall) => {
@@ -122,12 +134,13 @@ const pkg = {
             }
             console.log(call.peer);
             call.answer();
-            call.on("stream", (curStream) => {
+            call.on("stream", async (curStream) => {
               if (isDisplayed == true) {
                 console.log(isDisplayed);
                 console.log("Duplicate video element - returning");
                 return;
               }
+              audio.pause();
               connectionState = "receiving";
               video = new Html("video")
                 .styleJs({
@@ -158,50 +171,72 @@ const pkg = {
               const track = curStream.getVideoTracks()[0];
               console.log(track);
             });
-            call.on("close", () => {
+            call.on("close", async () => {
               connectionState = "ready";
               isDisplayed = false;
               video.elm.removeAttribute("src");
               video.elm.remove();
+              let playBgm = await window.localforage.getItem(
+                "settings__playBgm",
+              );
+              if (playBgm) {
+                audio.play();
+              }
+              socket.disconnect();
+              peer.destroy();
+              onEnd();
             });
-            call.on("disconnect", () => {
+            call.on("disconnect", async () => {
               connectionState = "ready";
               isDisplayed = false;
               video.elm.removeAttribute("src");
               video.elm.remove();
+              let playBgm = await window.localforage.getItem(
+                "settings__playBgm",
+              );
+              if (playBgm) {
+                audio.play();
+              }
+              socket.disconnect();
+              peer.destroy();
+              onEnd();
             });
           });
         });
       });
     }
 
-    new Html("h1").text("Loading...").appendTo(wrapper);
-
-    setupCasting(() => {
+    const onShareEnd = () => {
       wrapper.clear();
-      new Html("p").text("This TV is ready to project as:").appendTo(wrapper);
-      new Html("h1").text(tvName).appendTo(wrapper);
-      new Html("p")
-        .html(
-          `Open PlutoCast on a supported device and find <strong>${tvName}.</strong>`,
-        )
-        .appendTo(wrapper);
-      new Html("br").appendTo(wrapper);
-      row = new Html("div")
-        .class("flex-list")
-        .appendMany(
-          new Html("button").text("Exit app").on("click", (e) => {
-            Root.end();
-          }),
-        )
-        .appendTo(wrapper);
+      new Html("h1").text("Loading...").appendTo(wrapper);
 
-      Ui.init(Pid, "horizontal", [row.elm.children], function (e) {
-        if (e === "back") {
-          pkg.end();
-        }
-      });
-    });
+      setupCasting(() => {
+        wrapper.clear();
+        new Html("p").text("This TV is ready to project as:").appendTo(wrapper);
+        new Html("h1").text(tvName).appendTo(wrapper);
+        new Html("p")
+          .html(
+            `Open PlutoCast on a supported device and find <strong>${tvName}.</strong>`,
+          )
+          .appendTo(wrapper);
+        new Html("br").appendTo(wrapper);
+        row = new Html("div")
+          .class("flex-list")
+          .appendMany(
+            new Html("button").text("Exit app").on("click", (e) => {
+              Root.end();
+            }),
+          )
+          .appendTo(wrapper);
+
+        Ui.init(Pid, "horizontal", [row.elm.children], function (e) {
+          if (e === "back") {
+            pkg.end();
+          }
+        });
+      }, onShareEnd);
+    };
+    onShareEnd();
   },
   end: async function () {
     document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
