@@ -128,6 +128,30 @@ const pkg = {
           },
         );
 
+        document.addEventListener("CherryTree.Media.UpdateMetadata", (e) => {
+          conn.send({
+            type: "mediaSession",
+            sessionType: "updateMetadata",
+            data: e.detail,
+          });
+        });
+
+        document.addEventListener("CherryTree.Media.UpdatePlayState", (e) => {
+          conn.send({
+            type: "mediaSession",
+            sessionType: "updatePlayState",
+            data: e.detail,
+          });
+        });
+
+        document.addEventListener("CherryTree.Media.UpdatePosition", (e) => {
+          conn.send({
+            type: "mediaSession",
+            sessionType: "updatePosition",
+            data: e.detail,
+          });
+        });
+
         document.addEventListener("CherryTree.Remote.DestroyCustom", (e) => {
           customRemote = null;
           conn.send({
@@ -161,6 +185,19 @@ const pkg = {
                   type: "registerCustom",
                   detail: customRemote,
                 });
+              }
+            }
+            if (data.type === "mediaSession") {
+              switch (data.sessionType) {
+                case "action":
+                  document.dispatchEvent(
+                    new CustomEvent("CherryTree.Media.PlayerAction", {
+                      detail: { type: data.actionType, data: data.data },
+                    }),
+                  );
+                  break;
+                default:
+                  console.log("Unknown type, doing nothing");
               }
             }
             if (data.input) {

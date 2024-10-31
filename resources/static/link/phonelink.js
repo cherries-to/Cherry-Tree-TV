@@ -40,7 +40,8 @@ async function start() {
   let peer = null,
     conn = null,
     custRemoteWrapper = null,
-    custRemoteToggle = null;
+    custRemoteToggle = null,
+    audio = null;
 
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
@@ -197,6 +198,85 @@ async function start() {
         if (d.type === "destroyCustom") {
           custRemoteWrapper.cleanup();
           custRemoteToggle.cleanup();
+        }
+        if (d.type === "mediaSession") {
+          if (!("mediaSession" in navigator)) {
+            console.log("MediaSession not supported!");
+            return;
+          }
+
+          if (!audio) {
+            audio = new Audio("/assets/audio/1-hour-of-silence.mp3");
+            audio.loop = true;
+            audio.play();
+          }
+
+          switch (d.sessionType) {
+            case "updateMetadata":
+              console.log("updating metadata");
+              navigator.mediaSession.metadata = new MediaMetadata(d.data);
+              break;
+            case "updatePlayState":
+              console.log("updating play state");
+              navigator.mediaSession.playbackState = d.data;
+              break;
+            case "updatePosition":
+              console.log("updating position");
+              navigator.mediaSession.setPositionState(d.data);
+              break;
+            default:
+              console.log("Unknown type, doing nothing");
+              break;
+          }
+
+          navigator.mediaSession.setActionHandler("play", () => {
+            conn.send({
+              type: "mediaSession",
+              sessionType: "action",
+              actionType: "play",
+              data: {},
+            });
+          });
+          navigator.mediaSession.setActionHandler("pause", () => {
+            conn.send({
+              type: "mediaSession",
+              sessionType: "action",
+              actionType: "pause",
+              data: {},
+            });
+          });
+          navigator.mediaSession.setActionHandler("stop", () => {
+            conn.send({
+              type: "mediaSession",
+              sessionType: "action",
+              actionType: "stop",
+              data: {},
+            });
+          });
+          navigator.mediaSession.setActionHandler("seekbackward", () => {
+            conn.send({
+              type: "mediaSession",
+              sessionType: "action",
+              actionType: "seekBackward",
+              data: {},
+            });
+          });
+          navigator.mediaSession.setActionHandler("seekforward", () => {
+            conn.send({
+              type: "mediaSession",
+              sessionType: "action",
+              actionType: "seekForward",
+              data: {},
+            });
+          });
+          navigator.mediaSession.setActionHandler("seekto", (details) => {
+            conn.send({
+              type: "mediaSession",
+              sessionType: "action",
+              actionType: "seekTo",
+              data: details,
+            });
+          });
         }
         if (d.type === "changeWallpaper") {
           console.log(d);
