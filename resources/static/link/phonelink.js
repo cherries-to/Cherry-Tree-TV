@@ -157,6 +157,7 @@ async function start() {
               height: "8%",
               background: "rgb(25,25,25)",
               borderRadius: "0",
+              zIndex: "999999999",
             })
             .appendTo("body");
           let hidden = false;
@@ -175,7 +176,8 @@ async function start() {
           for (const element of elementsList) {
             console.log("now rendering", elements[element]);
             let elm = new Html(elements[element].type)
-              .text(elements[element].text)
+              .attr(elements[element].attr ? elements[element].attr : {})
+              .text(elements[element].text ? elements[element].text : "")
               .styleJs(elements[element].style)
               .appendTo(custRemoteWrapper);
             if (elements[element].events) {
@@ -209,11 +211,27 @@ async function start() {
             audio = new Audio("/assets/audio/1-hour-of-silence.mp3");
             audio.loop = true;
             audio.play();
+            audio.addEventListener("pause", () => {
+              conn.send({
+                type: "mediaSession",
+                sessionType: "action",
+                actionType: "pause",
+                data: {},
+              });
+            });
+            audio.addEventListener("play", () => {
+              conn.send({
+                type: "mediaSession",
+                sessionType: "action",
+                actionType: "play",
+                data: {},
+              });
+            });
           }
 
           switch (d.sessionType) {
             case "updateMetadata":
-              console.log("updating metadata");
+              console.log("updating metadata", d.data);
               navigator.mediaSession.metadata = new MediaMetadata(d.data);
               break;
             case "updatePlayState":
@@ -229,22 +247,22 @@ async function start() {
               break;
           }
 
-          navigator.mediaSession.setActionHandler("play", () => {
-            conn.send({
-              type: "mediaSession",
-              sessionType: "action",
-              actionType: "play",
-              data: {},
-            });
-          });
-          navigator.mediaSession.setActionHandler("pause", () => {
-            conn.send({
-              type: "mediaSession",
-              sessionType: "action",
-              actionType: "pause",
-              data: {},
-            });
-          });
+          // navigator.mediaSession.setActionHandler("play", () => {
+          //   conn.send({
+          //     type: "mediaSession",
+          //     sessionType: "action",
+          //     actionType: "play",
+          //     data: {},
+          //   });
+          // });
+          // navigator.mediaSession.setActionHandler("pause", () => {
+          //   conn.send({
+          //     type: "mediaSession",
+          //     sessionType: "action",
+          //     actionType: "pause",
+          //     data: {},
+          //   });
+          // });
           navigator.mediaSession.setActionHandler("stop", () => {
             conn.send({
               type: "mediaSession",

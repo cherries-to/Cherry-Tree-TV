@@ -1,3 +1,4 @@
+import CustomInput from "../../libs/customInput.js";
 import icons from "../../libs/icons.js";
 import Html from "/libs/html.js";
 
@@ -7,11 +8,15 @@ let wrapper,
   Sfx,
   bg,
   volumeUpdate,
+  customPlayerInput,
   playerInput,
   musicAudio,
   visualizer,
   audioMotion,
-  colorThief;
+  colorThief,
+  splitStr,
+  base64URL,
+  controller;
 
 const pkg = {
   name: "Audio Player",
@@ -155,6 +160,19 @@ const pkg = {
     let songTitle = new Html("h1").text("Unknown song").appendTo(songInfo);
     let songArtist = new Html("p").text("Unknown artist").appendTo(songInfo);
 
+    function blobToBase64(blob) {
+      return new Promise((resolve, _) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          let base64data = reader.result;
+          base64data = base64data.substr(base64data.indexOf(",") + 1);
+          base64data = "data:image/jpeg;base64," + base64data;
+          resolve(base64data);
+        };
+        reader.readAsDataURL(blob);
+      });
+    }
+
     if ("title" in tag.tags) {
       playerSong = tag.tags.title;
     }
@@ -169,14 +187,16 @@ const pkg = {
     if ("year" in tag.tags) {
       playerArtist = playerArtist + " • " + tag.tags.year;
     }
-
+    let dataURL;
     if ("picture" in tag.tags) {
       let buf = new Uint8Array(tag.tags.picture.data);
       let blob = new Blob([buf]);
       console.log(blob);
-      let dataURL = URL.createObjectURL(blob);
-      albumCover.elm.src = dataURL;
-      bg.elm.src = dataURL;
+      // dataURL = URL.createObjectURL(blob);
+      base64URL = await blobToBase64(blob);
+      console.log(base64URL);
+      albumCover.elm.src = base64URL;
+      bg.elm.src = base64URL;
       setTimeout(() => {
         bg.styleJs({
           opacity: "1",
@@ -364,6 +384,17 @@ const pkg = {
       }
     };
 
+    customPlayerInput = () => {
+      if (musicAudio.paused) {
+        musicAudio.play();
+        stopBgm();
+      } else {
+        musicAudio.pause();
+        playBgm();
+      }
+    };
+
+    document.addEventListener("AudioPlayer.PlayPause", customPlayerInput);
     document.addEventListener("CherryTree.Media.PlayerAction", playerInput);
 
     musicAudio.addEventListener("canplaythrough", () => {
@@ -372,16 +403,16 @@ const pkg = {
           details: playerSong,
           state: playerArtist,
         });
-      let splitStr = playerArtist.split(" • ");
-      document.dispatchEvent(
-        new CustomEvent("CherryTree.Media.UpdateMetadata", {
-          detail: {
-            title: playerSong,
-            artist: splitStr[0],
-            album: splitStr[1],
-          },
-        }),
-      );
+      // splitStr = playerArtist.split(" • ");
+      // document.dispatchEvent(
+      //   new CustomEvent("CherryTree.Media.UpdateMetadata", {
+      //     detail: {
+      //       title: playerSong,
+      //       artist: splitStr[0],
+      //       album: splitStr[1],
+      //     },
+      //   }),
+      // );
       if (autoplay) {
         musicAudio.play();
       }
@@ -391,6 +422,98 @@ const pkg = {
     // VERY PERFORMANCE HEAVY!
 
     function startVisualizer() {
+      splitStr = playerArtist.split(" • ");
+      console.log("dispatching event");
+      if (base64URL) {
+        document.dispatchEvent(
+          new CustomEvent("CherryTree.Media.UpdateMetadata", {
+            detail: {
+              title: playerSong,
+              artist: splitStr[0],
+              album: splitStr[1],
+              artwork: [{ src: base64URL }],
+            },
+          }),
+        );
+      } else {
+        document.dispatchEvent(
+          new CustomEvent("CherryTree.Media.UpdateMetadata", {
+            detail: {
+              title: playerSong,
+              artist: splitStr[0],
+              album: splitStr[1],
+            },
+          }),
+        );
+      }
+      controller = new CustomInput({
+        wrapperStyles: {
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "10px",
+        },
+        elements: {
+          background: {
+            type: "div",
+            text: "",
+            style: {
+              position: "fixed",
+              top: "0",
+              left: "0",
+              width: "100%",
+              height: "100%",
+              zIndex: "0",
+              background: `url(${base64URL})`,
+              backgroundRepeat: "no-repeat",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              filter: "blur(50px) brightness(50%)",
+            },
+          },
+          nowPlaying: {
+            type: "p",
+            text: "Now playing",
+            style: { textAlign: "center", zIndex: "10", maxWidth: "80%" },
+          },
+          albumCover: {
+            type: "img",
+            text: "",
+            attr: {
+              src: base64URL,
+            },
+            style: {
+              width: "50%",
+              aspectRatio: "1 / 1",
+              objectFit: "cover",
+              zIndex: "10",
+              borderRadius: "10px",
+            },
+          },
+          songName: {
+            type: "h1",
+            text: playerSong,
+            style: { textAlign: "center", zIndex: "10", maxWidth: "80%" },
+          },
+          songArtist: {
+            type: "p",
+            text: playerArtist,
+            style: { textAlign: "center", zIndex: "10", maxWidth: "80%" },
+          },
+          playPause: {
+            type: "button",
+            text: "Play/pause",
+            style: { zIndex: "10" },
+            events: {
+              click: "AudioPlayer.PlayPause",
+            },
+          },
+        },
+      });
+
+      controller.register();
+
       let color = colorThief.getColor(albumCover.elm);
       console.log("colors", color);
       let colorMain = `rgb(${color[0] + 50},${color[1] + 50}, ${
@@ -441,12 +564,14 @@ const pkg = {
     });
   },
   end: async function () {
+    controller.destroy();
     audioMotion.destroy();
     visualizer.cleanup();
     musicAudio.pause();
     musicAudio = null;
     document.removeEventListener("CherryTree.Ui.VolumeChange", volumeUpdate);
     document.removeEventListener("CherryTree.Media.PlayerAction", playerInput);
+    document.removeEventListener("AudioPlayer.PlayPause", customPlayerInput);
     bg.styleJs({ opacity: "0" });
     setTimeout(() => {
       bg.cleanup();

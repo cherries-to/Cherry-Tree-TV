@@ -1,12 +1,15 @@
-const YouTubeCastReceiver = require("yt-cast-receiver");
 const { app, BrowserWindow, ipcMain } = require("electron");
+const YouTubeCastReceiver = require("yt-cast-receiver");
 const { Client } = require("@xhayper/discord-rpc");
 const nodeDiskInfo = require("node-disk-info");
 const { Player } = require("yt-cast-receiver");
 const { Worker } = require("worker_threads");
 const { Server } = require("socket.io");
 const ffmpeg = require("fluent-ffmpeg");
+const { v4: uuidv4 } = require("uuid");
+const jwt = require("jsonwebtoken");
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const mime = require("mime-types");
 const qrcode = require("qrcode");
 const dgram = require("dgram");
@@ -219,6 +222,29 @@ app.whenReady().then(() => {
   if (!fs.existsSync(`${userData}/thumbnails/`)) {
     fs.mkdirSync(`${userData}/thumbnails/`);
   }
+
+  let config = {
+    pairToken: uuidv4(),
+    remotes: {},
+  };
+
+  if (!fs.existsSync(`${userData}/config.json`)) {
+    fs.writeFileSync(
+      `${userData}/config.json`,
+      JSON.stringify(config, null, 2),
+    );
+  }
+
+  function saveConfig() {
+    fs.writeFileSync(
+      `${userData}/config.json`,
+      JSON.stringify(config, null, 2),
+    );
+  }
+
+  config = JSON.parse(fs.readFileSync(`${userData}/config.json`));
+  console.log(config);
+
   client.login();
   io.on("connection", async (socket) => {
     console.log("connection attempt");

@@ -12,7 +12,7 @@ class CustomInput {
         }),
       );
     } else {
-      throw new Error("Control already registered, destroy to re-register");
+      console.error("Control already registered, destroy to re-register");
     }
   }
   destroy() {
@@ -22,7 +22,7 @@ class CustomInput {
       );
       this.#registered = false;
     } else {
-      throw new Error("Control not registered yet, nothing to destroy");
+      console.error("Control not registered yet, nothing to destroy");
     }
   }
 }
