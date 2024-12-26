@@ -14,7 +14,7 @@ module.exports = {
       name: "@electron-forge/maker-squirrel",
       config: {
         authors: "Cherries.to & Tranch Software",
-        description: "Easily your PC into a home theatre.",
+        description: "Easily turn your PC into a home theatre.",
         loadingGif: "installer.gif",
       },
     },
