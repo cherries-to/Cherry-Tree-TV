@@ -303,29 +303,51 @@ const pkg = {
       });
 
       buttons = [];
+      const fragment = document.createDocumentFragment();
 
       let folder = await GetFolder(launchArgs.showFolder);
       if (sortCreated) {
-        folder.sort(function (x, y) {
-          return x.created - y.created;
-        });
+        folder.sort((x, y) => x.created - y.created);
       } else {
-        folder.sort(function (x, y) {
-          return x.modified - y.modified;
-        });
+        folder.sort((x, y) => x.modified - y.modified);
       }
 
-      console.log(folder);
-      // Precompile regex
       const extRegex = /(?:\.([^.]+))?$/;
-
-      // Store frequently used styles
       const flexListStyle = { width: "100%" };
       const imageStyle = {
         aspectRatio: "16 / 9",
         height: "85%",
         borderRadius: "5px",
+        backgroundColor: "#2228", // Placeholder background
+        transition: "opacity 0.3s ease",
       };
+
+      // Create intersection observer for lazy loading
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              if (img.dataset.src) {
+                img.src = img.dataset.src;
+                img.style.opacity = "0";
+                img.onload = () => {
+                  img.style.opacity = "1";
+                };
+                img.onerror = () => {
+                  img.style.opacity = "1";
+                  img.style.backgroundColor = "#500";
+                };
+                observer.unobserve(img);
+              }
+            }
+          });
+        },
+        {
+          rootMargin: "50px",
+        },
+      );
+
       const showCountNameStyle = {
         display: "flex",
         flexDirection: "column",
@@ -343,35 +365,32 @@ const pkg = {
       const h1Style = { textAlign: "left", fontSize: "4em" };
       const pStyle = { textAlign: "left" };
 
-      const thumbnailBaseUrl = new URL("http://localhost:9864/thumbnail"); // Create the base URL outside the loop
-
+      const thumbnailBaseUrl = new URL("http://localhost:9864/thumbnail");
       let episodesFound = 0;
-      const episodes = {}; // Use a plain object or Map
+      const episodes = {};
 
       for (const item of folder) {
         const ext = extRegex.exec(item.name)[1];
-        console.log(ext);
         const mapping = mappings[ext];
 
         if (mapping && mapping.type === "video") {
           episodesFound++;
           episodes[item.name] = episodesFound;
-          console.log(item);
 
-          const row = new Html("div")
-            .class("flex-list")
-            .appendTo(contentWrapper)
-            .styleJs(flexListStyle);
+          const row = new Html("div").class("flex-list").styleJs(flexListStyle);
 
-          const thumbnailURL = new URL(thumbnailBaseUrl); // Clone the base URL
+          const thumbnailURL = new URL(thumbnailBaseUrl);
           thumbnailURL.searchParams.set(
             "path",
             launchArgs.showFolder + item.name,
           );
 
           const showPreview = new Html("img")
-            .styleJs(imageStyle)
-            .attr({ "data-src": thumbnailURL.toString(), class: "lazyload" });
+            .styleJs({ ...imageStyle, opacity: "0" })
+            .attr({ "data-src": thumbnailURL.toString() });
+
+          // Observe the image element
+          observer.observe(showPreview.elm);
 
           const showCountName = new Html("div").styleJs(showCountNameStyle);
           new Html("h1")
@@ -388,7 +407,6 @@ const pkg = {
             .styleJs(buttonStyle)
             .appendTo(row)
             .on("click", async () => {
-              console.log(item);
               Ui.transition("popOut", wrapper, 500, true);
               await Root.Libs.startPkg(
                 mapping.opensWith,
@@ -405,14 +423,16 @@ const pkg = {
               );
             });
 
-          UiElems.push(row.elm.children); // Collect elements for update
+          fragment.appendChild(row.elm);
           buttons.push(row);
+          UiElems.push(row.elm.children);
         }
       }
 
-      // Batch UI updates
+      contentWrapper.elm.appendChild(fragment);
       Ui.update(Pid, UiElems);
     }
+
     const row = new Html("div").class("flex-list").appendTo(contentWrapper);
     let sortButton = new Html("button")
       .text(`Sort by ${sortCreated ? "file creation" : "file modified"}`)
