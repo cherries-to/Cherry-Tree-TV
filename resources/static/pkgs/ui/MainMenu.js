@@ -42,6 +42,7 @@ const pkg = {
 
     logStep("MAIN MENU LOADED");
 
+    let watchParties = [];
     let friendsList = [];
     let info = {
       id: -1,
@@ -85,41 +86,10 @@ const pkg = {
       if (s.type === "watchParty") {
         console.log(s);
         let parsedData = JSON.parse(s.text);
+        watchParties.push({ ...parsedData, from: s.from });
         Root.Libs.Notify.show(
-          `${s.from.name} is hosting a watch party!`,
-          `Press the %menu% button to handle the invite.`,
-          "menu",
-          async () => {
-            let userResult = await Root.Libs.Modal.Show({
-              title: "Watch Party Invite",
-              description: `${s.from.name} has invited you to watch\n ${parsedData.name}`,
-              parent: document.body,
-              pid: await Ui.getTopUi(),
-              buttons: [
-                { type: "default", text: "Accept" },
-                { type: "default", text: "Ignore" },
-              ],
-            });
-            console.log(userResult);
-            if (!userResult.cancelled) {
-              const accepted = userResult.id === 0 ? true : false;
-              if (accepted) {
-                clearTimeout(screensaverTimeout);
-                await Root.Libs.startPkg(
-                  "apps:VideoPlayer",
-                  [
-                    {
-                      app: "video",
-                      watchParty: true,
-                      partyCode: parsedData.partyId,
-                      partyName: parsedData.name,
-                    },
-                  ],
-                  true,
-                );
-              }
-            }
-          },
+          `${s.from.name} invites you to a watch party!`,
+          `Head over to the Friends menu to join!`,
         );
       } else if (s.type === "now-playing") {
         if (s.data.who === info.id) return;
@@ -419,9 +389,13 @@ const pkg = {
 
     let friendListHtml = [],
       incomingFriendListHtml = [],
-      outgoingFriendListHtml = [];
+      outgoingFriendListHtml = [],
+      watchPartyListHtml = [];
 
-    let friendListWrapperWrapper, outgoingFriendList, incomingFriendList;
+    let friendListWrapperWrapper,
+      outgoingFriendList,
+      incomingFriendList,
+      watchPartyList;
 
     let friendTitle = new Html("h1").text("Friends").appendTo(moreList);
 
@@ -466,6 +440,7 @@ const pkg = {
       friendListHtml = [];
       incomingFriendListHtml = [];
       outgoingFriendListHtml = [];
+      watchPartyListHtml = [];
 
       let mergedFriends = friendsList.map((usr) => {
         uFriendList.forEach((uUsr) => {
@@ -613,6 +588,78 @@ const pkg = {
           }),
       );
 
+      watchPartyListHtml.push(
+        ...watchParties.map((party) => {
+          let button = new Html("button")
+            .class("auto", "flex-col", "transparent")
+            .appendMany(
+              new Html("div")
+                .class("flex-list", "flex-center")
+                .style({
+                  width: "12.5rem",
+                  height: "12.5rem",
+                  background: `${idToColor(party.from.id)}`,
+                  "border-radius": "0.15rem",
+                })
+                .append(
+                  new Html("span")
+                    .style({
+                      "background-color": "rgba(0,0,0,0.2)",
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      "justify-content": "center",
+                      "align-items": "center",
+                      "font-size": "4.5rem",
+                      flex: "1",
+                    })
+                    .text(idToEmoji(party.from.id)),
+                ),
+              new Html("span").class("title").text(party.from.name),
+            )
+            .on("click", async () => {
+              clearTimeout(screensaverTimeout);
+              let userResult = await Root.Libs.Modal.Show({
+                title: "Watch Party Invite",
+                description: `${party.from.name} has invited you to watch\n ${party.name}`,
+                parent: document.body,
+                pid: await Ui.getTopUi(),
+                buttons: [
+                  { type: "default", text: "Accept" },
+                  { type: "default", text: "Ignore" },
+                ],
+              });
+              console.log(userResult);
+              if (!userResult.cancelled) {
+                const accepted = userResult.id === 0 ? true : false;
+                if (accepted) {
+                  clearTimeout(screensaverTimeout);
+                  await Root.Libs.startPkg(
+                    "apps:VideoPlayer",
+                    [
+                      {
+                        app: "video",
+                        watchParty: true,
+                        partyCode: party.partyId,
+                        partyName: party.name,
+                      },
+                    ],
+                    true,
+                  );
+                }
+              } else {
+                initScreensaver();
+              }
+            });
+          let trimmed =
+            party.name.length > 20
+              ? party.name.slice(0, 20) + "..."
+              : party.name;
+          new Html("label").text(trimmed).appendTo(button);
+          return button;
+        }),
+      );
+
       if (incomingFriendListHtml.length === 0) {
         incomingFriendListHtml = [
           new Html("button").class("invisible").text("Nothing to see here.."),
@@ -621,6 +668,14 @@ const pkg = {
       if (outgoingFriendListHtml.length === 0) {
         outgoingFriendListHtml = [
           new Html("button").class("invisible").text("Nothing to see here.."),
+        ];
+      }
+
+      if (watchPartyListHtml.length === 0) {
+        watchPartyListHtml = [
+          new Html("button")
+            .class("invisible")
+            .text("No active watch parties.."),
         ];
       }
 
@@ -675,6 +730,7 @@ const pkg = {
         friendListWrapperWrapper.cleanup();
         outgoingFriendList.cleanup();
         incomingFriendList.cleanup();
+        watchPartyList.cleanup();
       }
 
       friendListWrapper.html("").appendMany(...friendListHtml);
@@ -704,10 +760,19 @@ const pkg = {
         )
         .appendTo(friendList);
 
+      watchPartyList = new Html("div")
+        .class("flex-col")
+        .appendMany(
+          new Html("h1").class("title").text("watch parties"),
+          new Html("div").class("flex-list").appendMany(...watchPartyListHtml),
+        )
+        .appendTo(friendList);
+
       currentMenuList = [
         friendListWrapper.elm.children,
         outgoingFriendListHtml,
         incomingFriendListHtml,
+        watchPartyListHtml,
       ];
     }
 
@@ -819,6 +884,7 @@ const pkg = {
                 friendListWrapper.elm.children,
                 outgoingFriendListHtml.map((m) => m.elm),
                 incomingFriendListHtml.map((m) => m.elm),
+                watchPartyListHtml.map((m) => m.elm),
               ];
             }
           }

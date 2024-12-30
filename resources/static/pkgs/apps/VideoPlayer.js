@@ -221,7 +221,7 @@ const pkg = {
               "User left",
               `This user has left the watch party.`,
             );
-            peer.destroy();
+            // peer.destroy();
           });
         });
       });
