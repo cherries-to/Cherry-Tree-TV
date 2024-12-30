@@ -104,6 +104,7 @@ const pkg = {
             if (!userResult.cancelled) {
               const accepted = userResult.id === 0 ? true : false;
               if (accepted) {
+                clearTimeout(screensaverTimeout);
                 await Root.Libs.startPkg(
                   "apps:VideoPlayer",
                   [

@@ -128,7 +128,17 @@ const pkg = {
         hostCode += chars[Math.floor(Math.random() * chars.length)];
       }
       return new Promise((resolve, reject) => {
-        let peer = new Peer(hostCode);
+        let peer = new Peer(hostCode, {
+          config: {
+            iceServers: [
+              {
+                urls: "turn:freestun.net:3478",
+                username: "free",
+                credential: "free",
+              },
+            ],
+          },
+        });
         function closePeer() {
           peer.destroy();
           document.removeEventListener(
@@ -681,7 +691,17 @@ const pkg = {
           closeModalCb = a;
         },
       );
-      peer = new Peer();
+      peer = new Peer(undefined, {
+        config: {
+          iceServers: [
+            {
+              urls: "turn:freestun.net:3478",
+              username: "free",
+              credential: "free",
+            },
+          ],
+        },
+      });
       function closePeer() {
         peer.destroy();
         document.removeEventListener("CherryTree.VideoPlayer.Close", closePeer);
