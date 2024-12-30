@@ -248,7 +248,7 @@ const pkg = {
         }
         Ui.transition("popOut", wrapper, 500, true);
         await Root.Libs.startPkg("ui:ScreenSaver", undefined);
-      }, 10000);
+      }, 60000);
     }
 
     function changePreview(id, coverEnabled = true) {
@@ -646,6 +646,7 @@ const pkg = {
             new Html("span").class("title").text("Add Friend"),
           )
           .on("click", async (e) => {
+            clearTimeout(screensaverTimeout);
             let options = {
               title: "Add a Friend",
               description: "Enter your friend's Cherries account name",
@@ -657,12 +658,16 @@ const pkg = {
 
             let result = await Root.Libs.Modal.showKeyboard(options);
 
-            if (result.canceled === true) return;
+            if (result.canceled === true) {
+              initScreensaver();
+              return;
+            }
 
             let data = await ws.sendMessage({
               type: "send-friend-request",
               message: result.value,
             });
+            initScreensaver();
           }),
       );
 
