@@ -493,20 +493,33 @@ const pkg = {
 
   home: async function () {
     this.wrapper.clear();
+    const tvName = this.Root.Security.getSecureVariable("TV_NAME");
 
-    this.actionRow = await this.createRow(this.wrapper);
-    this.searchRow = await this.createRow(this.wrapper);
+    // this.actionRow = await this.createRow(this.wrapper);
+    // this.searchRow = await this.createRow(this.wrapper);
 
-    await this.createActionRow();
+    // await this.createActionRow();
 
-    this.updateUi(
-      [this.actionRow.elm.children, this.searchRow.elm.children],
-      (e) => {
-        if (e === "back") {
-          pkg.end();
-        }
-      },
-    );
+    new Html("p").text("This TV is ready to cast as:").appendTo(this.wrapper);
+    new Html("h1").text(tvName).appendTo(this.wrapper);
+    new Html("p")
+      .html(`Open YouTube on your phone and find <strong>${tvName}.</strong>`)
+      .appendTo(this.wrapper);
+    new Html("br").appendTo(this.wrapper);
+    let row = new Html("div")
+      .class("flex-list")
+      .appendMany(
+        new Html("button").text("Exit app").on("click", (e) => {
+          Root.end();
+        }),
+      )
+      .appendTo(this.wrapper);
+
+    this.updateUi([row.elm.children], (e) => {
+      if (e === "back") {
+        pkg.end();
+      }
+    });
   },
 
   settings: async function () {
@@ -533,14 +546,22 @@ const pkg = {
 
     // create the topbar and other row elements
     this.outerWrapper = new Html("div")
-      .style({ "max-width": "100%" })
-      .class("ui", "pad-top", "gap")
+      .styleJs({
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "10px",
+      })
+      .class("full-ui")
       .appendTo("body");
 
     this.topBar = await this.createRow(this.outerWrapper);
     this.topBar.elm.style.paddingLeft = "12px"; // add padding left as 12px to match the row
 
-    this.wrapper = new Html("div").appendTo(this.outerWrapper);
+    this.wrapper = this.outerWrapper;
 
     // pop in application and play sound effect
     Ui.transition("popIn", this.wrapper);
