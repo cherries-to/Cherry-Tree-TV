@@ -198,15 +198,14 @@ const pkg = {
       };
       const textStyle = { textAlign: "left" };
 
+      const fragment = document.createDocumentFragment();
+
       for (const item of data.items) {
         const ext = extRegex.exec(item.name)[1];
         console.log(ext);
         console.log(item);
 
-        const row = new Html("div")
-          .class("flex-list")
-          .appendTo(wrapper)
-          .styleJs(flexListStyle);
+        const row = new Html("div").class("flex-list").styleJs(flexListStyle);
 
         const showPreview = new Html("img").styleJs(imageStyle).attr({
           "data-src": "/assets/img/broadcast_no_poster.svg",
@@ -222,7 +221,6 @@ const pkg = {
         new Html("button")
           .appendMany(showPreview, showCountName)
           .styleJs(buttonStyle)
-          .appendTo(row)
           .on("click", async () => {
             console.log(item);
             Ui.transition("popOut", wrapper, 500, true);
@@ -237,12 +235,15 @@ const pkg = {
               ],
               true,
             );
-          });
+          })
+          .appendTo(row);
 
+        fragment.appendChild(row.elm);
         UiElems.push(row.elm.children);
         buttons.push(row);
       }
 
+      wrapper.elm.appendChild(fragment);
       Ui.update(Pid, UiElems);
     }
     const row = new Html("div").class("flex-list").appendTo(wrapper);
