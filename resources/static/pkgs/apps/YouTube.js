@@ -510,7 +510,7 @@ const pkg = {
       .class("flex-list")
       .appendMany(
         new Html("button").text("Exit app").on("click", (e) => {
-          Root.end();
+          this.Root.end();
         }),
       )
       .appendTo(this.wrapper);
