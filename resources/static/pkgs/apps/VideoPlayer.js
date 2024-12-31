@@ -766,7 +766,7 @@ const pkg = {
       }
     }
 
-    function openMenu(overlay, tempUiElems) {
+    function openMenu(overlay, tempUiElems, onNavigate) {
       Sfx.playSfx("deck_ui_into_game_detail.wav");
       Ui.transition("popIn", overlay);
       bottom.styleJs({ opacity: "0" });
@@ -777,6 +777,7 @@ const pkg = {
         if (e === "back") {
           closeMenu(overlay);
         }
+        if (onNavigate) onNavigate();
       });
     }
 
@@ -815,6 +816,7 @@ const pkg = {
           flexDirection: "column",
           padding: "25px",
           overflow: "scroll",
+          scrollBehavior: "smooth",
           gap: "10px",
         })
         .appendTo(wrapper);
@@ -880,7 +882,27 @@ const pkg = {
         tempUiElems.push(row.elm.children);
       }
 
-      openMenu(overlay, tempUiElems);
+      openMenu(overlay, tempUiElems, () => {
+        // Add scroll adjustment when navigating
+        setTimeout(() => {
+          let scrolled = false;
+          for (const div of overlay.qsa(".flex-list")) {
+            let button = div.elm.children[0];
+            let focused = button.classList.contains("over");
+            if (focused) {
+              overlay.elm.scrollTop =
+                div.elm.offsetTop +
+                window.scrollY -
+                overlay.elm.offsetHeight / 2 +
+                50;
+              scrolled = true;
+            }
+          }
+          if (!scrolled) {
+            overlay.elm.scrollTop = 0;
+          }
+        }, 50);
+      });
       e.target.classList.remove("over");
     }
 
@@ -1094,6 +1116,7 @@ const pkg = {
           flexDirection: "column",
           padding: "25px",
           overflow: "scroll",
+          scrollBehavior: "smooth",
           gap: "10px",
         })
         .appendTo(wrapper);
@@ -1137,7 +1160,27 @@ const pkg = {
         tempUiElems.push(row.elm.children);
       });
 
-      openMenu(overlay, tempUiElems);
+      openMenu(overlay, tempUiElems, () => {
+        // Add scroll adjustment when navigating
+        setTimeout(() => {
+          let scrolled = false;
+          for (const div of overlay.qsa(".flex-list")) {
+            let button = div.elm.children[0];
+            let focused = button.classList.contains("over");
+            if (focused) {
+              overlay.elm.scrollTop =
+                div.elm.offsetTop +
+                window.scrollY -
+                overlay.elm.offsetHeight / 2 +
+                50;
+              scrolled = true;
+            }
+          }
+          if (!scrolled) {
+            overlay.elm.scrollTop = 0;
+          }
+        }, 50);
+      });
       e.target.classList.remove("over");
     }
 
@@ -1157,6 +1200,7 @@ const pkg = {
           flexDirection: "column",
           padding: "25px",
           overflow: "scroll",
+          scrollBehavior: "smooth",
           gap: "10px",
         })
         .appendTo(wrapper);
@@ -1193,7 +1237,27 @@ const pkg = {
         tempUiElems.push(row.elm.children);
       });
 
-      openMenu(overlay, tempUiElems);
+      openMenu(overlay, tempUiElems, () => {
+        // Add scroll adjustment when navigating
+        setTimeout(() => {
+          let scrolled = false;
+          for (const div of overlay.qsa(".flex-list")) {
+            let button = div.elm.children[0];
+            let focused = button.classList.contains("over");
+            if (focused) {
+              overlay.elm.scrollTop =
+                div.elm.offsetTop +
+                window.scrollY -
+                overlay.elm.offsetHeight / 2 +
+                50;
+              scrolled = true;
+            }
+          }
+          if (!scrolled) {
+            overlay.elm.scrollTop = 0;
+          }
+        }, 50);
+      });
     }
 
     function handleUiNavigation(e) {
