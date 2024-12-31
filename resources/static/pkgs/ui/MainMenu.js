@@ -647,8 +647,6 @@ const pkg = {
                     true,
                   );
                 }
-              } else {
-                initScreensaver();
               }
             });
           let trimmed =

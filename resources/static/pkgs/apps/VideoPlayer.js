@@ -11,6 +11,10 @@ console.log(CaptionsRenderer);
 
 let wrapper, Ui, Users, Pid, Sfx, volumeUpdate;
 let friends = [];
+let pingInterval = null;
+let lastPingTime = 0;
+const PING_INTERVAL = 5000; // Send ping every 5 seconds
+const PING_TIMEOUT = 15000; // Consider disconnected after 15 seconds of no response
 
 let brightness = localStorage.getItem("videoBrightness")
   ? parseInt(localStorage.getItem("videoBrightness"))
@@ -155,6 +159,10 @@ const pkg = {
         });
         peer.on("connection", (conn) => {
           console.log(conn);
+          // Start ping interval for this connection
+          pingInterval = setInterval(() => {
+            conn.send({ type: "ping", timestamp: Date.now() });
+          }, PING_INTERVAL);
           videoElm.addEventListener("timeupdate", () => {
             conn.send({
               type: "timeupdate",
@@ -215,12 +223,21 @@ const pkg = {
                 captionData: captionData,
               });
             }
+            if (data.type === "pong") {
+              lastPingTime = Date.now();
+              return;
+            }
           });
           conn.on("close", () => {
             Root.Libs.Notify.show(
               "User left",
               `This user has left the watch party.`,
             );
+            // Clear ping interval on connection close
+            if (pingInterval) {
+              clearInterval(pingInterval);
+              pingInterval = null;
+            }
             // peer.destroy();
           });
         });
@@ -583,6 +600,18 @@ const pkg = {
     }
 
     function addPartyEventListeners(conn, partyName) {
+      // Start checking for ping timeouts
+      let pingCheckInterval = setInterval(() => {
+        if (Date.now() - lastPingTime > PING_TIMEOUT) {
+          Root.Libs.Notify.show(
+            "Connection lost",
+            "Lost connection to the host. The watch party will end.",
+          );
+          clearInterval(pingCheckInterval);
+          pkg.end();
+        }
+      }, PING_INTERVAL);
+
       conn.on("data", async (data) => {
         if (data.type == "timeupdate") {
           const videoDuration = Math.round(data.duration);
@@ -617,8 +646,17 @@ const pkg = {
           console.log(data.captions);
           openPartyCaptionsMenu(data.captions, conn, partyName);
         }
+        if (data.type === "ping") {
+          // Respond to ping with pong
+          conn.send({ type: "pong", timestamp: data.timestamp });
+          lastPingTime = Date.now();
+          return;
+        }
       });
       conn.on("close", () => {
+        if (pingCheckInterval) {
+          clearInterval(pingCheckInterval);
+        }
         Root.Libs.Notify.show(
           "Watch party ended",
           `This watch party has ended.`,
@@ -1318,6 +1356,10 @@ const pkg = {
         },
       }),
     );
+    if (pingInterval) {
+      clearInterval(pingInterval);
+      pingInterval = null;
+    }
   },
 };
 
